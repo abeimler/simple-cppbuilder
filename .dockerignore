@@ -1,0 +1,11 @@
+.git/
+.gitignore
+Dockerfile
+Dockerfile.*
+docker-compose.yml
+docker-compose.*.yml
+example/
+test/
+LICENSE
+README.md
+build-images.sh
