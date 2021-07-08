@@ -180,3 +180,4 @@ Run `docker-compose up`.
 - https://github.com/abeimler/simple-cppbuilder
 - https://github.com/lefticus/cpp_starter_project
 - https://github.com/ricejasonf/cppdock
+- Icon made by [Freepik](https://www.freepik.com) from [Flaticon](https://www.flaticon.com/)
