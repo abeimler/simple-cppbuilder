@@ -5,7 +5,7 @@ Simple C++ Builder with gcc/clang, cmake and dependency manager (conan and/or vc
 ## Features
 
 - Pre-installed Compilers and Tools
-- Ready to use build scripts ([docker-build.sh]() and [docker-test.sh]())
+- Ready to use build scripts ([docker-build.sh](https://github.com/abeimler/simple-cppbuilder/blob/main/docker-build.sh) and [docker-test.sh](https://github.com/abeimler/simple-cppbuilder/blob/main/docker-test.sh))
 
 ## What's included
 
@@ -18,41 +18,41 @@ Base Image: [archlinux:base-devel](https://hub.docker.com/_/archlinux) with [yay
 
 ## Environment Variables
 
-`CC`
+### `CC`
 
 C Compiler, default:  `gcc`.
 Can also be `clang`  
 
-`CXX`
+### `CXX`
 
 C++ Compiler, default:  `g++`.
 Can also be `clang++`  
 
-`CMAKE_GENERATOR`
+### `CMAKE_GENERATOR`
 
 CMake Generator `cmake -G`, default: `Ninja`.
 Can also be `Unix Makefiles`  
 
-`BUILD_TYPE`
+### `BUILD_TYPE`
 
 CMake BuildType `-DCMAKE_BUILD_TYPE`, default: `Release`.
 Can also be `Debug`, `RelWithDebInfo` or `MinSizeRel`.  
 
-`TARGET`
+### `TARGET`
 
 target run by cmake `cmake --target`, default: `all`.  
 
-`TOOLCHAIN_FILE`
+### `TOOLCHAIN_FILE`
 
 CMake Toolchain File `-DCMAKE_TOOLCHAIN_FILE`, default `./vcpkg/scripts/buildsystems/vcpkg.cmake`.  
 
-`CMAKE_ARGS`
+### `CMAKE_ARGS`
 
 Custom CMake Arguments, e.g. `-DENABLE_COVERAGE:BOOL=TRUE`.  
 
 ## Example
 
-You can find a full C++ project example [here]().
+You can find a full C++ project example [here](https://github.com/abeimler/simple-cppbuilder/tree/main/example).
 
 ### Simple Dockerfile in your C++-Project
 
@@ -177,5 +177,6 @@ Run `docker-compose up`.
 
 ## Links
 
- - https://github.com/lefticus/cpp_starter_project
- - https://github.com/ricejasonf/cppdock
+- https://github.com/abeimler/simple-cppbuilder
+- https://github.com/lefticus/cpp_starter_project
+- https://github.com/ricejasonf/cppdock
