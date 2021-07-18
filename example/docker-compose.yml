@@ -129,3 +129,12 @@ services:
       BUILD_TYPE: Release
       CMAKE_GENERATOR: Ninja
       CMAKE_ARGS: -DUSE_RAYLIB:BOOL=TRUE
+  rpi4-release-build:
+    build:
+      context: .
+      dockerfile: Dockerfile.rpi
+      target: build
+    environment:
+      TARGET: all
+      BUILD_TYPE: Release
+      CMAKE_GENERATOR: Ninja

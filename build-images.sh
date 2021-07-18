@@ -25,3 +25,8 @@ docker build --force-rm=true -f ./Dockerfile.clang -t abeimler/simple-cppbuilder
 docker build --force-rm=true --build-arg extra_libraries="mesa glu glfw libx11 libxrender libxext libxcursor libxrandr libxinerama xorg-server-devel" -t abeimler/simple-cppbuilder:opengl-libs .
 docker build --force-rm=true -f ./Dockerfile.clang --build-arg extra_libraries="libc++" -t abeimler/simple-cppbuilder:libcpp .
 docker build --force-rm=true --build-arg extra_libraries="boost" -t abeimler/simple-cppbuilder:boost .
+
+
+docker build --force-rm=true -f ./Dockerfile.rpi --build-arg cross_compiler="armv8-rpi2-linux-gnueabihf" -t abeimler/simple-cppbuilder:rpi2 .
+docker build --force-rm=true -f ./Dockerfile.rpi --build-arg cross_compiler="armv8-rpi3-linux-gnueabihf" -t abeimler/simple-cppbuilder:rpi3 .
+docker build --force-rm=true -f ./Dockerfile.rpi --build-arg cross_compiler="armv8-rpi4-linux-gnueabihf" -t abeimler/simple-cppbuilder:rpi4 .

@@ -33,7 +33,7 @@ RUN python3 -m pip install --upgrade pip setuptools && \
     conan --version
 # Install more pip tools
 RUN python3 -m pip install --upgrade pip setuptools && \
-    python3 -m pip install cogapp
+    python3 -m pip install cogapp coverage
 
 # thx to https://github.com/lefticus/cpp_starter_project/pull/121
 
