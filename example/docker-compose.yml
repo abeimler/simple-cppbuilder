@@ -129,6 +129,16 @@ services:
       BUILD_TYPE: Release
       CMAKE_GENERATOR: Ninja
       CMAKE_ARGS: -DUSE_RAYLIB:BOOL=TRUE
+  mingw-release-build:
+    build:
+      context: .
+      dockerfile: Dockerfile.mingw
+      target: build
+    environment:
+      TARGET: all
+      BUILD_TYPE: Release
+      CMAKE_GENERATOR: Ninja
+      CMAKE_ARGS: -DBUILD_TESTING:BOOL=FALSE -DENABLE_TESTING:BOOL=FALSE
   rpi4-release-build:
     build:
       context: .
@@ -138,3 +148,4 @@ services:
       TARGET: all
       BUILD_TYPE: Release
       CMAKE_GENERATOR: Ninja
+      CMAKE_ARGS: -DBUILD_TESTING:BOOL=FALSE -DENABLE_TESTING:BOOL=FALSE

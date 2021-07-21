@@ -4,7 +4,6 @@
   "dependencies": [
     "magic-enum",
     "catch2",
-    "ms-gsl",
-    "spdlog"
+    "ms-gsl"
   ]
 }
