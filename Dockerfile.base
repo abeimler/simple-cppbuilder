@@ -54,4 +54,3 @@ ENV CXX "g++"
 
 # setup project env
 WORKDIR /home/project
-ENTRYPOINT ["/usr/bin/bash"]
