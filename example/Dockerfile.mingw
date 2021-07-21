@@ -1,0 +1,8 @@
+## base image
+FROM abeimler/simple-cppbuilder:x64-mingw-w64 as base
+
+## build stage
+FROM base as build
+COPY . .
+## do more prepare for build stuff here
+CMD ["./docker-build.sh"]

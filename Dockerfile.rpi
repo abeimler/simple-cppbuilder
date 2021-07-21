@@ -1,0 +1,62 @@
+## base image
+FROM abeimler/simple-cppbuilder:base as base
+
+ARG extra_libraries
+ARG cross_compiler "armv8-rpi4-linux-gnueabihf"
+ARG triplet "arm-rpi"
+ARG triplet_host "x64-linux"
+
+# Install packages available from standard repos
+RUN pacman-db-upgrade && \
+    pacman -Syyu --noconfirm && pacman-db-upgrade && \
+    pacman -S --noconfirm --needed \
+        wget curl pkg-config zip unzip tar go git help2man python unzip wget audit rsync && \
+    pacman -S --noconfirm  \
+        ${extra_libraries} \
+        python3 python-pip doxygen graphviz cmake make ninja ccache cppcheck valgrind gcovr \
+        neovim emacs nano
+
+# install crosstool-ng
+RUN useradd -m -G nobody -s /bin/bash crosstool-ng && passwd -d crosstool-ng && echo "crosstool-ng ALL=(ALL)  ALL" >> /etc/sudoers
+RUN runuser -l crosstool-ng -c \
+    "git clone https://github.com/crosstool-ng/crosstool-ng /home/crosstool-ng/crosstool-ng && \
+        cd /home/crosstool-ng/crosstool-ng && ./bootstrap && \
+        ./configure --enable-local && \
+        make"
+RUN runuser -l crosstool-ng -c \
+    "cd /home/crosstool-ng/crosstool-ng && ./ct-ng show-${cross_compiler} && \
+        ./ct-ng ${cross_compiler} && \
+        ./ct-ng build"
+RUN export PATH="${PATH}:/home/crosstool-ng/x-tools/${cross_compiler}/bin"
+
+# set default compiler
+ENV CC "gcc"
+ENV CXX "g++"
+ENV CROSS_COMPILE "/home/crosstool-ng/x-tools/${cross_compiler}/bin/${cross_compiler}-"
+
+# setup project env
+WORKDIR /home/project
+ENV TARGET "all"
+ENV BUILD_TYPE "Release"
+ENV CMAKE_GENERATOR "Ninja"
+ENV TOOLCHAIN_FILE "./vcpkg/scripts/buildsystems/vcpkg.cmake"
+ENV VCPKG_OVERLAY_TRIPLETS "/home/project/custom-triplets" 
+ENV CMAKE_ARGS ""
+COPY ./cmake ./cmake
+COPY ./custom-triplets ./custom-triplets
+COPY ./docker-build.rpi.sh ./docker-build.sh
+
+ENV VCPKG_DEFAULT_HOST_TRIPLET $triplet_host
+ENV VCPKG_DEFAULT_TRIPLET $triplet
+ENV VCPKG_DISABLE_METRICS 1
+
+RUN git clone https://github.com/Microsoft/vcpkg.git
+RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
+
+ENV TARGET_CC "${cross_compiler}-gcc"
+ENV TARGET_CXX "${cross_compiler}-g++"
+ENV CC "/home/crosstool-ng/x-tools/${cross_compiler}/bin/${cross_compiler}-gcc"
+ENV CXX "/home/crosstool-ng/x-tools/${cross_compiler}/bin/${cross_compiler}-g++"
+
+ENTRYPOINT ["/usr/bin/bash"]
+CMD ["./docker-build.sh"]

@@ -1,0 +1,8 @@
+## base image
+FROM abeimler/simple-cppbuilder:rpi4 as base
+
+## build stage
+FROM base as build
+# install more libs ?
+COPY . .
+CMD ["./docker-build.rpi.sh"]
