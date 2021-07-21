@@ -1,5 +1,7 @@
 # Simple C++ Docker Builder
 
+![docker-image-size](https://img.shields.io/docker/image-size/abeimler/simple-cppbuilder) ![automated](https://img.shields.io/docker/automated/abeimler/simple-cppbuilder) ![pulls](https://img.shields.io/docker/pulls/abeimler/simple-cppbuilder) ![license](https://img.shields.io/github/license/abeimler/simple-cppbuilder) ![stars](https://img.shields.io/docker/stars/abeimler/simple-cppbuilder)
+
 Simple C++ Builder with gcc/clang, cmake and dependency manager (conan and/or vcpkg).
 
 ## Features
