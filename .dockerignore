@@ -5,6 +5,7 @@ Dockerfile.*
 docker-compose.yml
 docker-compose.*.yml
 example/
+cpp_starter_project/
 test/
 LICENSE
 README.md
