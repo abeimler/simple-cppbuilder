@@ -2,7 +2,7 @@
 version: "3.9"
 services:
   # gcc Debug
-  gcc-debug-build:
+  cpp_starter_project-gcc-debug-build:
     build:
       context: .
       dockerfile: Dockerfile
@@ -13,7 +13,7 @@ services:
       TARGET: all
       BUILD_TYPE: Debug
       CMAKE_GENERATOR: Ninja
-  gcc-debug-test:
+  cpp_starter_project-gcc-debug-test:
     build:
       context: .
       dockerfile: Dockerfile
@@ -25,7 +25,7 @@ services:
       BUILD_TYPE: Debug
       CMAKE_GENERATOR: Ninja
   # gcc Release
-  gcc-release-build:
+  cpp_starter_project-gcc-release-build:
     build:
       context: .
       dockerfile: Dockerfile
@@ -36,7 +36,7 @@ services:
       TARGET: all
       BUILD_TYPE: Release
       CMAKE_GENERATOR: Ninja
-  gcc-release-test:
+  cpp_starter_project-gcc-release-test:
     build:
       context: .
       dockerfile: Dockerfile
@@ -48,7 +48,7 @@ services:
       BUILD_TYPE: RelWithDebInfo
       CMAKE_GENERATOR: Ninja
   # clang Debug
-  clang-debug-build:
+  cpp_starter_project-clang-debug-build:
     build:
       context: .
       dockerfile: Dockerfile
@@ -59,7 +59,7 @@ services:
       TARGET: all
       BUILD_TYPE: Debug
       CMAKE_GENERATOR: Ninja
-  clang-debug-test:
+  cpp_starter_project-clang-debug-test:
     build:
       context: .
       dockerfile: Dockerfile
@@ -71,7 +71,7 @@ services:
       BUILD_TYPE: Debug
       CMAKE_GENERATOR: Ninja
   # clang Release
-  clang-release-build:
+  cpp_starter_project-clang-release-build:
     build:
       context: .
       dockerfile: Dockerfile
@@ -82,7 +82,7 @@ services:
       TARGET: all
       BUILD_TYPE: Release
       CMAKE_GENERATOR: Ninja
-  clang-release-test:
+  cpp_starter_project-clang-release-test:
     build:
       context: .
       dockerfile: Dockerfile
@@ -93,7 +93,7 @@ services:
       TARGET: all
       BUILD_TYPE: RelWithDebInfo
       CMAKE_GENERATOR: Ninja
-  gcc-debug-test-cov:
+  cpp_starter_project-gcc-debug-test-cov:
     build:
       context: .
       dockerfile: Dockerfile
@@ -101,7 +101,74 @@ services:
     environment:
       CC: gcc
       CXX: g++
-      TARGET: tests
+      TARGET: all
       BUILD_TYPE: Debug
       CMAKE_GENERATOR: Ninja
       CMAKE_ARGS: -DENABLE_COVERAGE:BOOL=TRUE
+  # clang Release with different libs
+  cpp_starter_project-fltk-clang-release-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: fltk
+    environment:
+      CC: clang
+      CXX: clang++
+      TARGET: all
+      BUILD_TYPE: Release
+      CMAKE_GENERATOR: Ninja
+  cpp_starter_project-gtkmm-clang-release-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: gtkmm
+    environment:
+      CC: clang
+      CXX: clang++
+      TARGET: all
+      BUILD_TYPE: Release
+      CMAKE_GENERATOR: Ninja
+  cpp_starter_project-imgui-clang-release-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: imgui
+    environment:
+      CC: clang
+      CXX: clang++
+      TARGET: all
+      BUILD_TYPE: Release
+      CMAKE_GENERATOR: Ninja
+  cpp_starter_project-qt-clang-release-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: qt5
+    environment:
+      CC: clang
+      CXX: clang++
+      TARGET: all
+      BUILD_TYPE: Release
+      CMAKE_GENERATOR: Ninja
+  cpp_starter_project-sdl-clang-release-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: sdl
+    environment:
+      CC: clang
+      CXX: clang++
+      TARGET: all
+      BUILD_TYPE: Release
+      CMAKE_GENERATOR: Ninja
+  cpp_starter_project-nana-clang-release-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: nana
+    environment:
+      CC: clang
+      CXX: clang++
+      TARGET: all
+      BUILD_TYPE: Release
+      CMAKE_GENERATOR: Ninja

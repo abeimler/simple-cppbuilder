@@ -1,8 +1,10 @@
 # Simple C++ Docker Builder
 
+![logo](https://raw.githubusercontent.com/abeimler/simple-cppbuilder/main/img/logo.png)  
+
 ![docker-image-size](https://img.shields.io/docker/image-size/abeimler/simple-cppbuilder) ![automated](https://img.shields.io/docker/automated/abeimler/simple-cppbuilder) ![pulls](https://img.shields.io/docker/pulls/abeimler/simple-cppbuilder) ![license](https://img.shields.io/github/license/abeimler/simple-cppbuilder) ![stars](https://img.shields.io/docker/stars/abeimler/simple-cppbuilder)
 
-Simple C++ Builder with gcc/clang, cmake and dependency manager (conan and/or vcpkg).
+Simple C++ Builder with compilers, buildtools and dependency manager.
 
 ## Features
 
@@ -11,54 +13,21 @@ Simple C++ Builder with gcc/clang, cmake and dependency manager (conan and/or vc
 
 ## What's included
 
-Base Image: [archlinux:base-devel](https://hub.docker.com/_/archlinux) with [yay](https://github.com/Jguer/yay).
+Based on [archlinux:base-devel](https://hub.docker.com/_/archlinux) with [yay](https://github.com/Jguer/yay).
 
-- **Compilers:** clang, gcc or mingw-w64 (soon)
+- **Compilers:** clang, gcc or cross-compiler
 - **Buildtools:** cmake, make and ninja
 - **Dependency Manager:** conan and/or vcpkg
 - **More Tools:** python, pip, ccache, cppcheck, doxygen and more
 
-## Environment Variables
-
-### `CC`
-
-C Compiler, default:  `gcc`.
-Can also be `clang`  
-
-### `CXX`
-
-C++ Compiler, default:  `g++`.
-Can also be `clang++`  
-
-### `CMAKE_GENERATOR`
-
-CMake Generator `cmake -G`, default: `Ninja`.
-Can also be `Unix Makefiles`  
-
-### `BUILD_TYPE`
-
-CMake BuildType `-DCMAKE_BUILD_TYPE`, default: `Release`.
-Can also be `Debug`, `RelWithDebInfo` or `MinSizeRel`.  
-
-### `TARGET`
-
-target run by cmake `cmake --target`, default: `all`.  
-
-### `TOOLCHAIN_FILE`
-
-CMake Toolchain File `-DCMAKE_TOOLCHAIN_FILE`, default `./vcpkg/scripts/buildsystems/vcpkg.cmake`.  
-
-### `CMAKE_ARGS`
-
-Custom CMake Arguments, e.g. `-DENABLE_COVERAGE:BOOL=TRUE`.  
-
-## Example
+## How to use this image
 
 You can find a full C++ project example [here](https://github.com/abeimler/simple-cppbuilder/tree/main/example).
 
-### Simple Dockerfile in your C++-Project
+### Create a `Dockerfile` in your C++ project
 
 ```Dockerfile
+## build stage
 FROM abeimler/simple-cppbuilder as build
 COPY . .
 CMD ["./docker-build.sh"]
@@ -68,7 +37,72 @@ FROM build as test
 CMD ["./docker-test.sh"]
 ```
 
-### Dockerfile with more dependencies
+You can then build and run the Docker image:
+
+```bash
+$ docker build -t my-cpp-project .
+$ docker run -it --rm --name my-app-app my-cpp-project
+```
+
+## Image Variants
+
+### `:base`
+
+Base image with gcc, buildtools and [conan](https://conan.io/) (dependency manager).
+
+### `:latest`
+
+Default image with gcc, buildtools, [conan](https://conan.io/) and [vcpkg](https://vcpkg.io/) pre-installed (and bootstrapped).
+
+### Compilers
+
+#### `:gcc-10`, `:gcc-9`, `:gcc-8`, `:gcc-7`, `:gcc-6`, `:gcc-5`, `:gcc-4.9`
+
+Default image with gcc compiler.
+
+#### `:clang`
+
+Default image with clang compiler.
+
+### Libraries
+
+#### `:libcpp`
+
+Default image with clang compiler and [libc++](https://libcxx.llvm.org/) installed.
+
+#### `:boost`
+
+Default image with [boost](https://www.boost.org/) installed.
+
+#### `:opengl-libs`
+
+Default image with some OpenGL dependencies: `mesa glu glfw libx11 libxrender libxext libxcursor libxrandr libxinerama xorg-server-devel`.
+
+
+### Cross-Compiler (experimental)
+
+_Not fully tested_
+
+#### `:x64-mingw-w64`, `x86-mingw-w64`, `arm64-mingw-w64`, `arm-mingw-w64` (experemental)
+
+Default image with mingw-w64-cross-compiler: [mingw-w64-gcc](https://archlinux.org/packages/community/x86_64/mingw-w64-gcc/) and toolchain.
+
+#### `:emscripten`
+
+Default image with [emscripten](https://emscripten.org/).
+
+#### `:rpi2`, `:rpi3`, `:rpi4`
+
+Default image with arm-rpi-cross-compiler: ([crosstool-ng](https://crosstool-ng.github.io/)) for RaspberryPi and toolchain.
+
+#### `:arm-android`, `:arm64-android`, `:x86-android`, `:x64-android`
+
+Default image with [android-ndk](https://aur.archlinux.org/packages/android-ndk/) and toolchain.
+
+
+## More Examples
+
+### Dockerfile with system dependencies
 
 ```Dockerfile
 FROM abeimler/simple-cppbuilder as build
@@ -103,8 +137,8 @@ CMD ["./my-android-build.sh"]
 ```yml
 version: "3.9"
 services:
-  # gcc Debug with Ninja
-  gcc-debug-build:
+  # gcc Release with Ninja
+  gcc-release-build:
     build:
       context: .
       dockerfile: Dockerfile
@@ -113,7 +147,7 @@ services:
       CC: gcc
       CXX: g++
       TARGET: all
-      BUILD_TYPE: Debug
+      BUILD_TYPE: Release
       CMAKE_GENERATOR: Ninja
 ```
 
@@ -177,9 +211,54 @@ services:
 
 Run `docker-compose up`.
 
-## Links
 
-- https://github.com/abeimler/simple-cppbuilder
-- https://github.com/lefticus/cpp_starter_project
-- https://github.com/ricejasonf/cppdock
-- Icon made by [Freepik](https://www.freepik.com) from [Flaticon](https://www.flaticon.com/)
+## Environment Variables
+
+### `CC`
+
+C Compiler, default:  `gcc`.
+Can also be `clang`.  
+
+### `CXX`
+
+C++ Compiler, default:  `g++`.
+Can also be `clang++`.  
+
+### `CMAKE_GENERATOR`
+
+CMake Generator `cmake -G`, default: `Ninja`.
+Can also be `Unix Makefiles`.  
+
+### `BUILD_TYPE`
+
+CMake BuildType `-DCMAKE_BUILD_TYPE`, default: `Release`.
+Can also be `Debug`, `RelWithDebInfo` or `MinSizeRel`.  
+
+### `TARGET`
+
+target run by cmake `cmake --target`, default: `all`.  
+
+### `TOOLCHAIN_FILE`
+
+CMake Toolchain File `-DCMAKE_TOOLCHAIN_FILE`, default `./vcpkg/scripts/buildsystems/vcpkg.cmake`.  
+
+### `CMAKE_ARGS`
+
+Custom CMake Arguments, e.g. `-DENABLE_COVERAGE:BOOL=TRUE`.  
+
+
+## License
+
+View [license information](https://github.com/abeimler/simple-cppbuilder/blob/main/LICENSE) for the software contained in this image.  
+
+As with all Docker images, these likely also contain other software which may be under other licenses (such as Bash, etc from the base distribution, along with any direct or indirect dependencies of the primary software being contained).  
+
+As for any pre-built image usage, it is the image user's responsibility to ensure that any use of this image complies with any relevant licenses for all software contained within.
+
+
+### Links
+
+- [simple-cppbuilder GitHub](https://github.com/abeimler/simple-cppbuilder)
+- [cpp_starter_project](https://github.com/lefticus/cpp_starter_project)
+- [cppdock](https://github.com/ricejasonf/cppdock)
+- Icon made by me with C++-Icon made by [Freepik](https://www.freepik.com) from [Flaticon](https://www.flaticon.com/)

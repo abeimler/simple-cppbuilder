@@ -2,39 +2,65 @@
 FROM abeimler/simple-cppbuilder:base as base
 
 ARG extra_libraries
-ARG cc arm-linux-gnueabihf-gcc
-ARG cxx arm-linux-gnueabihf-g++
-ARG target arm-linux-gnueabihf
+ARG cc="arm-linux-gnueabihf-gcc"
+ARG cxx="arm-linux-gnueabihf-g++"
+ARG compiler_target="arm-linux-gnueabihf"
+ARG vcpkg_target_triplet="arm-linux"
+ARG vcpkg_host_triplet="x64-linux"
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
     pacman -Syyu --noconfirm && pacman-db-upgrade && \
     pacman -S --noconfirm --needed \
-        arm-linux-gnueabihf-gcc wget curl pkg-config zip unzip tar git go && \
+        gcc wget curl pkg-config zip unzip tar git go && \
     pacman -S --noconfirm  \
         ${extra_libraries} \
+        arm-none-eabi-gcc aarch64-linux-gnu-gcc \
         python3 python-pip doxygen graphviz cmake make ninja ccache cppcheck valgrind gcovr \
         neovim emacs nano
 
+# @FIXME: https://aur.archlinux.org/packages/arm-linux-gnueabihf-gcc-stage1/#comment-811696
+# install gnueabihf
+RUN export CFLAGS="Wno-format -Wno-format-security" && export CXXFLAGS="-Wno-format -Wno-format-security" && \
+    runuser -l yay -c \
+    "yay -Syu --noconfirm && yay -S --noconfirm \
+        arm-linux-gnueabihf-glibc-headers && \
+     yay -Syu --noconfirm && yay -S --noconfirm \
+        arm-linux-gnueabihf-gcc-stage1 && \
+     yay -Syu --noconfirm && yay -S --noconfirm \
+        arm-linux-gnueabihf-gcc-stage2 && \
+     yay -Syu --noconfirm && yay -S --noconfirm \
+        arm-linux-gnueabihf-gcc" && \
+    rm -rf /home/yay/.cache/* && \
+    export CFLAGS="" && export CXXFLAGS=""
+
 # setup project env
 WORKDIR /home/project
+COPY ./cmake ./cmake
+COPY ./docker-build.gnueabihf.sh ./docker-build.sh
+
+# install vcpkg
+## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
+ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
+ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
+ENV VCPKG_DISABLE_METRICS 1
+RUN git clone https://github.com/Microsoft/vcpkg.git
+RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
+ENV VCPKG_ROOT "/home/project/vcpkg"
+
+# cross compiler settings
+ENV CC $cc
+ENV CXX $cxx
+ENV COMPILER_TARGET $compiler_target
+ENV TARGET_TRIPLET $vcpkg_target_triplet
+
+# build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
 ENV CMAKE_GENERATOR "Ninja"
+ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV CMAKE_ARGS ""
-COPY ./docker-build.gnueabihf.sh ./docker-build.sh
 
-## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
-ENV VCPKG_DEFAULT_HOST_TRIPLET $host_triplet
-ENV VCPKG_DEFAULT_TRIPLET $triplet
-ENV VCPKG_DISABLE_METRICS 1
-
-RUN git clone https://github.com/Microsoft/vcpkg.git
-RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
-
-ENV CC $cc
-ENV CXX $cxx
-ENV TARGET $target
-
+RUN mkdir build
 ENTRYPOINT ["/usr/bin/bash"]
 CMD ["./docker-build.sh"]

@@ -2,9 +2,9 @@
 FROM abeimler/simple-cppbuilder:base as base
 
 ARG extra_libraries
-ARG cross_compiler "armv8-rpi4-linux-gnueabihf"
-ARG triplet "arm-rpi"
-ARG triplet_host "x64-linux"
+ARG compiler_target="armv8-rpi4-linux-gnueabihf"
+ARG vcpkg_target_triplet="arm-rpi"
+ARG triplet_host="x64-linux"
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
@@ -24,39 +24,46 @@ RUN runuser -l crosstool-ng -c \
         ./configure --enable-local && \
         make"
 RUN runuser -l crosstool-ng -c \
-    "cd /home/crosstool-ng/crosstool-ng && ./ct-ng show-${cross_compiler} && \
-        ./ct-ng ${cross_compiler} && \
+    "cd /home/crosstool-ng/crosstool-ng && ./ct-ng show-${compiler_target} && \
+        ./ct-ng ${compiler_target} && \
         ./ct-ng build"
-RUN export PATH="${PATH}:/home/crosstool-ng/x-tools/${cross_compiler}/bin"
+ENV PATH="/home/crosstool-ng/x-tools/${compiler_target}/bin:${PATH}"
 
 # set default compiler
 ENV CC "gcc"
 ENV CXX "g++"
-ENV CROSS_COMPILE "/home/crosstool-ng/x-tools/${cross_compiler}/bin/${cross_compiler}-"
 
 # setup project env
 WORKDIR /home/project
-ENV TARGET "all"
-ENV BUILD_TYPE "Release"
-ENV CMAKE_GENERATOR "Ninja"
-ENV TOOLCHAIN_FILE "./vcpkg/scripts/buildsystems/vcpkg.cmake"
-ENV VCPKG_OVERLAY_TRIPLETS "/home/project/custom-triplets" 
-ENV CMAKE_ARGS ""
 COPY ./cmake ./cmake
 COPY ./custom-triplets ./custom-triplets
 COPY ./docker-build.rpi.sh ./docker-build.sh
 
+# install vcpkg
 ENV VCPKG_DEFAULT_HOST_TRIPLET $triplet_host
-ENV VCPKG_DEFAULT_TRIPLET $triplet
+ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
 ENV VCPKG_DISABLE_METRICS 1
-
+ENV VCPKG_OVERLAY_TRIPLETS "/home/project/custom-triplets" 
 RUN git clone https://github.com/Microsoft/vcpkg.git
 RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
+ENV VCPKG_ROOT "/home/project/vcpkg"
 
-ENV TARGET_CC "${cross_compiler}-gcc"
-ENV TARGET_CXX "${cross_compiler}-g++"
-ENV CC "/home/crosstool-ng/x-tools/${cross_compiler}/bin/${cross_compiler}-gcc"
-ENV CXX "/home/crosstool-ng/x-tools/${cross_compiler}/bin/${cross_compiler}-g++"
+# cross compiler settings
+ENV COMPILER_TARGET $compiler_target
+ENV TARGET_CC "${compiler_target}-gcc"
+ENV TARGET_CXX "${compiler_target}-g++"
+ENV CROSS_COMPILER_CC "/home/crosstool-ng/x-tools/${compiler_target}/bin/${compiler_target}-gcc"
+ENV CROSS_COMPILER_CXX "/home/crosstool-ng/x-tools/${compiler_target}/bin/${compiler_target}-g++"
+ENV CC "/home/crosstool-ng/x-tools/${compiler_target}/bin/${compiler_target}-gcc"
+ENV CXX "/home/crosstool-ng/x-tools/${compiler_target}/bin/${compiler_target}-g++"
 
+# build script settings
+ENV TARGET "all"
+ENV BUILD_TYPE "Release"
+ENV CMAKE_GENERATOR "Ninja"
+ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
+ENV CMAKE_ARGS ""
+
+RUN mkdir build
 ENTRYPOINT ["/usr/bin/bash"]
 CMD ["./docker-build.sh"]

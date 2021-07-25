@@ -2,16 +2,15 @@
 FROM abeimler/simple-cppbuilder:base as base
 
 # default compiler versions
-ARG gcc_version=10
 ARG extra_libraries
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
     pacman -Syyu --noconfirm && pacman-db-upgrade && \
     pacman -S --noconfirm --needed \
-        wget curl pkg-config zip unzip tar git go && \
+        gcc wget curl pkg-config zip unzip tar git go && \
     pacman -S --noconfirm  \
-        gcc${gcc_version} clang binutils bison \
+        clang binutils bison \
         ${extra_libraries} \
         python3 python-pip doxygen graphviz cmake make ninja ccache cppcheck valgrind gcovr \
         neovim emacs nano
@@ -22,12 +21,15 @@ ENV CXX "g++"
 
 # setup project env
 WORKDIR /home/project
+COPY ./docker-build-without-toolchain.sh ./docker-build.sh
+COPY ./docker-test.sh ./docker-test.sh
+
+# build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
 ENV CMAKE_GENERATOR "Ninja"
 ENV CMAKE_ARGS ""
-COPY ./docker-build.sh ./docker-build.sh
-COPY ./docker-test.sh ./docker-test.sh
 
+RUN mkdir build
 ENTRYPOINT ["/usr/bin/bash"]
 CMD ["./docker-build.sh"]

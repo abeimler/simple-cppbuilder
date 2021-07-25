@@ -1,5 +1,5 @@
 ## base image
-FROM abeimler/simple-cppbuilder:rpi4 as base
+FROM abeimler/simple-cppbuilder:gnueabihf as base
 
 ## build stage
 FROM base as build

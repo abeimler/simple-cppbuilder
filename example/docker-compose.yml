@@ -2,7 +2,7 @@
 version: "3.9"
 services:
   # gcc Debug with make
-  gcc-debug-build-make:
+  example-gcc-debug-build-make:
     build:
       context: .
       dockerfile: Dockerfile
@@ -14,7 +14,7 @@ services:
       BUILD_TYPE: Debug
       CMAKE_GENERATOR: Unix Makefiles
   # gcc Debug
-  gcc-debug-build:
+  example-gcc-debug-build:
     build:
       context: .
       dockerfile: Dockerfile
@@ -25,7 +25,7 @@ services:
       TARGET: all
       BUILD_TYPE: Debug
       CMAKE_GENERATOR: Ninja
-  gcc-debug-test:
+  example-gcc-debug-test:
     build:
       context: .
       dockerfile: Dockerfile
@@ -37,7 +37,7 @@ services:
       BUILD_TYPE: Debug
       CMAKE_GENERATOR: Ninja
   # gcc Release
-  gcc-release-build:
+  example-gcc-release-build:
     build:
       context: .
       dockerfile: Dockerfile
@@ -48,7 +48,7 @@ services:
       TARGET: all
       BUILD_TYPE: Release
       CMAKE_GENERATOR: Ninja
-  gcc-release-test:
+  example-gcc-release-test:
     build:
       context: .
       dockerfile: Dockerfile
@@ -60,7 +60,7 @@ services:
       BUILD_TYPE: RelWithDebInfo
       CMAKE_GENERATOR: Ninja
   # clang Debug
-  clang-debug-build:
+  example-clang-debug-build:
     build:
       context: .
       dockerfile: Dockerfile
@@ -71,7 +71,7 @@ services:
       TARGET: all
       BUILD_TYPE: Debug
       CMAKE_GENERATOR: Ninja
-  clang-debug-test:
+  example-clang-debug-test:
     build:
       context: .
       dockerfile: Dockerfile
@@ -83,7 +83,7 @@ services:
       BUILD_TYPE: Debug
       CMAKE_GENERATOR: Ninja
   # clang Release
-  clang-release-build:
+  example-clang-release-build:
     build:
       context: .
       dockerfile: Dockerfile
@@ -94,7 +94,7 @@ services:
       TARGET: all
       BUILD_TYPE: Release
       CMAKE_GENERATOR: Ninja
-  clang-release-test:
+  example-clang-release-test:
     build:
       context: .
       dockerfile: Dockerfile
@@ -105,7 +105,7 @@ services:
       TARGET: all
       BUILD_TYPE: RelWithDebInfo
       CMAKE_GENERATOR: Ninja
-  gcc-debug-test-cov:
+  example-gcc-debug-test-cov:
     build:
       context: .
       dockerfile: Dockerfile
@@ -117,7 +117,7 @@ services:
       BUILD_TYPE: Debug
       CMAKE_GENERATOR: Ninja
       CMAKE_ARGS: -DENABLE_COVERAGE:BOOL=TRUE
-  gcc-release-with-raylib:
+  example-gcc-release-with-raylib:
     build:
       context: .
       dockerfile: Dockerfile.raylib
@@ -129,7 +129,7 @@ services:
       BUILD_TYPE: Release
       CMAKE_GENERATOR: Ninja
       CMAKE_ARGS: -DUSE_RAYLIB:BOOL=TRUE
-  mingw-release-build:
+  example-mingw-release-build:
     build:
       context: .
       dockerfile: Dockerfile.mingw
@@ -139,10 +139,20 @@ services:
       BUILD_TYPE: Release
       CMAKE_GENERATOR: Ninja
       CMAKE_ARGS: -DBUILD_TESTING:BOOL=FALSE -DENABLE_TESTING:BOOL=FALSE
-  rpi4-release-build:
+  example-rpi4-release-build:
     build:
       context: .
       dockerfile: Dockerfile.rpi
+      target: build
+    environment:
+      TARGET: all
+      BUILD_TYPE: Release
+      CMAKE_GENERATOR: Ninja
+      CMAKE_ARGS: -DBUILD_TESTING:BOOL=FALSE -DENABLE_TESTING:BOOL=FALSE
+  example-emscripten-release-build:
+    build:
+      context: .
+      dockerfile: Dockerfile.emscripten
       target: build
     environment:
       TARGET: all

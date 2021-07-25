@@ -2,22 +2,28 @@
 FROM abeimler/simple-cppbuilder:base as base
 
 # default compiler versions
+ARG gcc_version=10
 ARG extra_libraries
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
     pacman -Syyu --noconfirm && pacman-db-upgrade && \
     pacman -S --noconfirm --needed \
-        wget curl pkg-config zip unzip tar git go && \
+        gcc${gcc_version} wget curl pkg-config zip unzip tar git go && \
     pacman -S --noconfirm  \
-        gcc binutils bison \
+        binutils bison \
         ${extra_libraries} \
         python3 python-pip doxygen graphviz cmake make ninja ccache cppcheck valgrind gcovr \
         neovim emacs nano
 
+RUN runuser -l yay -c \
+    "yay -Syu --noconfirm && yay -S --noconfirm \
+        gcc${gcc_version}" && \
+    rm -rf /home/yay/.cache/*
+
 # set default compiler
-ENV CC "gcc"
-ENV CXX "g++"
+ENV CC "gcc${gcc_version}"
+ENV CXX "g++${gcc_version}"
 
 # setup project env
 WORKDIR /home/project

@@ -1,17 +1,15 @@
 ## base image
 FROM archlinux:base-devel as base
 
-# default compiler versions
-ARG gcc_version=10
 ARG extra_libraries
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
     pacman -Syyu --noconfirm && pacman-db-upgrade && \
     pacman -S --noconfirm --needed \
-        wget curl pkg-config zip unzip tar git go && \
+        gcc wget curl pkg-config zip unzip tar git go && \
     pacman -S --noconfirm  \
-        gcc${gcc_version} clang binutils bison \
+        clang binutils bison \
         ${extra_libraries} \
         python3 python-pip doxygen graphviz cmake make ninja ccache cppcheck valgrind gcovr \
         neovim emacs nano
