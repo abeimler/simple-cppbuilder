@@ -5,8 +5,10 @@ Dockerfile
 Dockerfile.*
 docker-compose.yml
 docker-compose.*.yml
+examples/
 example/
 android-example/
+cpp_starter_project/
 test/
 img/
 LICENSE

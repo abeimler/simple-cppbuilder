@@ -105,6 +105,7 @@ services:
       TARGET: all
       BUILD_TYPE: RelWithDebInfo
       CMAKE_GENERATOR: Ninja
+  # example with test coverage
   example-gcc-debug-test-cov:
     build:
       context: .
@@ -116,7 +117,8 @@ services:
       TARGET: example-coverage-test
       BUILD_TYPE: Debug
       CMAKE_GENERATOR: Ninja
-      CMAKE_ARGS: -DENABLE_COVERAGE:BOOL=TRUE
+      CMAKE_ARGS: -DENABLE_COVERAGE=ON
+  # example with dependency raylib (vcpkg)
   example-gcc-release-with-raylib:
     build:
       context: .
@@ -128,7 +130,8 @@ services:
       TARGET: all
       BUILD_TYPE: Release
       CMAKE_GENERATOR: Ninja
-      CMAKE_ARGS: -DUSE_RAYLIB:BOOL=TRUE
+      CMAKE_ARGS: -DUSE_RAYLIB=ON
+  # example mingw build (crosscompile)
   example-mingw-release-build:
     build:
       context: .
@@ -138,7 +141,8 @@ services:
       TARGET: all
       BUILD_TYPE: Release
       CMAKE_GENERATOR: Ninja
-      CMAKE_ARGS: -DBUILD_TESTING:BOOL=FALSE -DENABLE_TESTING:BOOL=FALSE
+      CMAKE_ARGS: -DENABLE_TESTING=OFF
+  # example Raspberry PI 4 build (crosscompile)
   example-rpi4-release-build:
     build:
       context: .
@@ -148,7 +152,8 @@ services:
       TARGET: all
       BUILD_TYPE: Release
       CMAKE_GENERATOR: Ninja
-      CMAKE_ARGS: -DBUILD_TESTING:BOOL=FALSE -DENABLE_TESTING:BOOL=FALSE
+      CMAKE_ARGS: -DENABLE_TESTING=OFF
+  # example WebAssambly build (crosscompile)
   example-emscripten-release-build:
     build:
       context: .
@@ -158,4 +163,4 @@ services:
       TARGET: all
       BUILD_TYPE: Release
       CMAKE_GENERATOR: Ninja
-      CMAKE_ARGS: -DBUILD_TESTING:BOOL=FALSE -DENABLE_TESTING:BOOL=FALSE
+      CMAKE_ARGS: -DENABLE_TESTING=OFF

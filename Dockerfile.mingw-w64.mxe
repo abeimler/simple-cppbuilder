@@ -5,12 +5,11 @@ ARG extra_libraries
 ARG vcpkg_target_triplet="x64-mingw-dynamic"
 ARG vcpkg_host_triplet="x64-linux"
 ARG processor="x86_64"
-ARG mingw_toolchain="mingw-w64-toolchain"
-ARG cross_triple="x86_64-w64-mingw32"
-ARG cc="${compiler_triplet}-gcc"
-ARG cxx="${compiler_triplet}-g++"
-ARG cmake="${compiler_triplet}-cmake"
-ARG make="${compiler_triplet}-make"
+ARG cross_triplet="x86_64-w64-mingw32.shared"
+ARG cc="${cross_triplet}-gcc"
+ARG cxx="${cross_triplet}-g++"
+ARG cmake="${cross_triplet}-cmake"
+ARG make="${cross_triplet}-make"
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
@@ -18,31 +17,31 @@ RUN pacman-db-upgrade && \
     pacman -S --noconfirm --needed \
         wget curl pkg-config zip unzip tar git go && \
     pacman -S --noconfirm  \
-        ${mingw_toolchain} binutils bison \
+        binutils bison \
         ${extra_libraries} \
         python3 python-pip doxygen graphviz cmake make ninja ccache cppcheck valgrind gcovr \
         neovim emacs nano
 
-# install extra mingw-w64 packages and windows tools from AUR
+# install windows tools from AUR
 RUN runuser -l yay -c \
     "yay -Syu --noconfirm && yay -S --noconfirm \
-        mingw-w64-cmake mingw-w64-configure mingw-w64-make mingw-w64-environment powershell" && \
+        powershell" && \
     rm -rf /home/yay/.cache/*
 
 # install mxe
-#RUN pacman-db-upgrade && \
-#    pacman -S --noconfirm  \
-#        bzip2 lzip p7zip unzip xz perl ruby gperf intltool perl-xml-parser 
-#ARG mxe_source_dir="/opt/mxe"
-#RUN git clone https://github.com/mxe/mxe.git $mxe_source_dir
-#RUN cd $mxe_source_dir && make cc ccache cmake cmake-conf ninja MXE_TARGETS="${compiler_triplet}.static ${compiler_triplet}.shared"
-#ENV MXE_SOURCE_DIR $mxe_source_dir
-#ENV PATH="${mxe_source_dir}/usr/bin:${PATH}"
+RUN pacman-db-upgrade && \
+    pacman -S --noconfirm  \
+        bzip2 lzip p7zip unzip xz perl ruby gperf intltool perl-xml-parser 
+ARG mxe_source_dir="/opt/mxe"
+RUN git clone https://github.com/mxe/mxe.git $mxe_source_dir
+RUN cd $mxe_source_dir && make cc ccache cmake cmake-conf ninja MXE_TARGETS="${cross_triplet}"
+ENV MXE_SOURCE_DIR $mxe_source_dir
+ENV PATH="${mxe_source_dir}/usr/bin:${PATH}"
 
 # setup project env
 WORKDIR /home/project
 COPY ./cmake ./cmake
-COPY ./docker-build.mingw.sh ./docker-build.sh
+COPY ./docker-build.mingw.mxe.sh ./docker-build.sh
 
 # install vcpkg
 ## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
@@ -57,13 +56,12 @@ ENV VCPKG_ROOT "/home/project/vcpkg"
 ENV CC $cc
 ENV CXX $cxx
 ENV PROCESSOR $processor
-ENV CROSS_TRIPLET $cross_triple
+ENV CROSS_TRIPLET $cross_triplet
 ENV TARGET_TRIPLET $vcpkg_target_triplet
 ENV CROSS_CMAKE $cmake
 ENV CROSS_MAKE $make
-ENV CROSS "${cross_triple}-"
-ENV CROSS_ROOT "/usr/$cross_triple"
-RUN mingw-env
+ENV CROSS "${cross_triplet}-"
+ENV COMPILER_PATH "${mxe_source_dir}/usr"
 
 # build script settings
 ENV TARGET "all"

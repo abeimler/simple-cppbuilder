@@ -17,14 +17,17 @@ RUN pacman-db-upgrade && \
         neovim emacs nano
 
 # install crosstool-ng
+ARG $crosstool_dir="/home/crosstool-ng"
+ENV CT_ALLOW_BUILD_AS_ROOT_SURE 1
+#COPY ./config/crosstool/crosstool-ng.config.rpi $crosstool_dir/.config
 RUN useradd -m -G nobody -s /bin/bash crosstool-ng && passwd -d crosstool-ng && echo "crosstool-ng ALL=(ALL)  ALL" >> /etc/sudoers
 RUN runuser -l crosstool-ng -c \
-    "git clone https://github.com/crosstool-ng/crosstool-ng /home/crosstool-ng/crosstool-ng && \
-        cd /home/crosstool-ng/crosstool-ng && ./bootstrap && \
+    "git clone https://github.com/crosstool-ng/crosstool-ng $crosstool_dir && \
+        cd $crosstool_dir && ./bootstrap && \
         ./configure --enable-local && \
         make"
 RUN runuser -l crosstool-ng -c \
-    "cd /home/crosstool-ng/crosstool-ng && ./ct-ng show-${compiler_target} && \
+    "cd $crosstool_dir && ./ct-ng show-${compiler_target} && \
         ./ct-ng ${compiler_target} && \
         ./ct-ng build"
 ENV PATH="/home/crosstool-ng/x-tools/${compiler_target}/bin:${PATH}"
@@ -54,8 +57,8 @@ ENV TARGET_CC "${compiler_target}-gcc"
 ENV TARGET_CXX "${compiler_target}-g++"
 ENV CROSS_COMPILER_CC "/home/crosstool-ng/x-tools/${compiler_target}/bin/${compiler_target}-gcc"
 ENV CROSS_COMPILER_CXX "/home/crosstool-ng/x-tools/${compiler_target}/bin/${compiler_target}-g++"
-ENV CC "/home/crosstool-ng/x-tools/${compiler_target}/bin/${compiler_target}-gcc"
-ENV CXX "/home/crosstool-ng/x-tools/${compiler_target}/bin/${compiler_target}-g++"
+ENV CC "${compiler_target}-gcc"
+ENV CXX "${compiler_target}-g++"
 
 # build script settings
 ENV TARGET "all"

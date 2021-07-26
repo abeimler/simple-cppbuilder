@@ -22,7 +22,7 @@ Based on [archlinux:base-devel](https://hub.docker.com/_/archlinux) with [yay](h
 
 ## How to use this image
 
-You can find a full C++ project example [here](https://github.com/abeimler/simple-cppbuilder/tree/main/example).
+You can find a full C++ project example [here](https://github.com/abeimler/simple-cppbuilder/tree/main/examples/example).
 
 ### Create a `Dockerfile` in your C++ project
 
