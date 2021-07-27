@@ -49,6 +49,8 @@ ENV CONAN_SYSREQUIRES_MODE enabled
 # set default compiler
 ENV CC "gcc"
 ENV CXX "g++"
+RUN $CC -v
+RUN $CXX -v
 
 # setup project env
 WORKDIR /home/project

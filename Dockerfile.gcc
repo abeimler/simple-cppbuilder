@@ -4,12 +4,14 @@ FROM abeimler/simple-cppbuilder:base as base
 # default compiler versions
 ARG gcc_version=10
 ARG extra_libraries
+ARG cc="gcc${gcc_version}"
+ARG cxx="g++${gcc_version}"
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
     pacman -Syyu --noconfirm && pacman-db-upgrade && \
     pacman -S --noconfirm --needed \
-        gcc${gcc_version} wget curl pkg-config zip unzip tar git go && \
+        wget curl pkg-config zip unzip tar git go && \
     pacman -S --noconfirm  \
         binutils bison \
         ${extra_libraries} \
@@ -22,13 +24,15 @@ RUN runuser -l yay -c \
     rm -rf /home/yay/.cache/*
 
 # set default compiler
-ENV CC "gcc${gcc_version}"
-ENV CXX "g++${gcc_version}"
+ENV CC $cc
+ENV CXX $cxx
+RUN $CC -v
+RUN $CXX -v
 
 # setup project env
 WORKDIR /home/project
-COPY ./docker-build.sh ./docker-build.sh
-COPY ./docker-test.sh ./docker-test.sh
+COPY ./scripts/docker-build.sh ./docker-build.sh
+COPY ./scripts/docker-test.sh ./docker-test.sh
 
 # install vcpkg
 ENV VCPKG_DISABLE_METRICS 1
@@ -45,4 +49,4 @@ ENV CMAKE_ARGS ""
 
 RUN mkdir build
 ENTRYPOINT ["/usr/bin/bash"]
-CMD ["./docker-build.sh"]
+#CMD ["./docker-build.sh"]

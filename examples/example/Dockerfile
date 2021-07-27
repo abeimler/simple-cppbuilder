@@ -15,3 +15,29 @@ CMD ["./docker-build.sh"]
 ## test stage
 FROM build as test
 CMD ["./docker-test.sh"]
+
+
+## base image for windows
+FROM abeimler/simple-cppbuilder:x64-mingw-w64 as base-windows
+
+## build stage
+FROM base-windows as windows-build
+COPY . .
+CMD ["./docker-build.sh"]
+
+
+## base image for windows
+FROM abeimler/simple-cppbuilder:x64-mingw-w64-mxe as base-windows-mxe
+
+## build stage
+FROM base-windows-mxe as windows-build-mxe
+COPY . .
+CMD ["./docker-build.sh"]
+
+## base image for web
+FROM abeimler/simple-cppbuilder:emscripten as base-web
+
+## build stage
+FROM base-web as build-web
+COPY . .
+CMD ["./docker-build.sh"]

@@ -9,3 +9,7 @@ if(ENABLE_UNITY)
   # Add for any project you want to apply unity builds for
   set_target_properties(${CMAKE_PROJECT_NAME}-app PROPERTIES UNITY_BUILD ON)
 endif()
+
+if (EMSCRIPTEN)
+  set_target_properties(${CMAKE_PROJECT_NAME}-app PROPERTIES LINK_FLAGS "-s DEMANGLE_SUPPORT=1 -s WASM=0 -s USE_PTHREADS=1" )
+endif()

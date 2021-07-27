@@ -1,5 +1,5 @@
 ## base image
-FROM abeimler/simple-cppbuilder:gnueabihf as base
+FROM abeimler/simple-cppbuilder:emscripten as base
 
 ## build stage
 FROM base as build

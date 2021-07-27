@@ -2,22 +2,23 @@
 FROM abeimler/simple-cppbuilder:base as base
 
 ARG extra_libraries
-ARG vcpkg_target_triplet="x64-mingw-dynamic"
 ARG vcpkg_host_triplet="x64-linux"
 ARG processor="x86_64"
+
+ARG vcpkg_target_triplet="x64-mingw-dynamic"
+
 ARG cross_triplet="x86_64-w64-mingw32.shared"
+
 ARG cc="${cross_triplet}-gcc"
 ARG cxx="${cross_triplet}-g++"
 ARG cmake="${cross_triplet}-cmake"
 ARG make="${cross_triplet}-make"
+ARG cmake_toolchain_file
+ARG cmake_generator="Unix Makefiles"
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
-    pacman -Syyu --noconfirm && pacman-db-upgrade && \
-    pacman -S --noconfirm --needed \
-        wget curl pkg-config zip unzip tar git go && \
     pacman -S --noconfirm  \
-        binutils bison \
         ${extra_libraries} \
         python3 python-pip doxygen graphviz cmake make ninja ccache cppcheck valgrind gcovr \
         neovim emacs nano
@@ -37,11 +38,12 @@ RUN git clone https://github.com/mxe/mxe.git $mxe_source_dir
 RUN cd $mxe_source_dir && make cc ccache cmake cmake-conf ninja MXE_TARGETS="${cross_triplet}"
 ENV MXE_SOURCE_DIR $mxe_source_dir
 ENV PATH="${mxe_source_dir}/usr/bin:${PATH}"
+ARG cross_root="${mxe_source_dir}/usr"
 
 # setup project env
 WORKDIR /home/project
 COPY ./cmake ./cmake
-COPY ./docker-build.mingw.mxe.sh ./docker-build.sh
+COPY ./scripts/docker-build.mxe.sh ./docker-build.sh
 
 # install vcpkg
 ## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
@@ -61,15 +63,19 @@ ENV TARGET_TRIPLET $vcpkg_target_triplet
 ENV CROSS_CMAKE $cmake
 ENV CROSS_MAKE $make
 ENV CROSS "${cross_triplet}-"
-ENV COMPILER_PATH "${mxe_source_dir}/usr"
+ENV CROSS_ROOT $cross_root
 
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
-ENV CMAKE_GENERATOR "MinGW Makefiles"
+ENV CMAKE_GENERATOR $cmake_generator
 ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
+ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
+
+RUN $CC -v
+RUN $CXX -v
 
 RUN mkdir build
 ENTRYPOINT ["/usr/bin/bash"]
-CMD ["./docker-build.sh"]
+#CMD ["./docker-build.sh"]

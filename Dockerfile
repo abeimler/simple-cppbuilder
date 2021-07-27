@@ -18,11 +18,13 @@ RUN pacman-db-upgrade && \
 # set default compiler
 ENV CC "gcc"
 ENV CXX "g++"
+RUN $CC -v
+RUN $CXX -v
 
 # setup project env
 WORKDIR /home/project
-COPY ./docker-build.sh ./docker-build.sh
-COPY ./docker-test.sh ./docker-test.sh
+COPY ./scripts/docker-build.sh ./docker-build.sh
+COPY ./scripts/docker-test.sh ./docker-test.sh
 
 # install vcpkg
 ENV VCPKG_DISABLE_METRICS 1
@@ -39,4 +41,4 @@ ENV CMAKE_ARGS ""
 
 RUN mkdir build
 ENTRYPOINT ["/usr/bin/bash"]
-CMD ["./docker-build.sh"]
+#CMD ["./docker-build.sh"]

@@ -1,0 +1,11 @@
+---
+version: "3.9"
+services:
+  example-web-release-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build
+    environment:
+      TARGET: all
+      BUILD_TYPE: Release

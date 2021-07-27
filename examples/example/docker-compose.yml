@@ -135,32 +135,28 @@ services:
   example-mingw-release-build:
     build:
       context: .
-      dockerfile: Dockerfile.mingw
-      target: build
+      dockerfile: Dockerfile
+      target: windows-build
     environment:
       TARGET: all
       BUILD_TYPE: Release
-      CMAKE_GENERATOR: Ninja
       CMAKE_ARGS: -DENABLE_TESTING=OFF
-  # example Raspberry PI 4 build (crosscompile)
-  example-rpi4-release-build:
+  example-mxe-release-build:
     build:
       context: .
-      dockerfile: Dockerfile.rpi
-      target: build
+      dockerfile: Dockerfile
+      target: windows-build-mxe
     environment:
       TARGET: all
       BUILD_TYPE: Release
-      CMAKE_GENERATOR: Ninja
       CMAKE_ARGS: -DENABLE_TESTING=OFF
-  # example WebAssambly build (crosscompile)
-  example-emscripten-release-build:
+  # example web build (emscripten)
+  example-web-release-build:
     build:
       context: .
-      dockerfile: Dockerfile.emscripten
-      target: build
+      dockerfile: Dockerfile
+      target: build-web
     environment:
       TARGET: all
       BUILD_TYPE: Release
-      CMAKE_GENERATOR: Ninja
       CMAKE_ARGS: -DENABLE_TESTING=OFF

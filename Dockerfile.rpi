@@ -2,9 +2,14 @@
 FROM abeimler/simple-cppbuilder:base as base
 
 ARG extra_libraries
-ARG compiler_target="armv8-rpi4-linux-gnueabihf"
-ARG vcpkg_target_triplet="arm-rpi"
+ARG processor="x86_64"
 ARG triplet_host="x64-linux"
+
+ARG vcpkg_target_triplet="arm-rpi"
+
+ARG cross_triple="armv8-rpi4-linux-gnueabihf"
+ARG cmake="cmake"
+ARG make="make"
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
@@ -17,20 +22,27 @@ RUN pacman-db-upgrade && \
         neovim emacs nano
 
 # install crosstool-ng
-ARG $crosstool_dir="/home/crosstool-ng"
+ARG crosstool_dir="/home/cross/crosstool-ng"
 ENV CT_ALLOW_BUILD_AS_ROOT_SURE 1
-#COPY ./config/crosstool/crosstool-ng.config.rpi $crosstool_dir/.config
-RUN useradd -m -G nobody -s /bin/bash crosstool-ng && passwd -d crosstool-ng && echo "crosstool-ng ALL=(ALL)  ALL" >> /etc/sudoers
-RUN runuser -l crosstool-ng -c \
+#COPY ./config/crosstool/crosstool-ng.config.rpi $cross_root/.config
+RUN useradd -m -G root -s /bin/bash cross && passwd -d cross && echo "cross ALL=(ALL)  ALL" >> /etc/sudoers
+#RUN mkdir -p $crosstool_dir && chown cross:root $crosstool_dir
+RUN runuser -l cross -c \
     "git clone https://github.com/crosstool-ng/crosstool-ng $crosstool_dir && \
         cd $crosstool_dir && ./bootstrap && \
         ./configure --enable-local && \
         make"
-RUN runuser -l crosstool-ng -c \
-    "cd $crosstool_dir && ./ct-ng show-${compiler_target} && \
-        ./ct-ng ${compiler_target} && \
+RUN runuser -l cross -c \
+    "cd $crosstool_dir && \
+        ./ct-ng ${cross_triple}"
+RUN runuser -l cross -c \
+    "cd $crosstool_dir && \
         ./ct-ng build"
-ENV PATH="/home/crosstool-ng/x-tools/${compiler_target}/bin:${PATH}"
+ARG cross_root="${crosstool_dir}/x-tools/${cross_triple}"
+ENV PATH="${cross_root}/bin:${PATH}"
+ARG cc="${cross_root}/bin/${cross_triple}-gcc"
+ARG cxx="${cross_root}/bin/${cross_triple}-g++"
+ARG cmake_generator="Unix Makefiles"
 
 # set default compiler
 ENV CC "gcc"
@@ -40,7 +52,8 @@ ENV CXX "g++"
 WORKDIR /home/project
 COPY ./cmake ./cmake
 COPY ./custom-triplets ./custom-triplets
-COPY ./docker-build.rpi.sh ./docker-build.sh
+COPY ./scripts/docker-build.rpi.sh ./docker-build.sh
+ARG cmake_toolchain_file="/home/project/cmake/rpi-toolchain.cmake"
 
 # install vcpkg
 ENV VCPKG_DEFAULT_HOST_TRIPLET $triplet_host
@@ -52,21 +65,26 @@ RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/project/vcpkg"
 
 # cross compiler settings
-ENV COMPILER_TARGET $compiler_target
-ENV TARGET_CC "${compiler_target}-gcc"
-ENV TARGET_CXX "${compiler_target}-g++"
-ENV CROSS_COMPILER_CC "/home/crosstool-ng/x-tools/${compiler_target}/bin/${compiler_target}-gcc"
-ENV CROSS_COMPILER_CXX "/home/crosstool-ng/x-tools/${compiler_target}/bin/${compiler_target}-g++"
-ENV CC "${compiler_target}-gcc"
-ENV CXX "${compiler_target}-g++"
+ENV CC $cc
+ENV CXX $cxx
+ENV PROCESSOR $processor
+ENV CROSS_TRIPLET $cross_triple
+ENV TARGET_TRIPLET $vcpkg_target_triplet
+ENV CROSS_CMAKE $cmake
+ENV CROSS_MAKE $make
+ENV CROSS "${cross_triple}-"
+
+# compiler env settings
+#COPY $crosstool_dir/ct-ng.comp /etc/bash_completion.d/ct-ng.comp
 
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
 ENV CMAKE_GENERATOR "Ninja"
 ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
+ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
 
 RUN mkdir build
 ENTRYPOINT ["/usr/bin/bash"]
-CMD ["./docker-build.sh"]
+#CMD ["./docker-build.sh"]

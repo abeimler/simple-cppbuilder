@@ -2,47 +2,46 @@
 FROM abeimler/simple-cppbuilder:base as base
 
 ARG extra_libraries
-ARG vcpkg_target_triplet="x64-mingw-dynamic"
 ARG vcpkg_host_triplet="x64-linux"
 ARG processor="x86_64"
-ARG mingw_toolchain="mingw-w64-toolchain"
-ARG cross_triple="x86_64-w64-mingw32"
-ARG cc="${compiler_triplet}-gcc"
-ARG cxx="${compiler_triplet}-g++"
-ARG cmake="${compiler_triplet}-cmake"
-ARG make="${compiler_triplet}-make"
+
+# e.g. x64-mingw-dynamic
+ARG vcpkg_target_triplet
+
+# e.g. x86_64-w64-mingw32
+ARG cross_triple
+
+ARG cc="${cross_triple}-gcc"
+ARG cxx="${cross_triple}-g++"
+ARG cmake="${cross_triple}-cmake"
+ARG make="${cross_triple}-make"
+ARG cross_root="/usr/$cross_triple"
+ARG cmake_toolchain_file
+ARG cmake_generator="Unix Makefiles"
+
+# e.g. mingw-w64-toolchain
+ARG install_toolchain="${cross_triple}-gcc" 
+# e.g. mingw-w64-cmake mingw-w64-configure mingw-w64-make mingw-w64-environment powershell ... mingw-w64-boost, mingw-w64-qt5-base, ... 
+ARG install_extras_toolchain
+
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
-    pacman -Syyu --noconfirm && pacman-db-upgrade && \
-    pacman -S --noconfirm --needed \
-        wget curl pkg-config zip unzip tar git go && \
     pacman -S --noconfirm  \
-        ${mingw_toolchain} binutils bison \
         ${extra_libraries} \
         python3 python-pip doxygen graphviz cmake make ninja ccache cppcheck valgrind gcovr \
         neovim emacs nano
 
-# install extra mingw-w64 packages and windows tools from AUR
+# install extra toolchain packages and tools from AUR
 RUN runuser -l yay -c \
     "yay -Syu --noconfirm && yay -S --noconfirm \
-        mingw-w64-cmake mingw-w64-configure mingw-w64-make mingw-w64-environment powershell" && \
+        ${install_toolchain} ${install_extras_toolchain}" && \
     rm -rf /home/yay/.cache/*
 
-# install mxe
-#RUN pacman-db-upgrade && \
-#    pacman -S --noconfirm  \
-#        bzip2 lzip p7zip unzip xz perl ruby gperf intltool perl-xml-parser 
-#ARG mxe_source_dir="/opt/mxe"
-#RUN git clone https://github.com/mxe/mxe.git $mxe_source_dir
-#RUN cd $mxe_source_dir && make cc ccache cmake cmake-conf ninja MXE_TARGETS="${compiler_triplet}.static ${compiler_triplet}.shared"
-#ENV MXE_SOURCE_DIR $mxe_source_dir
-#ENV PATH="${mxe_source_dir}/usr/bin:${PATH}"
-
 # setup project env
+COPY ./cmake /home/cmake
 WORKDIR /home/project
-COPY ./cmake ./cmake
-COPY ./docker-build.mingw.sh ./docker-build.sh
+COPY ./scripts/docker-build.cross.sh ./docker-build.sh
 
 # install vcpkg
 ## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
@@ -62,16 +61,24 @@ ENV TARGET_TRIPLET $vcpkg_target_triplet
 ENV CROSS_CMAKE $cmake
 ENV CROSS_MAKE $make
 ENV CROSS "${cross_triple}-"
-ENV CROSS_ROOT "/usr/$cross_triple"
-RUN mingw-env
+ENV CROSS_ROOT $cross_root
+
+# compiler env settings
+# e.g. mingw-env, emsdk_env.sh
+ARG setup_env_script="echo"
+RUN $setup_env_script
 
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
-ENV CMAKE_GENERATOR "MinGW Makefiles"
+ENV CMAKE_GENERATOR $cmake_generator
 ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
+ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
+
+RUN $CC -v
+RUN $CXX -v
 
 RUN mkdir build
 ENTRYPOINT ["/usr/bin/bash"]
-CMD ["./docker-build.sh"]
+#CMD ["./docker-build.sh"]

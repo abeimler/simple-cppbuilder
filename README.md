@@ -9,7 +9,7 @@ Simple C++ Builder with compilers, buildtools and dependency manager.
 ## Features
 
 - Pre-installed Compilers and Tools
-- Ready to use build scripts ([docker-build.sh](https://github.com/abeimler/simple-cppbuilder/blob/main/docker-build.sh) and [docker-test.sh](https://github.com/abeimler/simple-cppbuilder/blob/main/docker-test.sh))
+- Ready to use build scripts ([docker-build.sh](https://github.com/abeimler/simple-cppbuilder/blob/main/scripts/docker-build.sh) and [docker-test.sh](https://github.com/abeimler/simple-cppbuilder/blob/main/scripts/docker-test.sh))
 
 ## What's included
 
@@ -83,7 +83,7 @@ Default image with some OpenGL dependencies: `mesa glu glfw libx11 libxrender li
 
 _Not fully tested_
 
-#### `:x64-mingw-w64`, `x86-mingw-w64`, `arm64-mingw-w64`, `arm-mingw-w64` (experemental)
+#### `:x64-mingw-w64`, `x86-mingw-w64` (experemental)
 
 Default image with mingw-w64-cross-compiler: [mingw-w64-gcc](https://archlinux.org/packages/community/x86_64/mingw-w64-gcc/) and toolchain.
 

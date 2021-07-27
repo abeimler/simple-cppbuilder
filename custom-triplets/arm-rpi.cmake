@@ -5,4 +5,4 @@ set(VCPKG_LIBRARY_LINKAGE static)
 
 set(VCPKG_CMAKE_SYSTEM_NAME Linux)
 
-set(VCPKG_CHAINLOAD_TOOLCHAIN_FILE /home/project/cmake/rpi-toolchain.cmake)
+set(VCPKG_CHAINLOAD_TOOLCHAIN_FILE /home/project/cmake/arm-rpi-toolchain.cmake)
