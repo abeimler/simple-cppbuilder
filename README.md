@@ -15,9 +15,9 @@ Simple C++ Builder with compilers, buildtools and dependency manager.
 
 Based on [archlinux:base-devel](https://hub.docker.com/_/archlinux) with [yay](https://github.com/Jguer/yay).
 
-- **Compilers:** clang, gcc or cross-compiler
-- **Buildtools:** cmake, make and ninja
-- **Dependency Manager:** conan and/or vcpkg
+- **Compilers:** [clang](https://llvm.org/), [gcc](https://gcc.gnu.org/) or cross-compiler
+- **Buildtools:** [cmake](https://cmake.org/), make and ninja
+- **Dependency Manager:** [conan](https://conan.io/) and/or [vcpkg](https://vcpkg.io/en/index.html)
 - **More Tools:** python, pip, ccache, cppcheck, doxygen and more
 
 ## How to use this image
@@ -68,11 +68,15 @@ Default image with clang compiler.
 
 #### `:libcpp`
 
-Default image with clang compiler and [libc++](https://libcxx.llvm.org/) installed.
+Default image with clang and [libc++](https://libcxx.llvm.org/) installed.
 
 #### `:boost`
 
 Default image with [boost](https://www.boost.org/) installed.
+
+#### `:abseil-cpp`
+
+Default image with [abseil](https://abseil.io/) installed.
 
 #### `:opengl-libs`
 
@@ -83,9 +87,13 @@ Default image with some OpenGL dependencies: `mesa glu glfw libx11 libxrender li
 
 _Not fully tested_
 
-#### `:x64-mingw-w64`, `x86-mingw-w64` (experemental)
+#### `:x64-mingw-w64`, `x86-mingw-w64`
 
 Default image with mingw-w64-cross-compiler: [mingw-w64-gcc](https://archlinux.org/packages/community/x86_64/mingw-w64-gcc/) and toolchain.
+
+#### `:x64-mingw-w64-mxe`, `x86-mingw-w64-mxe`, `:x64-mingw-w64-mxe-static`, `x86-mingw-w64-mxe-static` (older compiler)
+
+Default image with [mxe](https://mxe.cc/) and toolchain.
 
 #### `:emscripten`
 
@@ -93,7 +101,7 @@ Default image with [emscripten](https://emscripten.org/).
 
 #### `:rpi2`, `:rpi3`, `:rpi4`
 
-Default image with arm-rpi-cross-compiler: ([crosstool-ng](https://crosstool-ng.github.io/)) for RaspberryPi and toolchain.
+Default image with arm-cross-compiler: ([crosstool-ng](https://crosstool-ng.github.io/)) for RaspberryPi and toolchain.
 
 #### `:arm-android`, `:arm64-android`, `:x86-android`, `:x64-android`
 
@@ -105,29 +113,29 @@ Default image with [android-ndk](https://aur.archlinux.org/packages/android-ndk/
 ### Dockerfile with system dependencies
 
 ```Dockerfile
-FROM abeimler/simple-cppbuilder as build
+FROM abeimler/simple-cppbuilder as base
 
 RUN pacman-db-upgrade && pacman -S --noconfirm  \
-    glu glfw raylib
+    qt5-base qt5-base-util 
 
+# build stage
+FROM base as build
 COPY . .
 CMD ["./docker-build.sh"]
-
-## test stage
-FROM build as test
-CMD ["./docker-test.sh"]
 ```
 
 ### Dockerfile using AUR
 
 ```Dockerfile
-FROM abeimler/simple-cppbuilder as build
+FROM abeimler/simple-cppbuilder as base
 
 # install android-sdk and android-ndk
 RUN runuser -l yay -c \
     "yay -Syu --noconfirm && yay -S --noconfirm \
       android-sdk android-ndk"
 
+# build stage
+FROM base as build
 COPY . .
 CMD ["./my-android-build.sh"]
 ```
@@ -151,13 +159,15 @@ services:
       CMAKE_GENERATOR: Ninja
 ```
 
+Run `docker-compose up --build`.
+
 ### Using docker-compose, run tests
 
 ```yml
 version: "3.9"
 services:
   # gcc Debug with Ninja
-  gcc-debug-build:
+  gcc-debug-test:
     build:
       context: .
       dockerfile: Dockerfile
@@ -170,16 +180,18 @@ services:
       CMAKE_GENERATOR: Ninja
 ```
 
+Run `docker-compose up --build`.
+
 ### Use your custom build script
 
-#### `arm-build.sh`
+#### `my-build.sh`
 
 ```bash
 #!/bin/bash
 
 mkdir build
 cd build
-cmake -G "Unix Makefiles" -DCMAKE_SYSTEM_NAME=Linux -DCMAKE_SYSTEM_PROCESSOR=arm -DCMAKE_C_COMPILER=clang -DCMAKE_C_COMPILER_TARGET=arm-linux-gnueabihf -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_COMPILER_TARGET=arm-linux-gnueabihf ..
+cmake -G "Ninja" -DCMAKE_SYSTEM_NAME=Linux -DCMAKE_SYSTEM_PROCESSOR=arm -DCMAKE_C_COMPILER=clang -DCMAKE_C_COMPILER_TARGET=arm-linux-gnueabihf -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_COMPILER_TARGET=arm-linux-gnueabihf ..
 
 make my-app -j 4
 ```
@@ -187,13 +199,13 @@ make my-app -j 4
 #### `Dockerfile`
 
 ```Dockerfile
-## base image
+# base image
 FROM abeimler/simple-cppbuilder as base
 
-## build stage
+# build stage
 FROM base as build
 COPY . .
-CMD ["./arm-build.sh"]
+CMD ["./my-build.sh"]
 ```
 
 #### `docker-compose.yml`
@@ -209,7 +221,7 @@ services:
       target: build
 ```
 
-Run `docker-compose up`.
+Run `docker-compose up --build`.
 
 
 ## Environment Variables
@@ -244,7 +256,7 @@ CMake Toolchain File `-DCMAKE_TOOLCHAIN_FILE`, default `./vcpkg/scripts/buildsys
 
 ### `CMAKE_ARGS`
 
-Custom CMake Arguments, e.g. `-DENABLE_COVERAGE:BOOL=TRUE`.  
+Custom CMake Arguments, e.g. `-DENABLE_COVERAGE:BOOL=ON`.  
 
 
 ## License
@@ -259,6 +271,7 @@ As for any pre-built image usage, it is the image user's responsibility to ensur
 ### Links
 
 - [simple-cppbuilder GitHub](https://github.com/abeimler/simple-cppbuilder)
+- [simple-cppbuilder-raylib GitHub](https://github.com/abeimler/simple-cppbuilder-raylib)
 - [cpp_starter_project](https://github.com/lefticus/cpp_starter_project)
 - [cppdock](https://github.com/ricejasonf/cppdock)
 - Icon made by me with C++-Icon made by [Freepik](https://www.freepik.com) from [Flaticon](https://www.flaticon.com/)

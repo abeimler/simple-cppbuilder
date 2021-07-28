@@ -11,7 +11,9 @@ RUN pacman-db-upgrade && \
     pacman -S --noconfirm  \
         clang binutils bison \
         ${extra_libraries} \
-        python3 python-pip doxygen graphviz cmake make ninja ccache cppcheck valgrind gcovr \
+        python3 python-pip doxygen graphviz \
+        cmake make ninja ccache cppcheck \
+        valgrind gcovr perf gperftools \
         neovim emacs nano
 
 # install yay

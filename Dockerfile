@@ -12,8 +12,7 @@ RUN pacman-db-upgrade && \
     pacman -S --noconfirm  \
         gcc binutils bison \
         ${extra_libraries} \
-        python3 python-pip doxygen graphviz cmake make ninja ccache cppcheck valgrind gcovr \
-        neovim emacs nano
+        cmake make ninja
 
 # set default compiler
 ENV CC "gcc"

@@ -25,7 +25,7 @@ ENV CXX clang++
 
 
 ## build stage
-FROM abeimler/simple-cppbuilder AS build
+FROM gcc AS build
 COPY . .
 CMD ["./docker-build.sh"]
 

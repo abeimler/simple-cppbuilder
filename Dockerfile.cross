@@ -29,8 +29,7 @@ ARG install_extras_toolchain
 RUN pacman-db-upgrade && \
     pacman -S --noconfirm  \
         ${extra_libraries} \
-        python3 python-pip doxygen graphviz cmake make ninja ccache cppcheck valgrind gcovr \
-        neovim emacs nano
+        cmake make ninja
 
 # install extra toolchain packages and tools from AUR
 RUN runuser -l yay -c \

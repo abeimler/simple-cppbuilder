@@ -20,8 +20,7 @@ ARG cmake_generator="Unix Makefiles"
 RUN pacman-db-upgrade && \
     pacman -S --noconfirm  \
         ${extra_libraries} \
-        python3 python-pip doxygen graphviz cmake make ninja ccache cppcheck valgrind gcovr \
-        neovim emacs nano
+        cmake make ninja
 
 # install windows tools from AUR
 RUN runuser -l yay -c \

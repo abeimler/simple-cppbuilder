@@ -21,8 +21,7 @@ RUN pacman-db-upgrade && \
         clang llvm \
         mesa glu glfw libx11 libxrender libxext libxcursor libxrandr libxinerama xorg-server-devel \
         ${extra_libraries} \
-        python3 python-pip doxygen graphviz cmake make ninja ccache cppcheck valgrind gcovr \
-        neovim emacs nano
+        cmake make ninja
 
 # install emscripten
 RUN runuser -l yay -c \

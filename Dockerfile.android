@@ -9,19 +9,21 @@ ARG vcpkg_target_triplet="arm-android"
 ARG android_abi="armeabi-v7a"
 
 ARG cmake_generator="Ninja"
+ARG make="ninja"
+ARG cmake="android-${android_abi}-cmake"
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
     pacman -S --noconfirm  \
         ${extra_libraries} \
-        python3 python-pip doxygen graphviz cmake make ninja ccache cppcheck valgrind gcovr \
-        neovim emacs nano
+        cmake make ninja
 
 
-# install android-ndk
+# install android stuff
 RUN runuser -l yay -c \
     "yay -Syu --noconfirm && yay -S --noconfirm \
-        jdk-openjdk android-sdk android-sdk-platform-tools android-sdk-build-tools android-ndk" && \
+        jdk-openjdk android-sdk android-sdk-platform-tools android-sdk-build-tools android-ndk \
+        android-pkg-config android-cmake android-environment" && \
     rm -rf /home/yay/.cache/* && \
     ln -s /opt/android-ndk /opt/android-sdk/ndk-bundle
 
@@ -42,13 +44,17 @@ ENV VCPKG_ROOT "/home/project/vcpkg"
 ENV PROCESSOR $processor
 ENV ANDROID_ABI $android_abi
 ENV TARGET_TRIPLET $vcpkg_target_triplet
+ENV CROSS_CMAKE $cmake
+ENV CROSS_MAKE $make
 ENV ANDROID_HOME "/opt/android-sdk"
 ENV ANDROID_NDK_HOME "/opt/android/ndk"
-ENV ANDROID_TOOLCHAIN_FILE "$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake"
-ENV ANDROID_TOOLCHAIN "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64"
-ENV ANDROID_BUILD_TOOLS "$ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools/ | head -n 1)"
-ENV ANDROID_PLATFORM_TOOLS "$ANDROID_HOME/build-tools/platform-tools"
-ARG cmake_toolchain_file="$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake"
+ENV ANDROID_TOOLCHAIN_FILE "${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake"
+ENV ANDROID_TOOLCHAIN "${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64"
+ENV ANDROID_BUILD_TOOLS "${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools/ | head -n 1)"
+ENV ANDROID_PLATFORM_TOOLS "${ANDROID_HOME}/build-tools/platform-tools"
+ARG cmake_toolchain_file="${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake"
+
+RUN source android-env $android_abi && android-env $android_abi
 
 # build script settings
 ENV TARGET "all"
