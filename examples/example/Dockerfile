@@ -9,19 +9,9 @@ FROM abeimler/simple-cppbuilder as base
 ## build stage
 FROM base as build
 COPY . .
-## do more prepare for build stuff here
 CMD ["./docker-build.sh"]
 ## test stage
 FROM build as test
-CMD ["./docker-test.sh"]
-
-
-# image using older gcc version
-FROM abeimler/simple-cppbuilder:gcc9 as build-old-gcc
-COPY . .
-CMD ["./docker-build.sh"]
-## test stage
-FROM build as test-old-gcc
 CMD ["./docker-test.sh"]
 
 
@@ -42,6 +32,12 @@ CMD ["./docker-build.sh"]
 
 ## build for aarch64
 FROM abeimler/simple-cppbuilder:aarch64-linux as build-arm64
+COPY . .
+CMD ["./docker-build.sh"]
+
+
+## build for aarch64
+FROM abeimler/simple-cppbuilder:rpi4 as build-rpi4
 COPY . .
 CMD ["./docker-build.sh"]
 

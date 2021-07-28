@@ -136,16 +136,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: windows-build
-    environment:
-      TARGET: all
-      BUILD_TYPE: Release
-      CMAKE_ARGS: -DENABLE_TESTING=OFF
-  example-mxe-release-build:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: windows-build-mxe
+      target: build-windows
     environment:
       TARGET: all
       BUILD_TYPE: Release
@@ -165,7 +156,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: arm64-build
+      target: build-arm64
+    environment:
+      TARGET: all
+      BUILD_TYPE: Release
+      CMAKE_ARGS: -DENABLE_TESTING=OFF
+  # example rpi4 build (crosscompile)
+  example-rpi4-release-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build-rpi4
     environment:
       TARGET: all
       BUILD_TYPE: Release
