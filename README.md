@@ -56,10 +56,6 @@ Default image with gcc, buildtools, [conan](https://conan.io/) and [vcpkg](https
 
 ### Compilers
 
-#### `:gcc-10`, `:gcc-9`, `:gcc-8`, `:gcc-7`, `:gcc-6`, `:gcc-5`, `:gcc-4.9`
-
-Default image with gcc compiler.
-
 #### `:clang`
 
 Default image with clang compiler.
