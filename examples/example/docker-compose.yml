@@ -160,3 +160,13 @@ services:
       TARGET: all
       BUILD_TYPE: Release
       CMAKE_ARGS: -DENABLE_TESTING=OFF
+  # example arm build (crosscompile)
+  example-arm64-release-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: arm64-build
+    environment:
+      TARGET: all
+      BUILD_TYPE: Release
+      CMAKE_ARGS: -DENABLE_TESTING=OFF

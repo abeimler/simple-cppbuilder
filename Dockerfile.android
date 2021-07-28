@@ -2,14 +2,21 @@
 FROM abeimler/simple-cppbuilder:base as base
 
 ARG extra_libraries
-ARG vcpkg_target_triplet="arm-android"
 ARG vcpkg_host_triplet="x64-linux"
+ARG processor="x86_64"
+
+ARG vcpkg_target_triplet="arm-android"
 ARG android_abi="armeabi-v7a"
+
+ARG cmake_generator="Ninja"
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
     pacman -S --noconfirm  \
-        ${extra_libraries} 
+        ${extra_libraries} \
+        python3 python-pip doxygen graphviz cmake make ninja ccache cppcheck valgrind gcovr \
+        neovim emacs nano
+
 
 # install android-ndk
 RUN runuser -l yay -c \
@@ -20,6 +27,7 @@ RUN runuser -l yay -c \
 
 # setup project env
 WORKDIR /home/project
+COPY ./scripts/docker-build.android.sh ./docker-build.sh
 
 # install vcpkg
 ## https://github.com/microsoft/vcpkg/blob/master/docs/users/android.md
@@ -31,6 +39,7 @@ RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/project/vcpkg"
 
 # cross compiler settings
+ENV PROCESSOR $processor
 ENV ANDROID_ABI $android_abi
 ENV TARGET_TRIPLET $vcpkg_target_triplet
 ENV ANDROID_HOME "/opt/android-sdk"
@@ -39,12 +48,14 @@ ENV ANDROID_TOOLCHAIN_FILE "$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmak
 ENV ANDROID_TOOLCHAIN "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64"
 ENV ANDROID_BUILD_TOOLS "$ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools/ | head -n 1)"
 ENV ANDROID_PLATFORM_TOOLS "$ANDROID_HOME/build-tools/platform-tools"
+ARG cmake_toolchain_file="$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake"
 
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
-ENV CMAKE_GENERATOR "Ninja"
+ENV CMAKE_GENERATOR $cmake_generator
 ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
+ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
 
 RUN mkdir build

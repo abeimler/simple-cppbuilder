@@ -50,16 +50,14 @@ ENV CXX "g++"
 
 # setup project env
 WORKDIR /home/project
-COPY ./cmake ./cmake
-COPY ./custom-triplets ./custom-triplets
+COPY ./cmake /home/cmake
 COPY ./scripts/docker-build.rpi.sh ./docker-build.sh
-ARG cmake_toolchain_file="/home/project/cmake/rpi-toolchain.cmake"
+ARG cmake_toolchain_file="/home/cmake/rpi-toolchain.cmake"
 
 # install vcpkg
 ENV VCPKG_DEFAULT_HOST_TRIPLET $triplet_host
 ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
 ENV VCPKG_DISABLE_METRICS 1
-ENV VCPKG_OVERLAY_TRIPLETS "/home/project/custom-triplets" 
 RUN git clone https://github.com/Microsoft/vcpkg.git
 RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/project/vcpkg"
