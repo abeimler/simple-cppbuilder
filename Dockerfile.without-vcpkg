@@ -25,6 +25,9 @@ WORKDIR /home/project
 COPY ./scripts/docker-build-without-toolchain.sh ./docker-build.sh
 COPY ./scripts/docker-test.sh ./docker-test.sh
 
+ENV CMAKE "cmake"
+ENV MAKE "make"
+
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"

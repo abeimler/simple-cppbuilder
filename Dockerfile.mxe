@@ -64,6 +64,9 @@ ENV CROSS_MAKE $make
 ENV CROSS "${cross_triplet}-"
 ENV CROSS_ROOT $cross_root
 
+ENV CMAKE $CROSS_CMAKE
+ENV MAKE $CROSS_MAKE
+
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"

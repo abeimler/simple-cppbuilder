@@ -48,6 +48,9 @@ ENV CONAN_SYSREQUIRES_SUDO 0
 # leaving this flag undefined can cause some installation failures.
 ENV CONAN_SYSREQUIRES_MODE enabled
 
+ENV CMAKE "cmake"
+ENV MAKE "make"
+
 # set default compiler
 ENV CC "gcc"
 ENV CXX "g++"

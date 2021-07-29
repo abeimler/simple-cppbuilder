@@ -9,7 +9,8 @@ ARG vcpkg_target_triplet="arm-linux"
 
 ARG cross_triple="armv8-rpi4-linux-gnueabihf"
 ARG cmake="cmake"
-ARG make="make"
+ARG make="ninja"
+ARG cmake_generator="Ninja"
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
@@ -37,11 +38,10 @@ RUN runuser -l cross -c \
 RUN runuser -l cross -c \
     "cd $crosstool_dir && \
         ./ct-ng build"
-ARG cross_root="${crosstool_dir}/x-tools/${cross_triple}"
+ARG cross_root="/home/cross/x-tools/${cross_triple}"
 ENV PATH="${cross_root}/bin:${PATH}"
-ARG cc="${cross_root}/bin/${cross_triple}-gcc"
-ARG cxx="${cross_root}/bin/${cross_triple}-g++"
-ARG cmake_generator="Unix Makefiles"
+ARG cc="${cross_triple}-gcc"
+ARG cxx="${cross_triple}-g++"
 
 # set default compiler
 ENV CC "gcc"
@@ -73,6 +73,9 @@ ENV CROSS "${cross_triple}-"
 
 # compiler env settings
 #COPY $crosstool_dir/ct-ng.comp /etc/bash_completion.d/ct-ng.comp
+
+ENV CMAKE $CROSS_CMAKE
+ENV MAKE $CROSS_MAKE
 
 # build script settings
 ENV TARGET "all"
