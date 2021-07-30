@@ -5,12 +5,16 @@ ARG extra_libraries
 ARG vcpkg_host_triplet="x64-linux"
 ARG processor="x86_64"
 
-ARG vcpkg_target_triplet="arm-android"
-ARG android_abi="armeabi-v7a"
+ARG vcpkg_target_triplet="x64-mingw-dynamic"
 
-ARG cmake="android-${android_abi}-cmake"
-ARG cmake_generator="Ninja"
-ARG make="ninja"
+ARG cross_triplet="x86_64-w64-mingw32.shared"
+
+ARG cc="${cross_triplet}-gcc"
+ARG cxx="${cross_triplet}-g++"
+ARG cmake="${cross_triplet}-cmake"
+ARG make="${cross_triplet}-make"
+ARG cmake_toolchain_file
+ARG cmake_generator="Unix Makefiles"
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
@@ -18,21 +22,30 @@ RUN pacman-db-upgrade && \
         ${extra_libraries} \
         cmake make ninja
 
-
-# install android stuff
+# install windows tools from AUR
 RUN runuser -l yay -c \
     "yay -Syu --noconfirm && yay -S --noconfirm \
-        jdk-openjdk android-sdk android-sdk-platform-tools android-sdk-build-tools android-ndk \
-        android-pkg-config android-cmake android-environment" && \
-    rm -rf /home/yay/.cache/* && \
-    ln -s /opt/android-ndk /opt/android-sdk/ndk-bundle
+        powershell" && \
+    rm -rf /home/yay/.cache/*
+
+# install mxe
+RUN pacman-db-upgrade && \
+    pacman -S --noconfirm  \
+        bzip2 lzip p7zip unzip xz perl ruby gperf intltool perl-xml-parser 
+ARG mxe_source_dir="/opt/mxe"
+RUN git clone https://github.com/mxe/mxe.git $mxe_source_dir
+RUN cd $mxe_source_dir && make cc ccache cmake cmake-conf ninja MXE_TARGETS="${cross_triplet}"
+ENV MXE_SOURCE_DIR $mxe_source_dir
+ENV PATH="${mxe_source_dir}/usr/bin:${PATH}"
+ARG cross_root="${mxe_source_dir}/usr"
 
 # setup project env
 WORKDIR /home/project
-COPY ./scripts/docker-build.android.sh ./docker-build.sh
+COPY ./cmake ./cmake
+COPY ./scripts/docker-build.mxe.sh ./docker-build.sh
 
 # install vcpkg
-## https://github.com/microsoft/vcpkg/blob/master/docs/users/android.md
+## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
 ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
 ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
 ENV VCPKG_DISABLE_METRICS 1
@@ -41,20 +54,15 @@ RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/project/vcpkg"
 
 # cross compiler settings
+ENV CC $cc
+ENV CXX $cxx
 ENV PROCESSOR $processor
-ENV ANDROID_ABI $android_abi
+ENV CROSS_TRIPLET $cross_triplet
 ENV TARGET_TRIPLET $vcpkg_target_triplet
 ENV CROSS_CMAKE $cmake
 ENV CROSS_MAKE $make
-ENV ANDROID_HOME "/opt/android-sdk"
-ENV ANDROID_NDK_HOME "/opt/android/ndk"
-ENV ANDROID_TOOLCHAIN_FILE "${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake"
-ENV ANDROID_TOOLCHAIN "${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64"
-ENV ANDROID_BUILD_TOOLS "${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools/ | head -n 1)"
-ENV ANDROID_PLATFORM_TOOLS "${ANDROID_HOME}/build-tools/platform-tools"
-ARG cmake_toolchain_file="${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake"
-
-RUN source android-env $android_abi && android-env $android_abi
+ENV CROSS "${cross_triplet}-"
+ENV CROSS_ROOT $cross_root
 
 ENV CMAKE $CROSS_CMAKE
 ENV MAKE $CROSS_MAKE
@@ -66,6 +74,9 @@ ENV CMAKE_GENERATOR $cmake_generator
 ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
+
+RUN $CC -v
+RUN $CXX -v
 
 RUN mkdir build
 ENTRYPOINT ["/usr/bin/bash"]

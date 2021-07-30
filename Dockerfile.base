@@ -1,19 +1,19 @@
 ## base image
 FROM archlinux:base-devel as base
 
-# default compiler versions
-ARG gcc_version=10
 ARG extra_libraries
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
     pacman -Syyu --noconfirm && pacman-db-upgrade && \
     pacman -S --noconfirm --needed \
-        wget curl pkg-config zip unzip tar git go && \
+        gcc wget curl pkg-config zip unzip tar git go && \
     pacman -S --noconfirm  \
-        gcc${gcc_version} clang binutils bison \
+        clang binutils bison \
         ${extra_libraries} \
-        python3 python-pip doxygen graphviz cmake make ninja ccache cppcheck valgrind gcovr \
+        python3 python-pip doxygen graphviz \
+        cmake make ninja ccache cppcheck \
+        valgrind gcovr perf gperftools \
         neovim emacs nano
 
 # install yay
@@ -48,9 +48,14 @@ ENV CONAN_SYSREQUIRES_SUDO 0
 # leaving this flag undefined can cause some installation failures.
 ENV CONAN_SYSREQUIRES_MODE enabled
 
+ENV CMAKE "cmake"
+ENV MAKE "make"
+
 # set default compiler
 ENV CC "gcc"
 ENV CXX "g++"
+RUN $CC -v
+RUN $CXX -v
 
 # setup project env
 WORKDIR /home/project

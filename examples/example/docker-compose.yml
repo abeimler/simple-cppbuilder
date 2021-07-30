@@ -1,0 +1,173 @@
+---
+version: "3.9"
+services:
+  # gcc Debug with make
+  example-gcc-debug-build-make:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build
+    environment:
+      CC: gcc
+      CXX: g++
+      TARGET: all
+      BUILD_TYPE: Debug
+      CMAKE_GENERATOR: Unix Makefiles
+  # gcc Debug
+  example-gcc-debug-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build
+    environment:
+      CC: gcc
+      CXX: g++
+      TARGET: all
+      BUILD_TYPE: Debug
+      CMAKE_GENERATOR: Ninja
+  example-gcc-debug-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+    environment:
+      CC: gcc
+      CXX: g++
+      TARGET: all
+      BUILD_TYPE: Debug
+      CMAKE_GENERATOR: Ninja
+  # gcc Release
+  example-gcc-release-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build
+    environment:
+      CC: gcc
+      CXX: g++
+      TARGET: all
+      BUILD_TYPE: Release
+      CMAKE_GENERATOR: Ninja
+  example-gcc-release-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+    environment:
+      CC: gcc
+      CXX: g++
+      TARGET: all
+      BUILD_TYPE: RelWithDebInfo
+      CMAKE_GENERATOR: Ninja
+  # clang Debug
+  example-clang-debug-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build
+    environment:
+      CC: clang
+      CXX: clang++
+      TARGET: all
+      BUILD_TYPE: Debug
+      CMAKE_GENERATOR: Ninja
+  example-clang-debug-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+    environment:
+      CC: clang
+      CXX: clang++
+      TARGET: all
+      BUILD_TYPE: Debug
+      CMAKE_GENERATOR: Ninja
+  # clang Release
+  example-clang-release-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build
+    environment:
+      CC: clang
+      CXX: clang++
+      TARGET: all
+      BUILD_TYPE: Release
+      CMAKE_GENERATOR: Ninja
+  example-clang-release-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+    environment:
+      CC: clang
+      CXX: clang++
+      TARGET: all
+      BUILD_TYPE: RelWithDebInfo
+      CMAKE_GENERATOR: Ninja
+  # example with test coverage
+  example-gcc-debug-test-cov:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+    environment:
+      CC: gcc
+      CXX: g++
+      TARGET: example-coverage-test
+      BUILD_TYPE: Debug
+      CMAKE_GENERATOR: Ninja
+      CMAKE_ARGS: -DENABLE_COVERAGE=ON
+  # example with dependency raylib (vcpkg)
+  example-gcc-release-with-raylib:
+    build:
+      context: .
+      dockerfile: Dockerfile.raylib
+      target: build
+    environment:
+      CC: gcc
+      CXX: g++
+      TARGET: all
+      BUILD_TYPE: Release
+      CMAKE_GENERATOR: Ninja
+      CMAKE_ARGS: -DUSE_RAYLIB=ON
+  # example mingw build (crosscompile)
+  example-mingw-release-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build-windows
+    environment:
+      TARGET: all
+      BUILD_TYPE: Release
+      CMAKE_ARGS: -DENABLE_TESTING=OFF
+  # example web build (emscripten)
+  example-web-release-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build-web
+    environment:
+      TARGET: all
+      BUILD_TYPE: Release
+      CMAKE_ARGS: -DENABLE_TESTING=OFF
+  # example arm build (crosscompile)
+  example-arm64-release-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build-arm64
+    environment:
+      TARGET: all
+      BUILD_TYPE: Release
+      CMAKE_ARGS: -DENABLE_TESTING=OFF
+  # example rpi4 build (crosscompile)
+  example-rpi4-release-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build-rpi4
+    environment:
+      TARGET: all
+      BUILD_TYPE: Release
+      CMAKE_ARGS: -DENABLE_TESTING=OFF

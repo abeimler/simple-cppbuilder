@@ -1,0 +1,14 @@
+.vs/
+build/
+out/
+build/*
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json 
+.gitignore
+Dockerfile
+docker-compose.yml
+docker-compose.*.yml
+vcpkg/

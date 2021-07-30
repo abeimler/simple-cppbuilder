@@ -1,0 +1,13 @@
+---
+version: "3.9"
+services:
+  android-example-release-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build
+    environment:
+      TARGET: all
+      BUILD_TYPE: Release
+      CMAKE_GENERATOR: Ninja
+      CMAKE_ARGS: -DBUILD_TESTING:BOOL=FALSE -DENABLE_TESTING:BOOL=FALSE

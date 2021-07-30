@@ -5,34 +5,37 @@ ARG extra_libraries
 ARG vcpkg_host_triplet="x64-linux"
 ARG processor="x86_64"
 
-ARG vcpkg_target_triplet="arm-android"
-ARG android_abi="armeabi-v7a"
+ARG vcpkg_target_triplet="wasm32-emscripten"
 
-ARG cmake="android-${android_abi}-cmake"
-ARG cmake_generator="Ninja"
-ARG make="ninja"
+ARG cc="emcc"
+ARG cxx="em++"
+ARG cmake="emcmake cmake"
+ARG make="emmake make"
+ARG cmake_toolchain_file="/usr/lib/emscripten/cmake/Modules/Platform/Emscripten.cmake"
+ARG cmake_generator="Unix Makefiles"
+
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
     pacman -S --noconfirm  \
+        clang llvm \
+        mesa glu glfw libx11 libxrender libxext libxcursor libxrandr libxinerama xorg-server-devel \
         ${extra_libraries} \
         cmake make ninja
 
-
-# install android stuff
+# install emscripten
 RUN runuser -l yay -c \
     "yay -Syu --noconfirm && yay -S --noconfirm \
-        jdk-openjdk android-sdk android-sdk-platform-tools android-sdk-build-tools android-ndk \
-        android-pkg-config android-cmake android-environment" && \
-    rm -rf /home/yay/.cache/* && \
-    ln -s /opt/android-ndk /opt/android-sdk/ndk-bundle
+        nodejs emscripten emsdk" && \
+    rm -rf /home/yay/.cache/*
+RUN /usr/lib/emsdk/emsdk install latest && /usr/lib/emsdk/emsdk activate latest
 
 # setup project env
 WORKDIR /home/project
-COPY ./scripts/docker-build.android.sh ./docker-build.sh
+COPY ./cmake ./cmake
+COPY ./scripts/docker-build.emscripten.sh ./docker-build.sh
 
 # install vcpkg
-## https://github.com/microsoft/vcpkg/blob/master/docs/users/android.md
 ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
 ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
 ENV VCPKG_DISABLE_METRICS 1
@@ -41,20 +44,24 @@ RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/project/vcpkg"
 
 # cross compiler settings
+ENV CC $cc
+ENV CXX $cxx
 ENV PROCESSOR $processor
-ENV ANDROID_ABI $android_abi
 ENV TARGET_TRIPLET $vcpkg_target_triplet
 ENV CROSS_CMAKE $cmake
 ENV CROSS_MAKE $make
-ENV ANDROID_HOME "/opt/android-sdk"
-ENV ANDROID_NDK_HOME "/opt/android/ndk"
-ENV ANDROID_TOOLCHAIN_FILE "${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake"
-ENV ANDROID_TOOLCHAIN "${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64"
-ENV ANDROID_BUILD_TOOLS "${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools/ | head -n 1)"
-ENV ANDROID_PLATFORM_TOOLS "${ANDROID_HOME}/build-tools/platform-tools"
-ARG cmake_toolchain_file="${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake"
 
-RUN source android-env $android_abi && android-env $android_abi
+# compiler env settings
+ENV EMSDK "/usr/lib/emsdk"
+ENV EM_CONFIG "/usr/lib/emsdk/.emscripten"
+ENV EM_CACHE "/usr/lib/emsdk/upstream/emscripten/cache"
+ENV EMSDK_PATH "/usr/lib/emsdk"
+ENV EMSCRIPTEN_PATH "/usr/lib/emscripten"
+ENV CLANG_PATH "/opt/emscripten-llvm/bin"
+ENV PYTHON_PATH "/usr/bin"
+ENV NODE_PATH "/usr/bin"
+ENV PATH="${EMSDK_PATH}:${EMSCRIPTEN_PATH}:${CLANG_PATH}:${NODE_PATH}:${PYTHON_PATH}:${PATH}"
+RUN source /usr/lib/emsdk/emsdk_env.sh && /usr/lib/emsdk/emsdk_env.sh
 
 ENV CMAKE $CROSS_CMAKE
 ENV MAKE $CROSS_MAKE
@@ -66,6 +73,9 @@ ENV CMAKE_GENERATOR $cmake_generator
 ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
+
+RUN $CC -v
+RUN $CXX -v
 
 RUN mkdir build
 ENTRYPOINT ["/usr/bin/bash"]
