@@ -71,8 +71,22 @@ ENV CROSS_CMAKE $cmake
 ENV CROSS_MAKE $make
 ENV CROSS "${cross_triple}-"
 
+ARG raspberrypi_firmware_repo="https://github.com/raspberrypi/firmware.git"
+ARG raspberrypi_firmware_branch="master"
+ARG raspberrypi_firmware_source_dir="/home/raspberrypi"
+RUN git clone -b $raspberrypi_firmware_branch $raspberrypi_firmware_repo $raspberrypi_firmware_source_dir
+RUN mkdir -p "${cross_root}/opt/vc" && cp -r ${raspberrypi_firmware_source_dir}/opt/vc "${cross_root}/opt/vc"
+RUN mkdir -p /opt/vc && cp -r ${raspberrypi_firmware_source_dir}/opt/vc /opt/vc
+ENV RASPBERRYPI_FIRMWARE_DIR $raspberrypi_firmware_source_dir
+
+ARG raspberrypi_tools_repo="https://github.com/raspberrypi/tools.git"
+ARG raspberrypi_tools_branch="master"
+ARG raspberrypi_tools_source_dir="/home/raspberrypi-tools"
+RUN git clone -b $raspberrypi_tools_branch $raspberrypi_tools_repo $raspberrypi_tools_source_dir
+ENV RASPBERRYPI_TOOLS_DIR $raspberrypi_tools_source_dir
+
 # compiler env settings
-#COPY $crosstool_dir/ct-ng.comp /etc/bash_completion.d/ct-ng.comp
+COPY ${crosstool_dir}/bash-completion/ct-ng /etc/bash_completion.d/ct-ng
 
 ENV CMAKE $CROSS_CMAKE
 ENV MAKE $CROSS_MAKE

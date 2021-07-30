@@ -41,7 +41,7 @@ You can then build and run the Docker image:
 
 ```bash
 $ docker build -t my-cpp-project .
-$ docker run -it --rm --name my-app-app my-cpp-project
+$ docker run -it --rm --name my-app my-cpp-project
 ```
 
 ### Run a single file
