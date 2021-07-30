@@ -8,9 +8,9 @@ ARG processor="x86_64"
 ARG vcpkg_target_triplet="arm-android"
 ARG android_abi="armeabi-v7a"
 
+ARG cmake="android-${android_abi}-cmake"
 ARG cmake_generator="Ninja"
 ARG make="ninja"
-ARG cmake="android-${android_abi}-cmake"
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
@@ -55,6 +55,9 @@ ENV ANDROID_PLATFORM_TOOLS "${ANDROID_HOME}/build-tools/platform-tools"
 ARG cmake_toolchain_file="${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake"
 
 RUN source android-env $android_abi && android-env $android_abi
+
+ENV CMAKE $CROSS_CMAKE
+ENV MAKE $CROSS_MAKE
 
 # build script settings
 ENV TARGET "all"

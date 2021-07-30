@@ -63,6 +63,9 @@ ENV NODE_PATH "/usr/bin"
 ENV PATH="${EMSDK_PATH}:${EMSCRIPTEN_PATH}:${CLANG_PATH}:${NODE_PATH}:${PYTHON_PATH}:${PATH}"
 RUN source /usr/lib/emsdk/emsdk_env.sh && /usr/lib/emsdk/emsdk_env.sh
 
+ENV CMAKE $CROSS_CMAKE
+ENV MAKE $CROSS_MAKE
+
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"

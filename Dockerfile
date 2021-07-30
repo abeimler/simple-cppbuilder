@@ -38,6 +38,9 @@ ENV CMAKE_GENERATOR "Ninja"
 ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV CMAKE_ARGS ""
 
+ENV CMAKE "cmake"
+ENV MAKE "make"
+
 RUN mkdir build
 ENTRYPOINT ["/usr/bin/bash"]
 #CMD ["./docker-build.sh"]

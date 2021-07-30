@@ -67,6 +67,9 @@ ENV CROSS_ROOT $cross_root
 ARG setup_env_script="echo"
 RUN $setup_env_script
 
+ENV CMAKE $CROSS_CMAKE
+ENV MAKE $CROSS_MAKE
+
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"

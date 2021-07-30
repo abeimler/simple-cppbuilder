@@ -41,7 +41,13 @@ You can then build and run the Docker image:
 
 ```bash
 $ docker build -t my-cpp-project .
-$ docker run -it --rm --name my-app-app my-cpp-project
+$ docker run -it --rm --name my-app my-cpp-project
+```
+
+### Run a single file
+
+```bash
+$ docker run -it --rm --name my-cpp-project -v "$PWD":/home/project -w /home/project abeimler/simple-cppbuilder ./docker-build.sh
 ```
 
 ## Image Variants
@@ -155,7 +161,9 @@ services:
       CMAKE_GENERATOR: Ninja
 ```
 
-Run `docker-compose up --build`.
+```bash
+$ docker-compose up --build
+```
 
 ### Using docker-compose, run tests
 
@@ -176,7 +184,9 @@ services:
       CMAKE_GENERATOR: Ninja
 ```
 
-Run `docker-compose up --build`.
+```bash
+$ docker-compose up --build
+```
 
 ### Use your custom build script
 
@@ -217,7 +227,9 @@ services:
       target: build
 ```
 
-Run `docker-compose up --build`.
+```bash
+$ docker-compose up --build
+```
 
 
 ## Environment Variables
