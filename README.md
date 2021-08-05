@@ -54,11 +54,11 @@ $ docker run -it --rm --name my-cpp-project -v "$PWD":/home/project -w /home/pro
 
 ### `:base`
 
-Base image with gcc, buildtools and [conan](https://conan.io/) (dependency manager).
+Base image with gcc, buildtools and [conan](https://conan.io/) (dependency manager) installed.
 
-### `:latest`
+### `:<version>`, `:latest`
 
-Default image with gcc, buildtools, [conan](https://conan.io/) and [vcpkg](https://vcpkg.io/) pre-installed (and bootstrapped).
+Default image with gcc, buildtools, [conan](https://conan.io/) installed and [vcpkg](https://vcpkg.io/) bootstrapped.
 
 ### Compilers
 
@@ -269,7 +269,7 @@ Custom CMake Arguments, e.g. `-DENABLE_COVERAGE:BOOL=ON`.
 
 ## License
 
-View [license information](https://github.com/abeimler/simple-cppbuilder/blob/main/LICENSE) for the software contained in this image.  
+View [license information](https://github.com/abeimler/simple-cppbuilder/blob/main/LICENSE) for this image.  
 
 As with all Docker images, these likely also contain other software which may be under other licenses (such as Bash, etc from the base distribution, along with any direct or indirect dependencies of the primary software being contained).  
 
