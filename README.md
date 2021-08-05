@@ -54,11 +54,11 @@ $ docker run -it --rm --name my-cpp-project -v "$PWD":/home/project -w /home/pro
 
 ### `:base`
 
-Base image with gcc, buildtools and [conan](https://conan.io/) (dependency manager).
+Base image with gcc, buildtools and [conan](https://conan.io/) (dependency manager) installed.
 
-### `:latest`
+### `:<version>`, `:latest`
 
-Default image with gcc, buildtools, [conan](https://conan.io/) and [vcpkg](https://vcpkg.io/) pre-installed (and bootstrapped).
+Default image with gcc, buildtools, [conan](https://conan.io/) installed and [vcpkg](https://vcpkg.io/) bootstrapped.
 
 ### Compilers
 
@@ -89,11 +89,11 @@ Default image with some OpenGL dependencies: `mesa glu glfw libx11 libxrender li
 
 _Not fully tested_
 
-#### `:x64-mingw-w64`, `x86-mingw-w64`
+#### `:x64-mingw-w64`, `:x86-mingw-w64`
 
 Default image with mingw-w64-cross-compiler: [mingw-w64-gcc](https://archlinux.org/packages/community/x86_64/mingw-w64-gcc/) and toolchain.
 
-#### `:x64-mingw-w64-mxe`, `x86-mingw-w64-mxe`, `:x64-mingw-w64-mxe-static`, `x86-mingw-w64-mxe-static` (older compiler)
+#### `:x64-mingw-w64-mxe`, `x86-mingw-w64-mxe`, `:x64-mingw-w64-mxe-static`, `:x86-mingw-w64-mxe-static` (older compiler)
 
 Default image with [mxe](https://mxe.cc/) and toolchain.
 
@@ -269,7 +269,7 @@ Custom CMake Arguments, e.g. `-DENABLE_COVERAGE:BOOL=ON`.
 
 ## License
 
-View [license information](https://github.com/abeimler/simple-cppbuilder/blob/main/LICENSE) for the software contained in this image.  
+View [license information](https://github.com/abeimler/simple-cppbuilder/blob/main/LICENSE) for this image.  
 
 As with all Docker images, these likely also contain other software which may be under other licenses (such as Bash, etc from the base distribution, along with any direct or indirect dependencies of the primary software being contained).  
 
@@ -278,6 +278,7 @@ As for any pre-built image usage, it is the image user's responsibility to ensur
 
 ### Links
 
+- [simple-cppbuilder DockerHub](https://hub.docker.com/r/abeimler/simple-cppbuilder)
 - [simple-cppbuilder GitHub](https://github.com/abeimler/simple-cppbuilder)
 - [simple-cppbuilder-raylib GitHub](https://github.com/abeimler/simple-cppbuilder-raylib)
 - [cpp_starter_project](https://github.com/lefticus/cpp_starter_project)
