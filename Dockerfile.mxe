@@ -12,15 +12,16 @@ ARG cross_triplet="x86_64-w64-mingw32.shared"
 ARG cc="${cross_triplet}-gcc"
 ARG cxx="${cross_triplet}-g++"
 ARG cmake="${cross_triplet}-cmake"
-ARG make="${cross_triplet}-make"
-ARG cmake_toolchain_file
-ARG cmake_generator="Unix Makefiles"
+ARG make="ninja"
+ARG cmake_generator="Ninja"
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
+    pacman -Syyu --noconfirm && pacman-db-upgrade && \
     pacman -S --noconfirm  \
         ${extra_libraries} \
-        cmake make ninja
+        cmake make ninja && \
+    pacman -Sc --noconfirm
 
 # install windows tools from AUR
 RUN runuser -l yay -c \
@@ -33,23 +34,28 @@ RUN pacman-db-upgrade && \
     pacman -S --noconfirm  \
         bzip2 lzip p7zip unzip xz perl ruby gperf intltool perl-xml-parser 
 ARG mxe_source_dir="/opt/mxe"
-RUN git clone https://github.com/mxe/mxe.git $mxe_source_dir
-RUN cd $mxe_source_dir && make cc ccache cmake cmake-conf ninja MXE_TARGETS="${cross_triplet}"
+RUN git clone --depth 1 https://github.com/mxe/mxe.git $mxe_source_dir
+RUN cd $mxe_source_dir && make cc MXE_TARGETS="${cross_triplet}"
+RUN cd $mxe_source_dir && make ccache cmake cmake-conf ninja --jobs=4 JOBS=2 MXE_TARGETS="${cross_triplet}" 
+RUN cd $mxe_source_dir && make clean-junk
+#RUN cd $mxe_source_dir && rm -rf $mxe_source_dir/log $mxe_source_dir/tmp-*
 ENV MXE_SOURCE_DIR $mxe_source_dir
 ENV PATH="${mxe_source_dir}/usr/bin:${PATH}"
 ARG cross_root="${mxe_source_dir}/usr"
+ARG cmake_toolchain_file="${cross_root}/${cross_triplet}/share/cmake/mxe-conf.cmake"
 
 # setup project env
 WORKDIR /home/project
 COPY ./cmake ./cmake
 COPY ./scripts/docker-build.mxe.sh ./docker-build.sh
+COPY ./scripts/docker-entrypoint.cross.sh /docker-entrypoint.sh
 
 # install vcpkg
 ## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
 ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
 ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
 ENV VCPKG_DISABLE_METRICS 1
-RUN git clone https://github.com/Microsoft/vcpkg.git
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
 RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/project/vcpkg"
 
@@ -63,6 +69,12 @@ ENV CROSS_CMAKE $cmake
 ENV CROSS_MAKE $make
 ENV CROSS "${cross_triplet}-"
 ENV CROSS_ROOT $cross_root
+ENV CROSS_TOOLCHAIN $cmake_toolchain_file
+
+RUN mkdir -p /home/cross
+RUN touch /home/cross/.bashrc
+ARG setup_env_script="/home/cross/.bashrc"
+ENV SETUP_ENV_SCRIPT $setup_env_script
 
 ENV CMAKE $CROSS_CMAKE
 ENV MAKE $CROSS_MAKE
@@ -75,9 +87,6 @@ ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
 
-RUN $CC -v
-RUN $CXX -v
-
 RUN mkdir build
-ENTRYPOINT ["/usr/bin/bash"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
 #CMD ["./docker-build.sh"]

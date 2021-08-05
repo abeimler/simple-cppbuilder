@@ -1,0 +1,56 @@
+schemaVersion: 2.0.0
+
+commandTests:
+- name: emcc compiler
+  setup: [["/usr/lib/emsdk/emsdk_env.sh"]]
+  command: $CC
+  args: ["--version"]
+  expectedOutput: [".*emcc*"]
+- name: em++ compiler
+  setup: [["/usr/lib/emsdk/emsdk_env.sh"]]
+  command: $CXX
+  args: ["--version"]
+  expectedOutput: [".*emcc.*"]
+- name: cmake
+  setup: [["/usr/lib/emsdk/emsdk_env.sh"]]
+  command: emcmake
+  args: ["cmake", "--version"]
+  expectedOutput: [".*cmake version.*"]
+- name: make
+  setup: [["/usr/lib/emsdk/emsdk_env.sh"]]
+  command: emmake
+  args: ["make", "--version"]
+  expectedOutput: [".*GNU Make.*"]
+
+fileExistenceTests:
+- name: 'vcpkg'
+  path: '/home/project/vcpkg/vcpkg'
+  shouldExist: true
+- name: 'cmake toolchain'
+  path: $CROSS_TOOLCHAIN
+  shouldExist: true
+- name: 'emsdk'
+  path: $EMSDK_PATH
+  shouldExist: true
+- name: 'emscripten'
+  path: $EMSCRIPTEN_PATH
+  shouldExist: true
+- name: 'emscripten llvm'
+  path: $CLANG_PATH
+  shouldExist: true
+- name: 'em config'
+  path: $EM_CONFIG
+  shouldExist: true
+
+metadataTest:
+  env:
+    - key: CC
+      value: emcc
+    - key: CXX
+      value: em++
+    - key: CMAKE
+      value: emcmake cmake
+    - key: MAKE
+      value: emmake make
+    - key: CROSS_TOOLCHAIN
+      value: /usr/lib/emscripten/cmake/Modules/Platform/Emscripten.cmake

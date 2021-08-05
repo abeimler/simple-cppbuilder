@@ -14,11 +14,12 @@ RUN pacman-db-upgrade && \
         python3 python-pip doxygen graphviz \
         cmake make ninja ccache cppcheck \
         valgrind gcovr perf gperftools \
-        neovim emacs nano
+        neovim emacs nano && \
+    pacman -Sc --noconfirm
 
 # install yay
 RUN useradd -m -G nobody -s /bin/bash yay && passwd -d yay && echo "yay ALL=(ALL)  ALL" >> /etc/sudoers
-RUN git clone https://aur.archlinux.org/yay.git /opt/yay && cd /opt/yay && \
+RUN git clone --depth 1 https://aur.archlinux.org/yay.git /opt/yay && cd /opt/yay && \
     chown -R yay:root . && chmod -R 775 . && \
     runuser -l yay -c "cd /opt/yay && makepkg -si --noprogressbar --noconfirm"
 RUN cd /
@@ -54,8 +55,6 @@ ENV MAKE "make"
 # set default compiler
 ENV CC "gcc"
 ENV CXX "g++"
-RUN $CC -v
-RUN $CXX -v
 
 # setup project env
 WORKDIR /home/project

@@ -1,0 +1,58 @@
+schemaVersion: 2.0.0
+
+commandTests:
+- name: clang compiler
+  setup: [["/docker-entrypoint.sh"]]
+  command: $CC
+  args: ["--version"]
+  expectedOutput: [".*clang version*"]
+- name: clang++ compiler
+  setup: [["/docker-entrypoint.sh"]]
+  command: $CXX
+  args: ["--version"]
+  expectedOutput: [".*clang version.*"]
+- name: cmake
+  setup: [["/docker-entrypoint.sh"]]
+  command: $CMAKE
+  args: ["--version"]
+  expectedOutput: [".*cmake version.*"]
+- name: make
+  setup: [["/docker-entrypoint.sh"]]
+  command: $MAKE
+  args: ["--version"]
+  excludedOutput: [".*(GNU Make).*"]
+
+fileExistenceTests:
+- name: 'vcpkg'
+  path: '/home/project/vcpkg/vcpkg'
+  shouldExist: true
+- name: 'cmake toolchain'
+  path: $CROSS_TOOLCHAIN
+  shouldExist: true
+- name: 'android toolchain'
+  path: $ANDROID_TOOLCHAIN_FILE
+  shouldExist: true
+- name: 'android home'
+  path: $ANDROID_HOME
+  shouldExist: true
+- name: 'android ndk'
+  path: $ANDROID_NDK_HOME
+  shouldExist: true
+- name: 'android platform tools'
+  path: $ANDROID_PLATFORM_TOOLS
+  shouldExist: true
+
+metadataTest:
+  env:
+    - key: CC
+      value: clang
+    - key: CXX
+      value: clang++
+    - key: CMAKE
+      value: android-armv7a-eabi-cmake
+    - key: MAKE
+      value: ninja
+    - key: CROSS_TOOLCHAIN
+      value: /opt/android-ndk/build/cmake/android.toolchain.cmake
+    - key: ANDROID_TOOLCHAIN_FILE
+      value: /opt/android-ndk/build/cmake/android.toolchain.cmake

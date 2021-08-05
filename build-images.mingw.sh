@@ -8,7 +8,7 @@ docker build --force-rm=true -f ./Dockerfile.cross \
     --build-arg cmake_generator="Ninja" \
     --build-arg make="ninja" \
     --build-arg cmake="x86_64-w64-mingw32-cmake" \
-    --build-arg setup_env_script="source mingw-env && mingw-env" \
+    --build-arg setup_env_script="mingw-env" \
     --build-arg cmake_toolchain_file="/usr/share/mingw/toolchain-x86_64-w64-mingw32.cmake" \
     -t abeimler/simple-cppbuilder:x64-mingw-w64 .
 
@@ -20,7 +20,7 @@ docker build --force-rm=true -f ./Dockerfile.cross \
     --build-arg cmake_generator="Ninja" \
     --build-arg make="ninja" \
     --build-arg cmake="i686-w64-mingw32-cmake" \
-    --build-arg setup_env_script="source mingw-env && mingw-env" \
+    --build-arg setup_env_script="mingw-env" \
     --build-arg cmake_toolchain_file="/usr/share/mingw/toolchain-i686-w64-mingw32.cmake" \
     -t abeimler/simple-cppbuilder:x86-mingw-w64 .
 

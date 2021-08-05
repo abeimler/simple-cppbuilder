@@ -141,16 +141,6 @@ services:
       TARGET: all
       BUILD_TYPE: Release
       CMAKE_ARGS: -DENABLE_TESTING=OFF
-  # example web build (emscripten)
-  example-web-release-build:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: build-web
-    environment:
-      TARGET: all
-      BUILD_TYPE: Release
-      CMAKE_ARGS: -DENABLE_TESTING=OFF
   # example arm build (crosscompile)
   example-arm64-release-build:
     build:

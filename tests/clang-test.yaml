@@ -1,0 +1,40 @@
+schemaVersion: 2.0.0
+
+commandTests:
+- name: clang compiler
+  command: $CC
+  args: ["--version"]
+  expectedOutput: [".*clang version*"]
+- name: clang++ compiler
+  command: $CXX
+  args: ["--version"]
+  expectedOutput: [".*clang version.*"]
+- name: cmake
+  command: $CMAKE
+  args: ["--version"]
+  expectedOutput: [".*cmake version.*"]
+- name: make
+  command: $MAKE
+  args: ["--version"]
+  expectedOutput: [".*GNU Make.*"]
+
+fileExistenceTests:
+- name: 'vcpkg'
+  path: '/home/project/vcpkg/vcpkg'
+  shouldExist: true
+- name: 'cmake toolchain'
+  path: '/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake'
+  shouldExist: true
+
+metadataTest:
+  env:
+    - key: CC
+      value: clang
+    - key: CXX
+      value: clang++
+    - key: CMAKE
+      value: cmake
+    - key: MAKE
+      value: make
+    - key: TOOLCHAIN_FILE
+      value: /home/project/vcpkg/scripts/buildsystems/vcpkg.cmake

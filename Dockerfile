@@ -12,13 +12,13 @@ RUN pacman-db-upgrade && \
     pacman -S --noconfirm  \
         gcc binutils bison \
         ${extra_libraries} \
-        cmake make ninja
+        cmake make ninja && \
+    pacman -Sc --noconfirm
+
 
 # set default compiler
 ENV CC "gcc"
 ENV CXX "g++"
-RUN $CC -v
-RUN $CXX -v
 
 # setup project env
 WORKDIR /home/project
@@ -27,7 +27,7 @@ COPY ./scripts/docker-test.sh ./docker-test.sh
 
 # install vcpkg
 ENV VCPKG_DISABLE_METRICS 1
-RUN git clone https://github.com/Microsoft/vcpkg.git
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
 RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/project/vcpkg"
 

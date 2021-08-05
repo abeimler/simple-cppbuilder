@@ -12,13 +12,12 @@ RUN pacman-db-upgrade && \
     pacman -S --noconfirm  \
         clang binutils bison \
         ${extra_libraries} \
-        cmake make ninja
+        cmake make ninja && \
+    pacman -Sc --noconfirm
 
 # set default compiler
 ENV CC "gcc"
 ENV CXX "g++"
-RUN $CC -v
-RUN $CXX -v
 
 # setup project env
 WORKDIR /home/project

@@ -2,8 +2,9 @@
 
 docker build --force-rm=true -f ./Dockerfile.base -t abeimler/simple-cppbuilder:base .
 
-docker build --force-rm=true -f ./Dockerfile.without-vcpkg -t abeimler/simple-cppbuilder:without-vcpkg .
 docker build --force-rm=true -t abeimler/simple-cppbuilder .
+
+docker build --force-rm=true -f ./Dockerfile.without-vcpkg -t abeimler/simple-cppbuilder:without-vcpkg .
 
 docker build --force-rm=true -f ./Dockerfile.clang -t abeimler/simple-cppbuilder:clang .
 

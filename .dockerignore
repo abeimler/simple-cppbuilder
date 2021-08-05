@@ -12,6 +12,7 @@ cpp_starter_project/
 test/
 img/
 LICENSE
+VERSION
 README.md
 build-images.sh
 push-images.sh
