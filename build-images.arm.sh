@@ -8,7 +8,7 @@ docker build --force-rm=true -f ./Dockerfile.cross \
     --build-arg cmake_generator="Ninja" \
     --build-arg make="ninja" \
     --build-arg cmake="aarch64-linux-gnu-cmake" \
-    --build-arg setup_env_script="source aarch64-linux-gnu-environment && aarch64-linux-gnu-environment" \
+    --build-arg setup_env_script="aarch64-linux-gnu-environment" \
     --build-arg cmake_toolchain_file="/home/cmake/aarch64-toolchain.cmake" \
     -t abeimler/simple-cppbuilder:aarch64-linux .
 

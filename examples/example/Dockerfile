@@ -1,10 +1,6 @@
 ## base image
 FROM abeimler/simple-cppbuilder as base
-
-## add more system libs and dependencies here
-#RUN pacman-db-upgrade && \
-#    pacman -S --noconfirm  \
-#        boost qt6-base qt6-tools
+COPY . .
 
 ## build stage
 FROM base as build

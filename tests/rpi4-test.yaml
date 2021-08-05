@@ -1,0 +1,55 @@
+schemaVersion: 2.0.0
+
+commandTests:
+- name: cross c compiler
+  command: $CC
+  args: ["--version"]
+  expectedOutput: [".*armv8-rpi4-linux-gnueabihf-gcc.*"]
+- name: cross c++ compiler
+  command: $CXX
+  args: ["--version"]
+  expectedOutput: [".*armv8-rpi4-linux-gnueabihf-g\\+\\+.*"]
+- name: cmake
+  command: $CMAKE
+  args: ["--version"]
+  expectedOutput: [".*cmake version.*"]
+- name: make
+  command: $MAKE
+  args: ["--version"]
+  excludedOutput: [".*(GNU Make).*"]
+
+fileExistenceTests:
+- name: 'vcpkg'
+  path: '/home/project/vcpkg/vcpkg'
+  shouldExist: true
+- name: 'cmake toolchain'
+  path: $CROSS_TOOLCHAIN
+  shouldExist: true
+- name: 'raspberrypi firmware'
+  path: $RASPBERRYPI_FIRMWARE_DIR
+  shouldExist: true
+- name: 'raspberrypi tools'
+  path: $RASPBERRYPI_TOOLS_DIR
+  shouldExist: true
+- name: 'opt vc'
+  path: '/opt/vc'
+  shouldExist: true
+- name: 'opt vc header files'
+  path: '/opt/vc/include/bcm_host.h'
+  shouldExist: true
+- name: 'opt vc header files GLES'
+  path: '/opt/vc/include/GLES2/gl2.h'
+  shouldExist: true
+
+metadataTest:
+  env:
+    - key: CC
+      value: armv8-rpi4-linux-gnueabihf-gcc
+    - key: CXX
+      value: armv8-rpi4-linux-gnueabihf-g++
+    - key: CMAKE
+      value: cmake
+    - key: MAKE
+      value: ninja
+    - key: CROSS_TOOLCHAIN
+      value: /home/cmake/arm-rpi-toolchain.cmake

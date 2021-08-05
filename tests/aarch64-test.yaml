@@ -1,0 +1,40 @@
+schemaVersion: 2.0.0
+
+commandTests:
+- name: mingw c compiler
+  command: $CC
+  args: ["--version"]
+  expectedOutput: [".*aarch64-linux-gnu-gcc.*"]
+- name: mingw c++ compiler
+  command: $CXX
+  args: ["--version"]
+  expectedOutput: [".*aarch64-linux-gnu-g\\+\\+.*"]
+- name: cmake
+  command: $CMAKE
+  args: ["--version"]
+  expectedOutput: [".*cmake version.*"]
+- name: make
+  command: $MAKE
+  args: ["--version"]
+  excludedOutput: [".*(GNU Make).*"]
+
+fileExistenceTests:
+- name: 'vcpkg'
+  path: '/home/project/vcpkg/vcpkg'
+  shouldExist: true
+- name: 'cmake toolchain'
+  path: '/home/cmake/aarch64-toolchain.cmake'
+  shouldExist: true
+
+metadataTest:
+  env:
+    - key: CC
+      value: aarch64-linux-gnu-gcc
+    - key: CXX
+      value: aarch64-linux-gnu-g++
+    - key: CMAKE
+      value: aarch64-linux-gnu-cmake
+    - key: MAKE
+      value: ninja
+    - key: CROSS_TOOLCHAIN
+      value: /home/cmake/aarch64-toolchain.cmake

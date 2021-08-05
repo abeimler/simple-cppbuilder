@@ -1,0 +1,38 @@
+schemaVersion: 2.0.0
+
+commandTests:
+- name: mingw c compiler
+  command: $CC
+  args: ["--version"]
+  expectedOutput: [".*x86_64-w64-mingw32.shared-gcc.*"]
+- name: mingw c++ compiler
+  command: $CXX
+  args: ["--version"]
+  expectedOutput: [".*x86_64-w64-mingw32.shared-g\\+\\+.*"]
+- name: cmake
+  command: $CMAKE
+  args: ["--version"]
+  expectedOutput: [".*cmake version.*"]
+- name: make
+  command: $MAKE
+  args: ["--version"]
+  excludedOutput: [".*(GNU Make).*"]
+
+fileExistenceTests:
+- name: 'vcpkg'
+  path: '/home/project/vcpkg/vcpkg'
+  shouldExist: true
+- name: 'cross compiler root'
+  path: $CROSS_ROOT
+  shouldExist: true
+
+metadataTest:
+  env:
+    - key: CC
+      value: x86_64-w64-mingw32.shared-gcc
+    - key: CXX
+      value: x86_64-w64-mingw32.shared-g++
+    - key: CMAKE
+      value: x86_64-w64-mingw32.shared-cmake
+    - key: MAKE
+      value: ninja

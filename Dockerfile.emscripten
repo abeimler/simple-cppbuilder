@@ -17,11 +17,13 @@ ARG cmake_generator="Unix Makefiles"
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
+    pacman -Syyu --noconfirm && pacman-db-upgrade && \
     pacman -S --noconfirm  \
         clang llvm \
         mesa glu glfw libx11 libxrender libxext libxcursor libxrandr libxinerama xorg-server-devel \
         ${extra_libraries} \
-        cmake make ninja
+        cmake make ninja && \
+    pacman -Sc --noconfirm
 
 # install emscripten
 RUN runuser -l yay -c \
@@ -34,12 +36,13 @@ RUN /usr/lib/emsdk/emsdk install latest && /usr/lib/emsdk/emsdk activate latest
 WORKDIR /home/project
 COPY ./cmake ./cmake
 COPY ./scripts/docker-build.emscripten.sh ./docker-build.sh
+COPY ./scripts/docker-entrypoint.cross.sh /docker-entrypoint.sh
 
 # install vcpkg
 ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
 ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
 ENV VCPKG_DISABLE_METRICS 1
-RUN git clone https://github.com/Microsoft/vcpkg.git
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
 RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/project/vcpkg"
 
@@ -50,6 +53,7 @@ ENV PROCESSOR $processor
 ENV TARGET_TRIPLET $vcpkg_target_triplet
 ENV CROSS_CMAKE $cmake
 ENV CROSS_MAKE $make
+ENV CROSS_TOOLCHAIN $cmake_toolchain_file
 
 # compiler env settings
 ENV EMSDK "/usr/lib/emsdk"
@@ -61,7 +65,9 @@ ENV CLANG_PATH "/opt/emscripten-llvm/bin"
 ENV PYTHON_PATH "/usr/bin"
 ENV NODE_PATH "/usr/bin"
 ENV PATH="${EMSDK_PATH}:${EMSCRIPTEN_PATH}:${CLANG_PATH}:${NODE_PATH}:${PYTHON_PATH}:${PATH}"
-RUN source /usr/lib/emsdk/emsdk_env.sh && /usr/lib/emsdk/emsdk_env.sh
+
+ARG setup_env_script="/usr/lib/emsdk/emsdk_env.sh"
+ENV SETUP_ENV_SCRIPT $setup_env_script
 
 ENV CMAKE $CROSS_CMAKE
 ENV MAKE $CROSS_MAKE
@@ -74,9 +80,6 @@ ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
 
-RUN $CC -v
-RUN $CXX -v
-
 RUN mkdir build
-ENTRYPOINT ["/usr/bin/bash"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
 #CMD ["./docker-build.sh"]

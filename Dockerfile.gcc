@@ -4,8 +4,8 @@ FROM abeimler/simple-cppbuilder:base as base
 # default compiler versions
 ARG gcc_version=10
 ARG extra_libraries
-ARG cc="gcc${gcc_version}"
-ARG cxx="g++${gcc_version}"
+ARG cc="gcc-${gcc_version}"
+ARG cxx="g++-${gcc_version}"
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
@@ -15,7 +15,8 @@ RUN pacman-db-upgrade && \
     pacman -S --noconfirm  \
         binutils bison \
         ${extra_libraries} \
-        cmake make ninja
+        cmake make ninja && \
+    pacman -Sc --noconfirm
 
 RUN runuser -l yay -c \
     "yay -Syu --noconfirm && yay -S --noconfirm \
@@ -35,12 +36,13 @@ COPY ./scripts/docker-test.sh ./docker-test.sh
 
 # install vcpkg
 ENV VCPKG_DISABLE_METRICS 1
-RUN git clone https://github.com/Microsoft/vcpkg.git
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
 RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/project/vcpkg"
 
 ENV CMAKE "cmake"
 ENV MAKE "make"
+RUN $CMAKE --version
 
 # build script settings
 ENV TARGET "all"

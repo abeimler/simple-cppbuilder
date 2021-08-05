@@ -1,6 +1,6 @@
 # Simple C++ Docker Builder
 
-![logo](https://raw.githubusercontent.com/abeimler/simple-cppbuilder/main/img/logo.png)  
+<a href="https://hub.docker.com/r/abeimler/simple-cppbuilder">![logo](https://raw.githubusercontent.com/abeimler/simple-cppbuilder/main/img/logo.png)</a>  
 
 ![docker-image-size](https://img.shields.io/docker/image-size/abeimler/simple-cppbuilder) ![automated](https://img.shields.io/docker/automated/abeimler/simple-cppbuilder) ![pulls](https://img.shields.io/docker/pulls/abeimler/simple-cppbuilder) ![license](https://img.shields.io/github/license/abeimler/simple-cppbuilder) ![stars](https://img.shields.io/docker/stars/abeimler/simple-cppbuilder)
 
@@ -101,9 +101,9 @@ Default image with [mxe](https://mxe.cc/) and toolchain.
 
 Default image with [emscripten](https://emscripten.org/).
 
-#### `:rpi2`, `:rpi3`, `:rpi4`
+#### `:rpi2`, `:rpi3`, `:rpi4` (big images!)
 
-Default image with arm-cross-compiler: ([crosstool-ng](https://crosstool-ng.github.io/)) for RaspberryPi and toolchain.
+Default image with arm-cross-compiler: ([crosstool-ng](https://crosstool-ng.github.io/)) for RaspberryPi, raspberrypi-tools and toolchain.
 
 #### `:arm-android`, `:arm64-android`, `:x86-android`, `:x64-android`
 

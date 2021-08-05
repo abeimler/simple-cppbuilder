@@ -27,9 +27,11 @@ ARG install_extras_toolchain
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
+    pacman -Syyu --noconfirm && pacman-db-upgrade && \
     pacman -S --noconfirm  \
         ${extra_libraries} \
-        cmake make ninja
+        cmake make ninja && \
+    pacman -Sc --noconfirm
 
 # install extra toolchain packages and tools from AUR
 RUN runuser -l yay -c \
@@ -41,13 +43,14 @@ RUN runuser -l yay -c \
 COPY ./cmake /home/cmake
 WORKDIR /home/project
 COPY ./scripts/docker-build.cross.sh ./docker-build.sh
+COPY ./scripts/docker-entrypoint.cross.sh /docker-entrypoint.sh
 
 # install vcpkg
 ## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
 ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
 ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
 ENV VCPKG_DISABLE_METRICS 1
-RUN git clone https://github.com/Microsoft/vcpkg.git
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
 RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/project/vcpkg"
 
@@ -61,11 +64,13 @@ ENV CROSS_CMAKE $cmake
 ENV CROSS_MAKE $make
 ENV CROSS "${cross_triple}-"
 ENV CROSS_ROOT $cross_root
+ENV CROSS_TOOLCHAIN $cmake_toolchain_file
 
 # compiler env settings
 # e.g. mingw-env, emsdk_env.sh
-ARG setup_env_script="echo"
-RUN $setup_env_script
+RUN touch /home/cross/.bashrc
+ARG setup_env_script="/home/cross/.bashrc"
+ENV SETUP_ENV_SCRIPT $setup_env_script
 
 ENV CMAKE $CROSS_CMAKE
 ENV MAKE $CROSS_MAKE
@@ -78,9 +83,6 @@ ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
 
-RUN $CC -v
-RUN $CXX -v
-
 RUN mkdir build
-ENTRYPOINT ["/usr/bin/bash"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
 #CMD ["./docker-build.sh"]
