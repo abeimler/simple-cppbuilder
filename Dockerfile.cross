@@ -68,6 +68,7 @@ ENV CROSS_TOOLCHAIN $cmake_toolchain_file
 
 # compiler env settings
 # e.g. mingw-env, emsdk_env.sh
+RUN mkdir -p /home/cross
 RUN touch /home/cross/.bashrc
 ARG setup_env_script="/home/cross/.bashrc"
 ENV SETUP_ENV_SCRIPT $setup_env_script

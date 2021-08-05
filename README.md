@@ -101,7 +101,7 @@ Default image with [mxe](https://mxe.cc/) and toolchain.
 
 Default image with [emscripten](https://emscripten.org/).
 
-#### `:rpi2`, `:rpi3`, `:rpi4` (big images!)
+#### `:rpi2`, `:rpi3`, `:rpi4`
 
 Default image with arm-cross-compiler: ([crosstool-ng](https://crosstool-ng.github.io/)) for RaspberryPi, raspberrypi-tools and toolchain.
 
