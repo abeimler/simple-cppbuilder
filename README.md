@@ -66,6 +66,10 @@ Default image with gcc, buildtools, [conan](https://conan.io/) installed and [vc
 
 Default image with clang compiler.
 
+#### `:gcc10`, `:gcc9`
+
+Default image with gcc compiler.
+
 ### Libraries
 
 #### `:libcpp`
@@ -101,7 +105,7 @@ Default image with [mxe](https://mxe.cc/) and toolchain.
 
 Default image with [emscripten](https://emscripten.org/).
 
-#### `:rpi2`, `:rpi3`, `:rpi4`
+#### `:rpi4`, `:rpi3`,  `:rpi2`, `:rpi`
 
 Default image with arm-cross-compiler: ([crosstool-ng](https://crosstool-ng.github.io/)) for RaspberryPi, raspberrypi-tools and toolchain.
 
