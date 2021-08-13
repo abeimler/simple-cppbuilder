@@ -6,6 +6,7 @@ container-structure-test test --image abeimler/simple-cppbuilder --config tests/
 container-structure-test test --image abeimler/simple-cppbuilder:without-vcpkg --config tests/without-vcpkg-test.yaml
 
 container-structure-test test --image abeimler/simple-cppbuilder:clang --config tests/clang-test.yaml
+container-structure-test test --image abeimler/simple-cppbuilder:gcc-9 --config tests/gcc9-test.yaml
 
 container-structure-test test --image abeimler/simple-cppbuilder:emscripten --config tests/emscripten-test.yaml
 
