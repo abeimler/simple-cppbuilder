@@ -1,5 +1,7 @@
 #!/bin/bash
 
+## install https://github.com/GoogleContainerTools/container-structure-test
+
 container-structure-test test --image abeimler/simple-cppbuilder:base --config tests/base-test.yaml
 
 container-structure-test test --image abeimler/simple-cppbuilder --config tests/test.yaml
@@ -20,6 +22,8 @@ container-structure-test test --image abeimler/simple-cppbuilder:arm-android --c
 container-structure-test test --image abeimler/simple-cppbuilder:rpi4 --config tests/rpi4-test.yaml
 
 docker-compose -f examples/example/docker-compose.yml up --build
+
+docker-compose -f examples/example/docker-compose-more.yml up --build
 docker-compose -f examples/cpp_starter_project/docker-compose.yml up --build
 docker-compose -f examples/web-example/docker-compose.yml up --build
 docker-compose -f examples/android-example/docker-compose.yml up --build
