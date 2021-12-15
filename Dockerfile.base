@@ -11,7 +11,7 @@ RUN pacman-db-upgrade && \
     pacman -S --noconfirm  \
         clang binutils bison \
         ${extra_libraries} \
-        python3 python-pip doxygen graphviz \
+        python python-pip doxygen graphviz \
         cmake make ninja ccache cppcheck \
         valgrind gcovr perf gperftools \
         neovim emacs nano && \
@@ -31,12 +31,12 @@ RUN runuser -l yay -c \
     rm -rf /home/yay/.cache/*
 
 # Install conan
-RUN python3 -m pip install --upgrade pip setuptools && \
-    python3 -m pip install conan && \
+RUN python -m pip install --upgrade pip setuptools && \
+    python -m pip install conan && \
     conan --version
 # Install more pip tools
-RUN python3 -m pip install --upgrade pip setuptools && \
-    python3 -m pip install cogapp coverage
+RUN python -m pip install --upgrade pip setuptools && \
+    python -m pip install cogapp coverage
 
 # thx to https://github.com/lefticus/cpp_starter_project/pull/121
 

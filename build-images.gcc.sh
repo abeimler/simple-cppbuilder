@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#docker build --force-rm=true -f ./Dockerfile.gcc --build-arg gcc_version=11 -t abeimler/simple-cppbuilder:gcc-11 .
 docker build --force-rm=true -f ./Dockerfile.gcc --build-arg gcc_version=10 -t abeimler/simple-cppbuilder:gcc-10 .
 docker build --force-rm=true -f ./Dockerfile.gcc --build-arg gcc_version=9 -t abeimler/simple-cppbuilder:gcc-9 .
 #docker build --force-rm=true -f ./Dockerfile.gcc --build-arg gcc_version=8 -t abeimler/simple-cppbuilder:gcc-8 .

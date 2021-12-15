@@ -9,3 +9,4 @@
 ./build-images.rpi.sh
 
 ./build-images.gcc.sh
+./build-images.mingw.mxe.sh
