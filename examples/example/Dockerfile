@@ -16,7 +16,7 @@ FROM abeimler/simple-cppbuilder:clang as build-clang
 COPY . .
 CMD ["./docker-build.sh"]
 ## test stage
-FROM build as test-clang
+FROM build-clang as test-clang
 CMD ["./docker-test.sh"]
 
 

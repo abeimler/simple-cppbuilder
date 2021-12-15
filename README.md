@@ -86,7 +86,7 @@ Default image with [abseil](https://abseil.io/) installed.
 
 #### `:opengl-libs`
 
-Default image with some OpenGL dependencies: `mesa glu glfw libx11 libxrender libxext libxcursor libxrandr libxinerama xorg-server-devel`.
+Default image with some OpenGL dependencies: `mesa glu glfw-x11 libx11 libxrender libxext libxcursor libxrandr libxinerama xorg-server-devel`.
 
 
 ### Cross-Compiler (experimental)
@@ -109,14 +109,14 @@ Default image with [emscripten](https://emscripten.org/).
 
 Default image with arm-cross-compiler: ([crosstool-ng](https://crosstool-ng.github.io/)) for RaspberryPi, raspberrypi-tools and toolchain.
 
-#### `:arm-android`, `:arm64-android`, `:x86-android`, `:x64-android`
+#### `:arm-android`, `:arm64-android`, `:x86-android`, `:x64-android`, `:arm-android-21`, `:arm64-android-21`, `:x86-android-21`, `:x64-android-21`
 
 Default image with [android-ndk](https://aur.archlinux.org/packages/android-ndk/) and toolchain.
 
 
 ## More Examples
 
-### Dockerfile with system dependencies
+### Dockerfile with dependencies
 
 ```Dockerfile
 FROM abeimler/simple-cppbuilder as base
@@ -146,10 +146,11 @@ COPY . .
 CMD ["./my-android-build.sh"]
 ```
 
-### Using docker-compose, build
+### Using docker-compose for build
 
 ```yml
-version: "3.9"
+version: '3.4'
+
 services:
   # gcc Release with Ninja
   gcc-release-build:
@@ -169,10 +170,11 @@ services:
 $ docker-compose up --build
 ```
 
-### Using docker-compose, run tests
+### Using docker-compose for testing
 
 ```yml
-version: "3.9"
+version: '3.4'
+
 services:
   # gcc Debug with Ninja
   gcc-debug-test:
@@ -222,7 +224,8 @@ CMD ["./my-build.sh"]
 
 ```yml
 ---
-version: "3.9"
+version: '3.4'
+
 services:
   my-app-build:
     build:
@@ -287,4 +290,4 @@ As for any pre-built image usage, it is the image user's responsibility to ensur
 - [simple-cppbuilder-raylib GitHub](https://github.com/abeimler/simple-cppbuilder-raylib)
 - [cpp_starter_project](https://github.com/lefticus/cpp_starter_project)
 - [cppdock](https://github.com/ricejasonf/cppdock)
-- Icon made by me with C++-Icon made by [Freepik](https://www.freepik.com) from [Flaticon](https://www.flaticon.com/)
+- Icon made by [me](https://hub.docker.com/u/abeimler) using C++-Icon made by [Freepik](https://www.freepik.com) from [Flaticon](https://www.flaticon.com/)
