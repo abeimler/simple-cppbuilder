@@ -7,7 +7,7 @@ COPY . .
 
 ## base image with OpenGL dependencies
 FROM abeimler/simple-cppbuilder:base AS base-opengl-libs
-RUN runuser -l yay -c "yay -Syu --noconfirm && yay -S --noconfirm mesa glu glfw libx11"
+RUN runuser -l yay -c "yay -Syu --noconfirm && yay -S --noconfirm mesa glu glfw-x11 libx11"
 ENV CONAN_SYSREQUIRES_SUDO 0
 ENV CONAN_SYSREQUIRES_MODE enabled
 ENV CMAKE_GENERATOR Ninja
