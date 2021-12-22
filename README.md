@@ -116,7 +116,7 @@ Default image with [android-ndk](https://aur.archlinux.org/packages/android-ndk/
 
 ## More Examples
 
-### Dockerfile with dependencies
+### Dockerfile with system dependencies
 
 ```Dockerfile
 FROM abeimler/simple-cppbuilder as base
