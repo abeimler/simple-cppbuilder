@@ -14,3 +14,7 @@ docker build --force-rm=true --build-arg extra_libraries="abseil-cpp" -t abeimle
 docker build --force-rm=true -f ./Dockerfile.clang --build-arg extra_libraries="libc++" -t abeimler/simple-cppbuilder:libcpp .
 
 docker build --force-rm=true -f ./Dockerfile.emscripten -t abeimler/simple-cppbuilder:emscripten .
+
+
+docker build --force-rm=true -f ./Dockerfile.ci -t abeimler/simple-cppbuilder:ci .
+docker build --force-rm=true -f ./Dockerfile.ci-windows -t abeimler/simple-cppbuilder:ci-windows .
