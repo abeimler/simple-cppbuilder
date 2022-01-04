@@ -1,14 +1,14 @@
 schemaVersion: 2.0.0
 
 commandTests:
-- name: mingw c compiler
+- name: gcc compiler
   command: $CC
   args: ["--version"]
-  expectedOutput: [".*x86_64-w64-mingw32-gcc.*"]
-- name: mingw c++ compiler
+  expectedOutput: [".*gcc.*"]
+- name: g++ compiler
   command: $CXX
   args: ["--version"]
-  expectedOutput: [".*x86_64-w64-mingw32-g\\+\\+.*"]
+  expectedOutput: [".*g\\+\\+.*"]
 - name: cmake
   command: $CMAKE
   args: ["--version"]
@@ -16,25 +16,25 @@ commandTests:
 - name: make
   command: $MAKE
   args: ["--version"]
-  expectedOutput: [".*(GNU Make).*"]
+  expectedOutput: [".*GNU Make.*"]
 
 fileExistenceTests:
 - name: 'vcpkg'
   path: '/home/project/vcpkg/vcpkg'
   shouldExist: true
 - name: 'cmake toolchain'
-  path: $CROSS_TOOLCHAIN
+  path: '/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake'
   shouldExist: true
 
 metadataTest:
   env:
     - key: CC
-      value: x86_64-w64-mingw32-gcc
+      value: gcc
     - key: CXX
-      value: x86_64-w64-mingw32-g++
+      value: g++
     - key: CMAKE
-      value: x86_64-w64-mingw32-cmake
+      value: cmake
     - key: MAKE
-      value: ninja
-    - key: CROSS_TOOLCHAIN
-      value: /usr/share/mingw/toolchain-x86_64-w64-mingw32.cmake
+      value: make
+    - key: TOOLCHAIN_FILE
+      value: /home/project/vcpkg/scripts/buildsystems/vcpkg.cmake

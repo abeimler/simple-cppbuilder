@@ -8,7 +8,7 @@ commandTests:
 - name: mingw c++ compiler
   command: $CXX
   args: ["--version"]
-  expectedOutput: [".*x86_64-w64-mingw32-g\\+\\+.*"]
+  expectedOutput: [".*x86_64-w64-mingw32-g\\+\\+*"]
 - name: cmake
   command: $CMAKE
   args: ["--version"]
@@ -16,7 +16,7 @@ commandTests:
 - name: make
   command: $MAKE
   args: ["--version"]
-  expectedOutput: [".*(GNU Make).*"]
+  expectedOutput: [".*Make.*"]
 
 fileExistenceTests:
 - name: 'vcpkg'
@@ -33,8 +33,8 @@ metadataTest:
     - key: CXX
       value: x86_64-w64-mingw32-g++
     - key: CMAKE
-      value: x86_64-w64-mingw32-cmake
+      value: cmake
     - key: MAKE
-      value: ninja
+      value: make
     - key: CROSS_TOOLCHAIN
-      value: /usr/share/mingw/toolchain-x86_64-w64-mingw32.cmake
+      value: /home/cmake/mingw-w64-toolchain.cmake

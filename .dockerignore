@@ -10,9 +10,14 @@ example/
 android-example/
 cpp_starter_project/
 test/
+tests/
 img/
+examples/
 LICENSE
 VERSION
 README.md
 build-images.sh
 push-images.sh
+.gitlab-ci.yml
+build-images.sh
+build-images.*.sh

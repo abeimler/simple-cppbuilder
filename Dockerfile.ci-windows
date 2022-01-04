@@ -1,0 +1,146 @@
+## base image
+FROM ubuntu:22.04 as base
+
+ARG extra_libraries
+
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt update -y && apt install software-properties-common -y && \
+    add-apt-repository -y ppa:ubuntu-toolchain-r/test && \
+    apt update -y
+# Install packages available from standard repos
+RUN apt update -y && \
+    apt install -yq \
+        gcc wget curl pkg-config zip unzip tar git build-essential && \
+    apt install -y  \
+        mingw-w64 clang binutils bison \
+        ${extra_libraries} \
+        python3 python3-pip doxygen graphviz \
+        cmake make ninja-build ccache cppcheck cmake-extras \
+        valgrind gcovr linux-tools-common linux-tools-generic google-perftools \
+        neovim emacs nano && \
+    rm -rf /var/lib/apt/lists/*
+#bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+RUN apt update -y && \
+    apt install -y  \
+        software-properties-common lsb-release && \
+    rm -rf /var/lib/apt/lists/*
+#RUN apt-key adv \
+#    --keyserver keyserver.ubuntu.com \
+#    --recv-keys 86B72ED9 && \
+#    add-apt-repository \
+#        "deb [arch=amd64] https://pkg.mxe.cc/repos/apt `lsb_release -sc` main" && \
+#    apt update -y
+#RUN apt update -y && apt install -y mxe-x86-64-w64-mingw32.shared-cc mxe-x86-64-w64-mingw32.static-cc
+
+# Install conan
+RUN python3 -m pip install --upgrade pip setuptools && \
+    python3 -m pip install conan && \
+    conan --version
+# Install more pip tools
+RUN python3 -m pip install --upgrade pip setuptools && \
+    python3 -m pip install cogapp coverage
+
+# thx to https://github.com/lefticus/cpp_starter_project/pull/121
+
+# By default, anything you run in Docker is done as superuser.
+# Conan runs some install commands as superuser, and will prepend `sudo` to
+# these commands, unless `CONAN_SYSREQUIRES_SUDO=0` is in your env variables.
+ENV CONAN_SYSREQUIRES_SUDO 0
+# Some packages request that Conan use the system package manager to install
+# a few dependencies. This flag allows Conan to proceed with these installations;
+# leaving this flag undefined can cause some installation failures.
+ENV CONAN_SYSREQUIRES_MODE enabled
+
+ENV CMAKE "cmake"
+ENV MAKE "make"
+ENV CC "gcc"
+ENV CXX "g++"
+
+# setup project env
+WORKDIR /home/project
+
+
+
+## ci image for windows build
+FROM base as ci-base-windows
+
+ARG extra_libraries
+ARG vcpkg_host_triplet="x64-linux"
+ARG processor="x86_64"
+
+# e.g. x64-mingw-dynamic
+ARG vcpkg_target_triplet="x64-mingw-dynamic"
+
+# e.g. x86_64-w64-mingw32
+ARG cross_triple="x86_64-w64-mingw32"
+
+ARG cc="${cross_triple}-gcc"
+ARG cxx="${cross_triple}-g++"
+ARG cmake="cmake"
+ARG make="make"
+ARG cross_root="/usr/$cross_triple"
+ARG cmake_toolchain_file="/home/cmake/mingw-w64-toolchain.cmake"
+ARG cmake_generator="Unix Makefiles"
+
+# e.g. mingw-w64-toolchain
+ARG install_toolchain="g++-mingw-w64"
+# e.g. mingw-w64-cmake mingw-w64-configure mingw-w64-make mingw-w64-environment powershell ... mingw-w64-boost, mingw-w64-qt5-base, ... 
+ARG install_extras_toolchain
+
+
+# Install packages available from standard repos
+RUN apt update -y && \
+    apt install -y  \
+        ${install_toolchain} ${install_extras_toolchain} && \
+    rm -rf /var/lib/apt/lists/*
+
+
+# setup project env
+COPY ./cmake /home/cmake
+WORKDIR /home/project
+COPY ./scripts/docker-build.cross.sh ./docker-build.sh
+COPY ./scripts/docker-entrypoint.cross.sh /docker-entrypoint.sh
+
+# install vcpkg
+## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
+ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
+ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
+ENV VCPKG_DISABLE_METRICS 1
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
+RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
+ENV VCPKG_ROOT "/home/project/vcpkg"
+
+# cross compiler settings
+ENV CC $cc
+ENV CXX $cxx
+ENV PROCESSOR $processor
+ENV CROSS_TRIPLET $cross_triple
+ENV TARGET_TRIPLET $vcpkg_target_triplet
+ENV CROSS_CMAKE $cmake
+ENV CROSS_MAKE $make
+ENV CROSS "${cross_triple}-"
+ENV CROSS_ROOT $cross_root
+ENV CROSS_TOOLCHAIN $cmake_toolchain_file
+
+# compiler env settings
+# e.g. mingw-env, emsdk_env.sh
+RUN mkdir -p /home/cross
+RUN touch /home/cross/.bashrc
+ARG setup_env_script="/home/cross/.bashrc"
+ENV SETUP_ENV_SCRIPT $setup_env_script
+
+ENV CMAKE $CROSS_CMAKE
+ENV MAKE $CROSS_MAKE
+
+# build script settings
+ENV TARGET "all"
+ENV BUILD_TYPE "Release"
+ENV CMAKE_GENERATOR $cmake_generator
+ENV VCPKG_TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
+ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
+ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
+ENV CMAKE_ARGS ""
+
+RUN mkdir build
+ENTRYPOINT ["/docker-entrypoint.sh"]
+#CMD ["./docker-build.sh"]

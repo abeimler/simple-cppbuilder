@@ -21,6 +21,9 @@ container-structure-test test --image abeimler/simple-cppbuilder:arm-android --c
 
 container-structure-test test --image abeimler/simple-cppbuilder:rpi4 --config tests/rpi4-test.yaml
 
+container-structure-test test --image abeimler/simple-cppbuilder:ci --config tests/ci-test.yaml
+container-structure-test test --image abeimler/simple-cppbuilder:ci-windows --config tests/mingw-test.yaml
+
 docker-compose -f examples/example/docker-compose.yml up --build
 docker-compose -f examples/example/docker-compose.yml down
 
