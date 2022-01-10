@@ -1,0 +1,38 @@
+version: '3.4'
+
+services:
+  # gcc Debug with make
+  example-gcc-debug-build-make:
+    build:
+      context: .
+      dockerfile: Dockerfile.ci
+      target: build
+    environment:
+      TARGET: all
+      BUILD_TYPE: Debug
+  # gcc Debug
+  example-gcc-debug-build:
+    build:
+      context: .
+      dockerfile: Dockerfile.ci
+      target: build
+    environment:
+      TARGET: all
+      BUILD_TYPE: Debug
+  example-gcc-debug-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.ci
+      target: test
+    environment:
+      TARGET: all
+      BUILD_TYPE: Debug
+  # example with test coverage
+  example-gcc-debug-test-cov:
+    build:
+      context: .
+      dockerfile: Dockerfile.ci
+      target: test
+    environment:
+      TARGET: example-coverage-test
+      CMAKE_ARGS: -DENABLE_COVERAGE=ON

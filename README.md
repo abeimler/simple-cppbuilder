@@ -109,10 +109,15 @@ Default image with [emscripten](https://emscripten.org/).
 
 Default image with arm-cross-compiler: ([crosstool-ng](https://crosstool-ng.github.io/)) for RaspberryPi, raspberrypi-tools and toolchain.
 
-#### `:arm-android`, `:arm64-android`, `:x86-android`, `:x64-android`, `:arm-android-21`, `:arm64-android-21`, `:x86-android-21`, `:x64-android-21`
+#### `:arm-android`, `:arm64-android`, `:x86-android`, `:x64-android`
 
 Default image with [android-ndk](https://aur.archlinux.org/packages/android-ndk/) and toolchain.
 
+
+### `:ci`, `:ci-x64-mingw-w64`
+
+Alternative Ubuntu-based image with basic compilers.  
+_if the other images does't work for your CI use this image._
 
 ## More Examples
 
@@ -183,8 +188,6 @@ services:
       dockerfile: Dockerfile
       target: test
     environment:
-      CC: gcc
-      CXX: g++
       TARGET: all
       BUILD_TYPE: Debug
       CMAKE_GENERATOR: Ninja
