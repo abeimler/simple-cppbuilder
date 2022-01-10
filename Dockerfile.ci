@@ -41,7 +41,7 @@ ENV CONAN_SYSREQUIRES_SUDO 0
 ENV CONAN_SYSREQUIRES_MODE enabled
 
 ENV CMAKE "cmake"
-ENV MAKE "make"
+ENV MAKE "ninja"
 
 # set default compiler
 ENV CC "gcc"
