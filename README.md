@@ -89,6 +89,14 @@ Default image with [abseil](https://abseil.io/) installed.
 Default image with some OpenGL dependencies: `mesa glu glfw-x11 libx11 libxrender libxext libxcursor libxrandr libxinerama xorg-server-devel`.
 
 
+### Misc
+
+#### `:ci`, `:ci-x64-mingw-w64`
+
+Alternative Ubuntu-based image with basic compilers.  
+_Nice base image for CI/CD._
+
+
 ### Cross-Compiler (experimental)
 
 _Not fully tested_
@@ -112,12 +120,6 @@ Default image with arm-cross-compiler: ([crosstool-ng](https://crosstool-ng.gith
 #### `:arm-android`, `:arm64-android`, `:x86-android`, `:x64-android`
 
 Default image with [android-ndk](https://aur.archlinux.org/packages/android-ndk/) and toolchain.
-
-
-### `:ci`, `:ci-x64-mingw-w64`
-
-Alternative Ubuntu-based image with basic compilers.  
-_if the other images does't work for your CI use this image._
 
 ## More Examples
 

@@ -1,36 +1,55 @@
 ## base image
-FROM ubuntu:22.04 as base
+FROM ubuntu:21.04 as base
 
 ARG extra_libraries
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt update -y && apt install software-properties-common -y && \
+RUN apt-get update -y && apt-get install --no-install-recommends -y gnupg wget curl apt-transport-https software-properties-common && \
     add-apt-repository -y ppa:ubuntu-toolchain-r/test && \
-    apt update -y
+    apt-get update -y
 # Install packages available from standard repos
-RUN apt update -y && \
-    apt install -yq \
+RUN apt-get update -y && \
+    apt-get install -yq \
         gcc wget curl pkg-config zip unzip tar git build-essential && \
-    apt install -y  \
+    apt-get install -y  \
         mingw-w64 clang binutils bison \
         ${extra_libraries} \
         python3 python3-pip doxygen graphviz \
         cmake make ninja-build ccache cppcheck cmake-extras \
         valgrind gcovr linux-tools-common linux-tools-generic google-perftools \
         neovim emacs nano && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 #bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
-RUN apt update -y && \
-    apt install -y  \
+
+# install powershell
+ENV PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache
+RUN curl -sSL https://github.com/PowerShell/PowerShell/releases/download/v7.2.1/powershell-lts_7.2.1-1.deb_amd64.deb -o /tmp/powershell.deb && \
+    apt-get update -y && apt-get install --no-install-recommends -y /tmp/powershell.deb && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* && \
+    rm /tmp/powershell.deb
+ENV POWERSHELL_TELEMETRY_OPTOUT 1
+RUN pwsh \
+        -NoLogo \
+        -NoProfile \
+        -Command " \
+          \$ErrorActionPreference = 'Stop' ; \
+          \$ProgressPreference = 'SilentlyContinue' ; \
+          while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
+            Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
+            Start-Sleep -Seconds 6 ; \
+          }"
+
+RUN apt-get update -y && \
+    apt-get install -y  \
         software-properties-common lsb-release && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 #RUN apt-key adv \
 #    --keyserver keyserver.ubuntu.com \
 #    --recv-keys 86B72ED9 && \
 #    add-apt-repository \
 #        "deb [arch=amd64] https://pkg.mxe.cc/repos/apt `lsb_release -sc` main" && \
-#    apt update -y
-#RUN apt update -y && apt install -y mxe-x86-64-w64-mingw32.shared-cc mxe-x86-64-w64-mingw32.static-cc
+#    apt-get update -y
+#RUN apt-get update -y && apt-get install -y mxe-x86-64-w64-mingw32.shared-cc mxe-x86-64-w64-mingw32.static-cc
 
 # Install conan
 RUN python3 -m pip install --upgrade pip setuptools && \
@@ -89,10 +108,10 @@ ARG install_extras_toolchain
 
 
 # Install packages available from standard repos
-RUN apt update -y && \
-    apt install -y  \
+RUN apt-get update -y && \
+    apt-get install --no-install-recommends -y  \
         ${install_toolchain} ${install_extras_toolchain} && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 
 # setup project env
@@ -143,4 +162,3 @@ ENV CMAKE_ARGS ""
 
 RUN mkdir build
 ENTRYPOINT ["/docker-entrypoint.sh"]
-#CMD ["./docker-build.sh"]
