@@ -1,15 +1,6 @@
 version: '3.4'
 
 services:
-  # gcc Debug with make
-  example-gcc-debug-build-make:
-    build:
-      context: .
-      dockerfile: Dockerfile.ci
-      target: build
-    environment:
-      TARGET: all
-      BUILD_TYPE: Debug
   # gcc Debug
   example-gcc-debug-build:
     build:
@@ -36,3 +27,12 @@ services:
     environment:
       TARGET: example-coverage-test
       CMAKE_ARGS: -DENABLE_COVERAGE=ON
+  # mingw Debug
+  example-windows-debug-build:
+    build:
+      context: .
+      dockerfile: Dockerfile.ci
+      target: build-windows
+    environment:
+      TARGET: all
+      BUILD_TYPE: Debug

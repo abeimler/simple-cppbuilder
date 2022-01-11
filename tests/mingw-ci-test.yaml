@@ -17,6 +17,10 @@ commandTests:
   command: $MAKE
   args: ["--version"]
   expectedOutput: [".*Make.*"]
+- name: powershell
+  command: pwsh
+  args: ["-Version"]
+  expectedOutput: [".*PowerShell.*"]
 
 fileExistenceTests:
 - name: 'vcpkg'

@@ -4,21 +4,21 @@ FROM ubuntu:22.04 as base
 ARG extra_libraries
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt update -y && apt install software-properties-common -y && \
+RUN apt-get update -y && apt-get install --no-install-recommends -y gnupg software-properties-common && \
     add-apt-repository -y ppa:ubuntu-toolchain-r/test && \
-    apt update -y
+    apt-get update -y
 # Install packages available from standard repos
-RUN apt update -y && \
-    apt install -yq \
+RUN apt-get update -y && \
+    apt-get install --no-install-recommends -yq \
         gcc wget curl pkg-config zip unzip tar git build-essential && \
-    apt install -y  \
+    apt-get install --no-install-recommends -y  \
         clang binutils bison \
         ${extra_libraries} \
         python3 python3-pip doxygen graphviz \
         cmake make ninja-build ccache cppcheck cmake-extras \
         valgrind gcovr linux-tools-common linux-tools-generic google-perftools \
         neovim emacs nano && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 #bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
 
 # Install conan
@@ -59,14 +59,14 @@ FROM base as ci-base
 ARG extra_libraries
 
 # Install packages available from standard repos
-RUN apt update -y && \
-    apt install -yq \
+RUN apt-get update -y && \
+    apt-get install --no-install-recommends -yq \
         gcc wget curl pkg-config zip unzip tar git build-essential && \
-    apt install -y  \
+    apt-get install --no-install-recommends -y  \
         clang binutils bison \
         ${extra_libraries} \
         cmake make ninja-build && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 
 # set default compiler
@@ -96,5 +96,3 @@ ENV CMAKE "cmake"
 ENV MAKE "make"
 
 RUN mkdir build
-ENTRYPOINT ["/usr/bin/bash"]
-#CMD ["./docker-build.sh"]
