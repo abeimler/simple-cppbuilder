@@ -42,5 +42,5 @@ ENV CMAKE "cmake"
 ENV MAKE "make"
 
 RUN mkdir build
-ENTRYPOINT ["/usr/bin/bash"]
+#ENTRYPOINT ["/usr/bin/bash"]
 #CMD ["./docker-build.sh"]

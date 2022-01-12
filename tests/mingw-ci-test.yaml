@@ -29,6 +29,9 @@ fileExistenceTests:
 - name: 'cmake toolchain'
   path: $CROSS_TOOLCHAIN
   shouldExist: true
+- name: 'compiler root path'
+  path: $CROSS_ROOT
+  shouldExist: true
 
 metadataTest:
   env:
