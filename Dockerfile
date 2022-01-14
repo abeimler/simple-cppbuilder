@@ -12,7 +12,7 @@ RUN pacman-db-upgrade && \
         gcc binutils bison \
         ${extra_libraries} \
         cmake make ninja && \
-    pacman -Sc --noconfirm
+    pacman -Scc --noconfirm
 
 
 # set default compiler
@@ -42,5 +42,5 @@ ENV CMAKE "cmake"
 ENV MAKE "make"
 
 RUN mkdir build
-ENTRYPOINT ["/usr/bin/bash"]
+#ENTRYPOINT ["/usr/bin/bash"]
 #CMD ["./docker-build.sh"]

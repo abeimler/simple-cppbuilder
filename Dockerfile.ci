@@ -41,7 +41,7 @@ ENV CONAN_SYSREQUIRES_SUDO 0
 ENV CONAN_SYSREQUIRES_MODE enabled
 
 ENV CMAKE "cmake"
-ENV MAKE "ninja"
+ENV MAKE "make"
 
 # set default compiler
 ENV CC "gcc"
@@ -87,7 +87,7 @@ ENV VCPKG_ROOT "/home/project/vcpkg"
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
-ENV CMAKE_GENERATOR "Ninja"
+ENV CMAKE_GENERATOR "Unix Makefiles"
 ENV VCPKG_TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV CMAKE_ARGS ""

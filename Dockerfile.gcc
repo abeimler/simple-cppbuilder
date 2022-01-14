@@ -15,11 +15,12 @@ RUN pacman-db-upgrade && \
         binutils bison \
         ${extra_libraries} \
         cmake make ninja && \
-    pacman -Sc --noconfirm
+    pacman -Scc --noconfirm
 
 RUN runuser -l yay -c \
     "yay -Syu --noconfirm && yay -S --noconfirm \
         gcc${gcc_version}" && \
+    runuser -l yay -c "yay -Scc --noconfirm" && \
     rm -rf /home/yay/.cache/*
 
 # set default compiler
@@ -52,5 +53,5 @@ ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV CMAKE_ARGS ""
 
 RUN mkdir build
-ENTRYPOINT ["/usr/bin/bash"]
+#ENTRYPOINT ["/usr/bin/bash"]
 #CMD ["./docker-build.sh"]

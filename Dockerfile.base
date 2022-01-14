@@ -3,7 +3,7 @@ FROM archlinux:base-devel as base
 
 ARG extra_libraries
 
-RUN pacman -Syu --noconfirm
+RUN pacman -Syuu --noconfirm
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
@@ -16,7 +16,7 @@ RUN pacman-db-upgrade && \
         cmake make ninja ccache cppcheck \
         valgrind gcovr perf gperftools \
         neovim emacs nano && \
-    pacman -Sc --noconfirm
+    pacman -Scc --noconfirm
 
 # install yay
 RUN useradd -m -G nobody -s /bin/bash yay && passwd -d yay && echo "yay ALL=(ALL)  ALL" >> /etc/sudoers
@@ -29,6 +29,7 @@ RUN cd /
 RUN runuser -l yay -c \
     "yay -Syu --noconfirm && yay -S --noconfirm \
         extra-cmake-modules-git lcov cccc" && \
+    runuser -l yay -c "yay -Scc --noconfirm" && \
     rm -rf /home/yay/.cache/*
 
 # Install conan

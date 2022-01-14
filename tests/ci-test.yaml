@@ -35,6 +35,6 @@ metadataTest:
     - key: CMAKE
       value: cmake
     - key: MAKE
-      value: ninja
+      value: make
     - key: TOOLCHAIN_FILE
       value: /home/project/vcpkg/scripts/buildsystems/vcpkg.cmake
