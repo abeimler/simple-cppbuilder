@@ -21,7 +21,7 @@ RUN pacman-db-upgrade && \
         clang llvm \
         alsa-lib libxrender libxtst \
         cmake make ninja && \
-    pacman -Sc --noconfirm
+    pacman -Scc --noconfirm
 
 
 # install android stuff
@@ -29,6 +29,7 @@ RUN runuser -l yay -c \
     "yay -Syu --noconfirm && yay -S --noconfirm \
         jdk-openjdk android-sdk android-sdk-platform-tools android-sdk-build-tools-21 android-ndk-21 \
         android-pkg-config android-cmake android-environment" && \
+    runuser -l yay -c "yay -Scc --noconfirm" && \
     rm -rf /home/yay/.cache/*
 
 # setup project env

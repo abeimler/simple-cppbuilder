@@ -35,6 +35,6 @@ metadataTest:
     - key: CMAKE
       value: x86_64-w64-mingw32-cmake
     - key: MAKE
-      value: ninja
+      value: x86_64-w64-mingw32-make
     - key: CROSS_TOOLCHAIN
       value: /usr/share/mingw/toolchain-x86_64-w64-mingw32.cmake

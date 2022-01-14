@@ -20,7 +20,7 @@ RUN pacman-db-upgrade && \
     pacman -S --noconfirm  \
         ${extra_libraries} \
         cmake make ninja && \
-    pacman -Sc --noconfirm
+    pacman -Scc --noconfirm
 
 # install crosstool-ng
 ARG crosstool_dir="/home/cross/crosstool-ng"

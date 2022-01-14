@@ -12,7 +12,7 @@ RUN pacman-db-upgrade && \
         gcc binutils bison \
         ${extra_libraries} \
         cmake make ninja && \
-    pacman -Sc --noconfirm
+    pacman -Scc --noconfirm
 
 
 # set default compiler

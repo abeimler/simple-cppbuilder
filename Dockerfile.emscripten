@@ -22,12 +22,13 @@ RUN pacman-db-upgrade && \
         mesa glu glfw libx11 libxrender libxext libxcursor libxrandr libxinerama xorg-server-devel \
         ${extra_libraries} \
         cmake make ninja && \
-    pacman -Sc --noconfirm
+    pacman -Scc --noconfirm
 
 # install emscripten
 RUN runuser -l yay -c \
     "yay -Syu --noconfirm && yay -S --noconfirm \
         nodejs emscripten emsdk" && \
+    runuser -l yay -c "yay -Scc --noconfirm" && \
     rm -rf /home/yay/.cache/*
 RUN /usr/lib/emsdk/emsdk install latest && /usr/lib/emsdk/emsdk activate latest
 
