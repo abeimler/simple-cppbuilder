@@ -17,4 +17,5 @@ docker build --force-rm=true -f ./Dockerfile.emscripten -t abeimler/simple-cppbu
 
 
 docker build --force-rm=true -f ./Dockerfile.ci -t abeimler/simple-cppbuilder:ci .
+docker build --force-rm=true -f ./Dockerfile.ci2 -t abeimler/simple-cppbuilder:ci2 .
 docker build --force-rm=true -f ./Dockerfile.ci-windows -t abeimler/simple-cppbuilder:ci-x64-mingw-w64 .

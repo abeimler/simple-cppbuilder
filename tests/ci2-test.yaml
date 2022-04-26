@@ -42,9 +42,9 @@ fileExistenceTests:
 metadataTest:
   env:
     - key: CC
-      value: gcc
+      value: clang
     - key: CXX
-      value: g++
+      value: clang++
     - key: CMAKE
       value: cmake
     - key: MAKE

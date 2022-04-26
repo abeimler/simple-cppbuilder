@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 # src: https://aur.archlinux.org/cgit/aur.git/tree/mingw-cmake.sh?h=mingw-w64-cmake
 
 ${CROSS_CMAKE} \

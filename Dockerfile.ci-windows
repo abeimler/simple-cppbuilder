@@ -12,10 +12,11 @@ RUN apt-get update -y && \
     apt-get install -yq \
         gcc wget curl pkg-config zip unzip tar git build-essential && \
     apt-get install -y  \
-        mingw-w64 clang binutils bison \
+        mingw-w64 binutils bison \
         ${extra_libraries} \
         python3 python3-pip doxygen graphviz \
         cmake make ninja-build ccache cppcheck cmake-extras \
+        clang clang-tidy clang-format \
         valgrind gcovr linux-tools-common linux-tools-generic google-perftools \
         neovim emacs nano && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -23,8 +24,8 @@ RUN apt-get update -y && \
 
 # install powershell
 ENV PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache
-RUN curl -sSL https://github.com/PowerShell/PowerShell/releases/download/v7.2.1/powershell-lts_7.2.1-1.deb_amd64.deb -o /tmp/powershell.deb && \
-    apt-get update -y && apt-get install --no-install-recommends -y /tmp/powershell.deb && \
+RUN curl -sSL https://github.com/PowerShell/PowerShell/releases/download/v7.2.2/powershell-lts_7.2.2-1.deb_amd64.deb -o /tmp/powershell.deb && \
+    apt-get update -y && apt-get install -y /tmp/powershell.deb && \
     apt-get clean && rm -rf /var/lib/apt/lists/* && \
     rm /tmp/powershell.deb
 ENV POWERSHELL_TELEMETRY_OPTOUT 1

@@ -93,8 +93,13 @@ Default image with some OpenGL dependencies: `mesa glu glfw-x11 libx11 libxrende
 
 #### `:ci`, `:ci-x64-mingw-w64`
 
-Alternative Ubuntu-based image with basic compilers.  
+Alternative Ubuntu-based image with basic compilers and tools.  
 _Nice base image for CI/CD._
+
+#### `:ci2`
+
+Alternative Ubuntu-based image with basic compilers and tools.  
+_Uses [setup-cpp](https://github.com/aminya/setup-cpp)._
 
 
 ### Cross-Compiler (experimental)
