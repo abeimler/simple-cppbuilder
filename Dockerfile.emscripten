@@ -1,5 +1,5 @@
 ## base image
-FROM abeimler/simple-cppbuilder:base as base
+FROM abeimler/simple-cppbuilder:base AS base
 
 ARG extra_libraries
 ARG vcpkg_host_triplet="x64-linux"
@@ -36,7 +36,6 @@ RUN /usr/lib/emsdk/emsdk install latest && /usr/lib/emsdk/emsdk activate latest
 WORKDIR /home/project
 COPY ./cmake ./cmake
 COPY ./scripts/docker-build.emscripten.sh ./docker-build.sh
-COPY ./scripts/docker-entrypoint.cross.sh /docker-entrypoint.sh
 
 # install vcpkg
 ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
@@ -68,6 +67,7 @@ ENV PATH="${EMSDK_PATH}:${EMSCRIPTEN_PATH}:${CLANG_PATH}:${NODE_PATH}:${PYTHON_P
 
 ARG setup_env_script="/usr/lib/emsdk/emsdk_env.sh"
 ENV SETUP_ENV_SCRIPT $setup_env_script
+RUN . $setup_env_script
 
 ENV CMAKE $CROSS_CMAKE
 ENV MAKE $CROSS_MAKE
@@ -82,5 +82,3 @@ ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
 
 RUN mkdir build
-ENTRYPOINT ["/docker-entrypoint.sh"]
-#CMD ["./docker-build.sh"]

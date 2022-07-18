@@ -1,5 +1,5 @@
 ## base image
-FROM abeimler/simple-cppbuilder:base as base
+FROM abeimler/simple-cppbuilder:base AS base
 
 ARG extra_libraries
 ARG vcpkg_host_triplet="x64-linux"
@@ -48,7 +48,6 @@ ARG cmake_toolchain_file="${cross_root}/${cross_triplet}/share/cmake/mxe-conf.cm
 WORKDIR /home/project
 COPY ./cmake ./cmake
 COPY ./scripts/docker-build.mxe.sh ./docker-build.sh
-COPY ./scripts/docker-entrypoint.cross.sh /docker-entrypoint.sh
 
 # install vcpkg
 ## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
@@ -75,6 +74,7 @@ RUN mkdir -p /home/cross
 RUN touch /home/cross/.bashrc
 ARG setup_env_script="/home/cross/.bashrc"
 ENV SETUP_ENV_SCRIPT $setup_env_script
+RUN . $setup_env_script
 
 ENV CMAKE $CROSS_CMAKE
 ENV MAKE $CROSS_MAKE
@@ -89,5 +89,3 @@ ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
 
 RUN mkdir build
-ENTRYPOINT ["/docker-entrypoint.sh"]
-#CMD ["./docker-build.sh"]

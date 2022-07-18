@@ -1,14 +1,16 @@
 ## base image
-FROM ubuntu:latest as base
+FROM ubuntu:latest AS base
 
 ARG extra_libraries
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update -y && apt-get install --no-install-recommends -y gnupg software-properties-common && \
+RUN apt-get update -yqq && \
+    apt-get install --no-install-recommends -y gnupg software-properties-common && \
     add-apt-repository -y ppa:ubuntu-toolchain-r/test && \
-    apt-get update -y
+    apt-get update -y && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 # Install packages available from standard repos
-RUN apt-get update -y && \
+RUN apt-get update -yqq && \
     apt-get install --no-install-recommends -yq \
         gcc wget curl pkg-config zip unzip tar git build-essential && \
     apt-get install --no-install-recommends -y  \

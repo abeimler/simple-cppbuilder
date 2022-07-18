@@ -1,5 +1,5 @@
 ## base image
-FROM abeimler/simple-cppbuilder:base as base
+FROM abeimler/simple-cppbuilder:base AS base
 
 ARG extra_libraries
 ARG vcpkg_host_triplet="x64-linux"
@@ -27,7 +27,7 @@ RUN pacman-db-upgrade && \
 # install android stuff
 RUN runuser -l yay -c \
     "yay -Syu --noconfirm && yay -S --noconfirm \
-        jdk-openjdk android-sdk android-sdk-platform-tools android-sdk-build-tools android-ndk \
+        jdk-openjdk android-platform android-sdk-build-tools \
         android-pkg-config android-cmake android-environment" && \
     runuser -l yay -c "yay -Scc --noconfirm" && \
     rm -rf /home/yay/.cache/* && \
@@ -36,8 +36,6 @@ RUN runuser -l yay -c \
 # setup project env
 WORKDIR /home/project
 COPY ./scripts/docker-build.android.sh ./docker-build.sh
-COPY ./scripts/custom-env.android.sh /custom-env.sh
-COPY ./scripts/docker-entrypoint.cross.sh /docker-entrypoint.sh
 
 # install vcpkg
 ## https://github.com/microsoft/vcpkg/blob/master/docs/users/android.md
@@ -63,9 +61,11 @@ ENV ANDROID_TOOLCHAIN_FILE "${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cm
 ENV ANDROID_PLATFORM_TOOLS "${ANDROID_HOME}/platform-tools"
 ARG cmake_toolchain_file="${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake"
 ENV CROSS_TOOLCHAIN "${ANDROID_TOOLCHAIN_FILE}"
+ENV ANDROID_BUILD_TOOLS "${ANDROID_HOME}/build-tools/$ANDROID_BUILD_TOOLS_REVISION"
 
 ARG setup_env_script="android-env $android_abi"
 ENV SETUP_ENV_SCRIPT $setup_env_script
+RUN . $setup_env_script
 
 ENV CMAKE $CROSS_CMAKE
 ENV MAKE $CROSS_MAKE
@@ -80,5 +80,3 @@ ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
 
 RUN mkdir build
-ENTRYPOINT ["/docker-entrypoint.sh"]
-#CMD ["./docker-build.sh"]

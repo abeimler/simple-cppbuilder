@@ -33,7 +33,7 @@ metadataTest:
     - key: CXX
       value: aarch64-linux-gnu-g++
     - key: CMAKE
-      value: aarch64-linux-gnu-cmake
+      value: cmake
     - key: MAKE
       value: ninja
     - key: CROSS_TOOLCHAIN

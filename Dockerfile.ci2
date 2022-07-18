@@ -1,18 +1,19 @@
 ## base image
-FROM ubuntu:latest as base
+FROM ubuntu:devel AS base
 
 ARG extra_libraries
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update -y && apt-get install --no-install-recommends -y gnupg software-properties-common
-# Install packages available from standard repos
-RUN apt-get update -y && \
+RUN apt-get update -y && apt-get install --no-install-recommends -y gnupg software-properties-common ca-certificates && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+# Install basic packages available from standard repos
+RUN apt-get update -y -qq && \
     apt-get install --no-install-recommends -yq \
         wget curl pkg-config zip unzip tar git && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # add setup_cpp
-RUN wget --no-verbose "https://github.com/aminya/setup-cpp/releases/download/v0.13.1/setup_cpp_linux"
+RUN wget --no-verbose "https://github.com/aminya/setup-cpp/releases/download/v0.13.2/setup_cpp_linux"
 RUN chmod +x ./setup_cpp_linux
 RUN ./setup_cpp_linux --compiler llvm --gcc true --make true --cmake true --ninja true --ccache true --doxygen true --gcovr true
 
@@ -56,11 +57,13 @@ ENV CXX "clang++"
 
 # setup project env
 WORKDIR /home/project
+RUN bash -c 'source ~/.cpprc'
 
+ENTRYPOINT [ "/bin/bash" ]
 
 
 ## ci image
-FROM base as ci-base
+FROM base AS ci-base
 
 # default compiler versions
 ARG extra_libraries
@@ -96,8 +99,11 @@ ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV CMAKE_ARGS ""
 
 ENV SETUP_ENV_SCRIPT ~/.cpprc
+RUN bash -c 'source ~/.cpprc'
 
 ENV CMAKE "cmake"
 ENV MAKE "make"
 
 RUN mkdir build
+
+ENTRYPOINT [ "/bin/bash" ]

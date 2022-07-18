@@ -1,5 +1,5 @@
 ## base image
-FROM abeimler/simple-cppbuilder:base as base
+FROM abeimler/simple-cppbuilder:base AS base
 
 # default compiler versions
 ARG extra_libraries
@@ -42,5 +42,3 @@ ENV CMAKE "cmake"
 ENV MAKE "make"
 
 RUN mkdir build
-#ENTRYPOINT ["/usr/bin/bash"]
-#CMD ["./docker-build.sh"]

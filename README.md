@@ -297,7 +297,6 @@ As for any pre-built image usage, it is the image user's responsibility to ensur
 
 - [simple-cppbuilder DockerHub](https://hub.docker.com/r/abeimler/simple-cppbuilder)
 - [simple-cppbuilder GitHub](https://github.com/abeimler/simple-cppbuilder)
-- [simple-cppbuilder-raylib GitHub](https://github.com/abeimler/simple-cppbuilder-raylib)
 - [cpp_starter_project](https://github.com/lefticus/cpp_starter_project)
 - [cppdock](https://github.com/ricejasonf/cppdock)
 - Icon made by [me](https://hub.docker.com/u/abeimler) using C++-Icon made by [Freepik](https://www.freepik.com) from [Flaticon](https://www.flaticon.com/)

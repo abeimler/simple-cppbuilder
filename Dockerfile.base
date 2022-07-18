@@ -1,5 +1,5 @@
 ## base image
-FROM archlinux:base-devel as base
+FROM archlinux:base-devel AS base
 
 ARG extra_libraries
 

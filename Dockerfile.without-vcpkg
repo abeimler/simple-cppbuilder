@@ -1,5 +1,5 @@
 ## base image
-FROM abeimler/simple-cppbuilder:base as base
+FROM abeimler/simple-cppbuilder:base AS base
 
 # default compiler versions
 ARG extra_libraries
@@ -33,5 +33,3 @@ ENV CMAKE_GENERATOR "Ninja"
 ENV CMAKE_ARGS ""
 
 RUN mkdir build
-#ENTRYPOINT ["/usr/bin/bash"]
-#CMD ["./docker-build.sh"]

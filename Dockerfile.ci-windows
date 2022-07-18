@@ -1,5 +1,5 @@
 ## base image
-FROM ubuntu:20.04 as base
+FROM ubuntu:20.04 AS base
 
 ARG extra_libraries
 
@@ -84,7 +84,7 @@ WORKDIR /home/project
 
 
 ## ci image for windows build
-FROM base as ci-base-windows
+FROM base AS ci-base-windows
 
 ARG extra_libraries
 ARG vcpkg_host_triplet="x64-linux"
@@ -109,7 +109,6 @@ ARG cmake_generator="Unix Makefiles"
 COPY ./cmake /home/cmake
 WORKDIR /home/project
 COPY ./scripts/docker-build.mingw.sh ./docker-build.sh
-COPY ./scripts/docker-entrypoint.cross.sh /docker-entrypoint.sh
 
 # install vcpkg
 ## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
@@ -138,6 +137,7 @@ RUN mkdir -p /home/cross
 RUN touch /home/cross/.bashrc
 ARG setup_env_script="/home/cross/.bashrc"
 ENV SETUP_ENV_SCRIPT $setup_env_script
+RUN . $setup_env_script
 
 ENV CMAKE $CROSS_CMAKE
 ENV MAKE $CROSS_MAKE
@@ -152,4 +152,3 @@ ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
 
 RUN mkdir build
-ENTRYPOINT ["/docker-entrypoint.sh"]

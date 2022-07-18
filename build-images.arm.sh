@@ -4,11 +4,9 @@ docker build --force-rm=true -f ./Dockerfile.cross \
     --build-arg vcpkg_target_triplet="arm64-linux" \
     --build-arg cross_triple="aarch64-linux-gnu" \
     --build-arg install_toolchain="aarch64-linux-gnu-gcc" \
-    --build-arg install_extras_toolchain="aarch64-linux-gnu-pkg-config aarch64-linux-gnu-configure aarch64-linux-gnu-cmake aarch64-linux-gnu-environment" \
     --build-arg cmake_generator="Ninja" \
     --build-arg make="ninja" \
-    --build-arg cmake="aarch64-linux-gnu-cmake" \
-    --build-arg setup_env_script="aarch64-linux-gnu-environment" \
+    --build-arg cmake="cmake" \
     --build-arg cmake_toolchain_file="/home/cmake/aarch64-toolchain.cmake" \
     -t abeimler/simple-cppbuilder:aarch64-linux .
 
