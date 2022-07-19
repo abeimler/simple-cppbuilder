@@ -16,7 +16,7 @@ commandTests:
 - name: make
   command: $MAKE
   args: ["--version"]
-  expectedOutput: [".*Make.*"]
+  expectedOutput: [".*1.*"]
 - name: powershell
   command: pwsh
   args: ["-Version"]
@@ -24,24 +24,11 @@ commandTests:
 
 fileExistenceTests:
 - name: 'vcpkg'
-  path: '/home/project/vcpkg/vcpkg'
+  path: '/home/vcpkg/vcpkg'
   shouldExist: true
 - name: 'cmake toolchain'
-  path: $CROSS_TOOLCHAIN
+  path: '/home/cmake/x86_64-w64-mingw32-toolchain.cmake'
   shouldExist: true
-- name: 'compiler root path'
-  path: $CROSS_ROOT
+- name: 'cross root'
+  path: '/usr/x86_64-w64-mingw32'
   shouldExist: true
-
-metadataTest:
-  env:
-    - key: CC
-      value: x86_64-w64-mingw32-gcc
-    - key: CXX
-      value: x86_64-w64-mingw32-g++
-    - key: CMAKE
-      value: cmake
-    - key: MAKE
-      value: make
-    - key: CROSS_TOOLCHAIN
-      value: /home/cmake/mingw-w64-toolchain.cmake

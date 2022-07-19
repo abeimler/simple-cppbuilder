@@ -1,11 +1,15 @@
 ## base image
-FROM ubuntu:devel AS base
+FROM ubuntu:20.04 AS base
 
 ARG extra_libraries
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update -y && apt-get install --no-install-recommends -y gnupg software-properties-common ca-certificates && \
+RUN apt-get update -y -qq && apt-get install --no-install-recommends -y gnupg software-properties-common ca-certificates && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
+# keys used by apt
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 40976EAF437D05B5
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1E9377A2BA9EF27F
 # Install basic packages available from standard repos
 RUN apt-get update -y -qq && \
     apt-get install --no-install-recommends -yq \
@@ -13,9 +17,9 @@ RUN apt-get update -y -qq && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # add setup_cpp
-RUN wget --no-verbose "https://github.com/aminya/setup-cpp/releases/download/v0.13.2/setup_cpp_linux"
-RUN chmod +x ./setup_cpp_linux
-RUN ./setup_cpp_linux --compiler llvm --gcc true --make true --cmake true --ninja true --ccache true --doxygen true --gcovr true
+RUN wget --no-verbose "https://github.com/aminya/setup-cpp/releases/download/v0.18.0/setup_cpp_linux" -O /setup_cpp_linux
+RUN chmod +x /setup_cpp_linux
+RUN /setup_cpp_linux --compiler llvm --gcc true --make true --cmake true --ninja true --ccache true --doxygen true --gcovr true --cppcheck true --clangtidy true --clangformat true
 
 
 # Install more tools from standard repos
@@ -49,16 +53,17 @@ ENV CONAN_SYSREQUIRES_MODE enabled
 ENV SETUP_ENV_SCRIPT ~/.cpprc
 
 ENV CMAKE "cmake"
-ENV MAKE "make"
+ENV MAKE "/root/ninja/ninja"
 
 # set default compiler
-ENV CC "clang"
-ENV CXX "clang++"
+ENV CC "/root/llvm/bin/clang"
+ENV CXX "/root/llvm/bin/clang++"
 
 # setup project env
 WORKDIR /home/project
 RUN bash -c 'source ~/.cpprc'
 
+CMD source ~/.cpprc
 ENTRYPOINT [ "/bin/bash" ]
 
 
@@ -76,34 +81,35 @@ RUN apt-get update -y && \
 
 
 # set default compiler
-ENV CC "gcc"
-ENV CXX "g++"
+ENV CC "/root/llvm/bin/clang"
+ENV CXX "/root/llvm/bin/clang++"
 
 # setup project env
 WORKDIR /home/project
-COPY ./scripts/docker-build.sh ./docker-build.sh
-COPY ./scripts/docker-test.sh ./docker-test.sh
+COPY ./scripts/docker-build.setup-cpp.sh ./docker-build.sh
+COPY ./scripts/docker-test.setup-cpp.sh ./docker-test.sh
 
 # install vcpkg
 ENV VCPKG_DISABLE_METRICS 1
-RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
-RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
-ENV VCPKG_ROOT "/home/project/vcpkg"
+RUN /setup_cpp_linux --vcpkg true
+ENV VCPKG_ROOT "/root/vcpkg"
 
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
-ENV CMAKE_GENERATOR "Unix Makefiles"
-ENV VCPKG_TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
-ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
+ENV CMAKE_GENERATOR "Ninja"
+ENV VCPKG_TOOLCHAIN_FILE "/root/vcpkg/scripts/buildsystems/vcpkg.cmake"
+ENV TOOLCHAIN_FILE "/root/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV CMAKE_ARGS ""
 
 ENV SETUP_ENV_SCRIPT ~/.cpprc
 RUN bash -c 'source ~/.cpprc'
 
 ENV CMAKE "cmake"
-ENV MAKE "make"
+ENV MAKE "/root/ninja/ninja"
 
+WORKDIR /home/project
 RUN mkdir build
 
+CMD source ~/.cpprc
 ENTRYPOINT [ "/bin/bash" ]

@@ -34,8 +34,12 @@ RUN /usr/lib/emsdk/emsdk install latest && /usr/lib/emsdk/emsdk activate latest
 
 # setup project env
 WORKDIR /home/project
+ARG setup_env_script="/usr/lib/emsdk/emsdk_env.sh"
+ENV SETUP_ENV_SCRIPT $setup_env_script
+RUN . $setup_env_script
 COPY ./cmake ./cmake
-COPY ./scripts/docker-build.emscripten.sh ./docker-build.sh
+COPY ./scripts/docker-build.setup-env.sh ./docker-build.sh
+COPY ./scripts/docker-test.setup-env.sh ./docker-test.sh
 
 # install vcpkg
 ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
@@ -64,10 +68,6 @@ ENV CLANG_PATH "/opt/emscripten-llvm/bin"
 ENV PYTHON_PATH "/usr/bin"
 ENV NODE_PATH "/usr/bin"
 ENV PATH="${EMSDK_PATH}:${EMSCRIPTEN_PATH}:${CLANG_PATH}:${NODE_PATH}:${PYTHON_PATH}:${PATH}"
-
-ARG setup_env_script="/usr/lib/emsdk/emsdk_env.sh"
-ENV SETUP_ENV_SCRIPT $setup_env_script
-RUN . $setup_env_script
 
 ENV CMAKE $CROSS_CMAKE
 ENV MAKE $CROSS_MAKE

@@ -1,14 +1,14 @@
 schemaVersion: 2.0.0
 
 commandTests:
-- name: gcc compiler
+- name: compiler
   command: $CC
   args: ["--version"]
-  expectedOutput: [".*gcc.*"]
-- name: g++ compiler
+  expectedOutput: [".*clang.*"]
+- name: compiler
   command: $CXX
   args: ["--version"]
-  expectedOutput: [".*g\\+\\+.*"]
+  expectedOutput: [".*clang.*"]
 - name: cmake
   command: $CMAKE
   args: ["--version"]
@@ -17,14 +17,6 @@ commandTests:
   command: $MAKE
   args: ["--version"]
   expectedOutput: [".*1.*"]
-- name: clang-tidy
-  command: clang-tidy
-  args: ["--version"]
-  expectedOutput: [".*LLVM*"]
-- name: clang-format
-  command: clang-format
-  args: ["--version"]
-  expectedOutput: [".*clang-format.*"]
 - name: cppcheck
   command: cppcheck
   args: ["--version"]
@@ -32,14 +24,17 @@ commandTests:
 
 
 fileExistenceTests:
-- name: 'vcpkg'
-  path: '/home/project/vcpkg/vcpkg'
+- name: "vcpkg"
+  path: "/root/vcpkg"
+  shouldExist: true
+- name: "llvm"
+  path: "/root/llvm"
   shouldExist: true
 - name: 'cmake toolchain'
-  path: '/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake'
+  path: '/root/vcpkg/scripts/buildsystems/vcpkg.cmake'
   shouldExist: true
 
 metadataTest:
   env:
     - key: TOOLCHAIN_FILE
-      value: /home/project/vcpkg/scripts/buildsystems/vcpkg.cmake
+      value: /root/vcpkg/scripts/buildsystems/vcpkg.cmake

@@ -1,5 +1,5 @@
 ## base image
-FROM ubuntu:latest AS base
+FROM ubuntu:22.04 AS base
 
 ARG extra_libraries
 
@@ -44,7 +44,7 @@ ENV CONAN_SYSREQUIRES_SUDO 0
 ENV CONAN_SYSREQUIRES_MODE enabled
 
 ENV CMAKE "cmake"
-ENV MAKE "make"
+ENV MAKE "ninja"
 
 # set default compiler
 ENV CC "gcc"
@@ -86,12 +86,13 @@ ENV VCPKG_ROOT "/home/project/vcpkg"
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
-ENV CMAKE_GENERATOR "Unix Makefiles"
+ENV CMAKE_GENERATOR "Ninja"
 ENV VCPKG_TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV CMAKE_ARGS ""
 
 ENV CMAKE "cmake"
-ENV MAKE "make"
+ENV MAKE "ninja"
 
+WORKDIR /home/project
 RUN mkdir build

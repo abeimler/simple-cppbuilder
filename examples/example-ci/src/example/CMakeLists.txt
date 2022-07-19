@@ -1,0 +1,15 @@
+include(GenerateExportHeader)
+
+add_library(example STATIC)
+target_sources(example PRIVATE example.h example.cpp)
+generate_export_header(example)
+target_include_directories(example PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(example PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(example PRIVATE project_warnings project_options)
+
+find_package(magic_enum CONFIG REQUIRED)
+find_package(Microsoft.GSL CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
+target_link_system_library(example PUBLIC Microsoft.GSL::GSL)
+target_link_system_library(example PUBLIC magic_enum::magic_enum)
+target_link_system_libraries(example PUBLIC fmt::fmt-header-only)

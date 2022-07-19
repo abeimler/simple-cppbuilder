@@ -4,11 +4,11 @@ commandTests:
 - name: gcc compiler
   command: $CC
   args: ["--version"]
-  expectedOutput: [".*gcc.*"]
+  expectedOutput: [".*gcc.*GCC.*10.*"]
 - name: g++ compiler
   command: $CXX
   args: ["--version"]
-  expectedOutput: [".*g\\+\\+.*"]
+  expectedOutput: [".*g\\+\\+.*GCC.*10.*"]
 - name: cmake
   command: $CMAKE
   args: ["--version"]
@@ -17,19 +17,6 @@ commandTests:
   command: $MAKE
   args: ["--version"]
   expectedOutput: [".*GNU Make.*"]
-- name: clang-tidy
-  command: clang-tidy
-  args: ["--version"]
-  expectedOutput: [".*LLVM*"]
-- name: clang-format
-  command: clang-format
-  args: ["--version"]
-  expectedOutput: [".*clang-format.*"]
-- name: cppcheck
-  command: cppcheck
-  args: ["--version"]
-  expectedOutput: [".*Cppcheck.*"]
-
 
 fileExistenceTests:
 - name: 'vcpkg'
@@ -42,9 +29,9 @@ fileExistenceTests:
 metadataTest:
   env:
     - key: CC
-      value: clang
+      value: gcc
     - key: CXX
-      value: clang++
+      value: g++
     - key: CMAKE
       value: cmake
     - key: MAKE

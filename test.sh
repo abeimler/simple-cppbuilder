@@ -8,6 +8,7 @@ container-structure-test test --image abeimler/simple-cppbuilder --config tests/
 container-structure-test test --image abeimler/simple-cppbuilder:without-vcpkg --config tests/without-vcpkg-test.yaml
 
 container-structure-test test --image abeimler/simple-cppbuilder:clang --config tests/clang-test.yaml
+container-structure-test test --image abeimler/simple-cppbuilder:gcc-10 --config tests/gcc10-test.yaml
 container-structure-test test --image abeimler/simple-cppbuilder:gcc-9 --config tests/gcc9-test.yaml
 
 container-structure-test test --image abeimler/simple-cppbuilder:emscripten --config tests/emscripten-test.yaml
@@ -22,8 +23,10 @@ container-structure-test test --image abeimler/simple-cppbuilder:arm-android --c
 container-structure-test test --image abeimler/simple-cppbuilder:rpi4 --config tests/rpi4-test.yaml
 
 container-structure-test test --image abeimler/simple-cppbuilder:ci --config tests/ci-test.yaml
-container-structure-test test --image abeimler/simple-cppbuilder:ci-x64-mingw-w64 --config tests/mingw-ci-test.yaml
-container-structure-test test --image abeimler/simple-cppbuilder:ci2 --config tests/ci2-test.yaml
+container-structure-test test --image abeimler/simple-cppbuilder:ci-x64-mingw-w64 --config tests/ci-windows-test.yaml
+container-structure-test test --image abeimler/simple-cppbuilder:ci-setup-cpp --config tests/ci-setup-cpp-test.yaml
+
+
 
 docker-compose -f examples/example/docker-compose.yml up --build
 docker-compose -f examples/example/docker-compose.yml down
@@ -41,4 +44,9 @@ docker-compose -f examples/android-example/docker-compose.yml down
 docker-compose -f examples/example/docker-compose-ci.yml up --build
 docker-compose -f examples/example/docker-compose-ci.yml down
 
+docker-compose -f examples/example-ci/docker-compose.yml up --build
+docker-compose -f examples/example-ci/docker-compose.yml down
+
 docker run -it --rm --name my-cpp-project -v "$PWD/examples/single":/home/project -w /home/project abeimler/simple-cppbuilder ./docker-build.sh
+docker run -it --rm --name my-cpp-project -v "$PWD/examples/single":/home/project -w /home/project abeimler/simple-cppbuilder-ci ./docker-build.sh
+docker run -it --rm --name my-cpp-project -v "$PWD/examples/single":/home/project -w /home/project abeimler/simple-cppbuilder-setup-cpp ./docker-build.sh

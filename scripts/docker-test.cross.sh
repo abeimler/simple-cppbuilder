@@ -12,3 +12,5 @@ ${CROSS_CMAKE} -B build -S . -G "${CMAKE_GENERATOR}" -DCMAKE_BUILD_TYPE="${BUILD
 # @FIXME: "CMake Error: Unknown argument --build" with ${CROSS_CMAKE} ... use ninja, ${CROSS_MAKE} = ninja
 #cmake -B build --build build --target "${TARGET}"
 cd build && ${CROSS_MAKE} "${TARGET}"
+
+ctest --build-test
