@@ -41,7 +41,9 @@ docker-compose -f examples/example-ci/docker-compose.yml up --build example-gcc-
 docker-compose -f examples/example-ci/docker-compose.yml up --build example-windows-build
 docker-compose -f examples/example-ci/docker-compose.yml down
 
-docker-compose -f examples/example/docker-compose.cross.yml up --build
+docker-compose -f examples/example/docker-compose.cross.yml up --build example-mingw-release-build
+docker-compose -f examples/example/docker-compose.cross.yml up --build example-arm64-release-build
+docker-compose -f examples/example/docker-compose.cross.yml up --build example-rpi4-release-build
 docker-compose -f examples/example/docker-compose.cross.yml down
 
 docker-compose -f examples/cpp_starter_project/docker-compose.yml up --build

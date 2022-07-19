@@ -13,15 +13,17 @@ ARG cross_triple
 
 ARG cc="${cross_triple}-gcc"
 ARG cxx="${cross_triple}-g++"
-ARG cmake="${cross_triple}-cmake"
-ARG make="${cross_triple}-make"
+ARG cmake="cmake"
+ARG make="make"
+ARG cross_cmake="${cross_triple}-cmake"
+ARG cross_make="${cross_triple}-make"
 ARG cross_root="/usr/$cross_triple"
 ARG cmake_toolchain_file
 ARG cmake_generator="Unix Makefiles"
 
 # e.g. mingw-w64-toolchain
 ARG install_toolchain="${cross_triple}-gcc" 
-# e.g. mingw-w64-cmake mingw-w64-configure mingw-w64-make mingw-w64-environment powershell ... mingw-w64-boost, mingw-w64-qt5-base, ... 
+# e.g. mingw-w64-cmake mingw-w64-configure mingw-w64-make mingw-w64-environment powershell-bin ... mingw-w64-boost, mingw-w64-qt5-base, ... 
 ARG install_extras_toolchain
 
 
@@ -46,22 +48,14 @@ ENV CXX $cxx
 ENV PROCESSOR $processor
 ENV CROSS_TRIPLET $cross_triple
 ENV TARGET_TRIPLET $vcpkg_target_triplet
-ENV CROSS_CMAKE $cmake
-ENV CROSS_MAKE $make
+ENV CROSS_CMAKE $cross_cmake
+ENV CROSS_MAKE $cross_make
 ENV CROSS "${cross_triple}-"
 ENV CROSS_ROOT $cross_root
 ENV CROSS_TOOLCHAIN $cmake_toolchain_file
 
-# compiler env settings
-# e.g. mingw-env, emsdk_env.sh
-RUN mkdir -p /home/cross
-RUN touch /home/cross/.bashrc
-ARG setup_env_script="/home/cross/.bashrc"
-ENV SETUP_ENV_SCRIPT $setup_env_script
-RUN . $setup_env_script
-
-ENV CMAKE $CROSS_CMAKE
-ENV MAKE $CROSS_MAKE
+ENV CMAKE $cmake
+ENV MAKE $make
 
 # build script settings
 ENV TARGET "all"
@@ -73,9 +67,10 @@ ENV CMAKE_ARGS ""
 
 # setup project env
 COPY ./cmake /home/cmake
-ENV PROJECT_DIR /home/project
 WORKDIR /home/project
-COPY ./scripts/docker-build.cross.sh ./docker-build.sh
+ARG docker_build_script "docker-build.cross.sh"
+COPY ./scripts/$docker_build_script ./docker-build.sh
+
 
 # install vcpkg
 ## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
@@ -88,6 +83,15 @@ ENV VCPKG_ROOT "/home/project/vcpkg"
 
 ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+
+# compiler env settings
+# e.g. mingw-env, emsdk_env.sh
+RUN mkdir -p /home/cross
+RUN touch /home/cross/.bashrc
+ARG setup_env_script="/home/cross/.bashrc"
+ENV SETUP_ENV_SCRIPT $setup_env_script
+RUN . $setup_env_script
 
 ENV PROJECT_DIR /home/project
 WORKDIR /home/project

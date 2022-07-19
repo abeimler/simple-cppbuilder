@@ -13,6 +13,10 @@ set(CMAKE_CXX_COMPILER $ENV{CROSS_TRIPLET}-g++)
 # set the resource compiler (RHBZ #652435)
 set(CMAKE_RC_COMPILER $ENV{CROSS_TRIPLET}-windres)
 set(CMAKE_MC_COMPILER $ENV{CROSS_TRIPLET}-windmc)
+# These are needed for compiling lapack (RHBZ #753906)
+#set(CMAKE_Fortran_COMPILER $ENV{CROSS_TRIPLET}-gfortran)
+#set(CMAKE_AR:FILEPATH $ENV{CROSS_TRIPLET}-ar)
+#set(CMAKE_RANLIB:FILEPATH $ENV{CROSS_TRIPLET}-ranlib)
 
 # search for programs in the build host directories
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
@@ -30,7 +34,3 @@ set(QT_HOST_PATH "/usr" CACHE PATH "host path for Qt")
 # override boost thread component suffix as mingw-w64-boost is compiled with threadapi=win32
 set(Boost_THREADAPI win32)
 
-# These are needed for compiling lapack (RHBZ #753906)
-set(CMAKE_Fortran_COMPILER $ENV{CROSS_TRIPLET}-gfortran)
-set(CMAKE_AR:FILEPATH $ENV{CROSS_TRIPLET}-ar)
-set(CMAKE_RANLIB:FILEPATH $ENV{CROSS_TRIPLET}-ranlib)
