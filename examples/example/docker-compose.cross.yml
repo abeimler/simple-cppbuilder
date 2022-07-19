@@ -1,0 +1,33 @@
+version: '3.4'
+
+services:
+  # example mingw build (crosscompile)
+  example-mingw-release-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build-windows
+    environment:
+      TARGET: all
+      BUILD_TYPE: Release
+      CMAKE_ARGS: -DENABLE_DEVELOPER_MODE:BOOL=OFF -DENABLE_TESTING:BOOL=OFF
+  # example arm build (crosscompile)
+  example-arm64-release-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build-arm64
+    environment:
+      TARGET: all
+      BUILD_TYPE: Release
+      CMAKE_ARGS: -DENABLE_DEVELOPER_MODE:BOOL=OFF -DENABLE_TESTING:BOOL=OFF
+  # example rpi4 build (crosscompile)
+  example-rpi4-release-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build-rpi4
+    environment:
+      TARGET: all
+      BUILD_TYPE: Release
+      CMAKE_ARGS: -DENABLE_DEVELOPER_MODE:BOOL=OFF -DENABLE_TESTING:BOOL=OFF

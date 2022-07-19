@@ -1,17 +1,17 @@
 version: '3.4'
 
 services:
-  # gcc Debug
-  example-gcc-debug-build:
+  # gcc
+  example-gcc-build:
     build:
       context: .
       dockerfile: Dockerfile
       target: build
     environment:
       TARGET: all
-      BUILD_TYPE: RelWithDebInfo
-      CMAKE_ARGS: -DENABLE_DEVELOPER_MODE:BOOL=OFF
-  example-gcc-debug-test:
+      BUILD_TYPE: Release
+      CMAKE_ARGS: -DENABLE_TESTING:BOOL=OFF -DENABLE_DEVELOPER_MODE:BOOL=OFF
+  example-gcc-test:
     build:
       context: .
       dockerfile: Dockerfile
@@ -21,21 +21,22 @@ services:
       BUILD_TYPE: RelWithDebInfo
       CMAKE_ARGS: -DENABLE_TESTING:BOOL=ON -DENABLE_DEVELOPER_MODE:BOOL=OFF
   # example with test coverage
-  example-gcc-debug-test-cov:
+  example-gcc-test-cov:
     build:
       context: .
       dockerfile: Dockerfile
       target: test
     environment:
       TARGET: all
+      BUILD_TYPE: Debug
       CMAKE_ARGS: -DENABLE_TESTING:BOOL=ON -DOPT_ENABLE_COVERAGE:BOOL=ON -DENABLE_DEVELOPER_MODE:BOOL=OFF
-  # mingw Debug
-  example-windows-debug-build:
+  # mingw
+  example-windows-build:
     build:
       context: .
       dockerfile: Dockerfile
       target: build-windows
     environment:
       TARGET: all
-      BUILD_TYPE: RelWithDebInfo
+      BUILD_TYPE: Release
       CMAKE_ARGS: -DENABLE_DEVELOPER_MODE:BOOL=OFF -DENABLE_TESTING:BOOL=OFF

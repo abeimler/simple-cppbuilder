@@ -39,19 +39,6 @@ RUN runuser -l yay -c \
     runuser -l yay -c "yay -Scc --noconfirm" && \
     rm -rf /home/yay/.cache/*
 
-# setup project env
-COPY ./cmake /home/cmake
-WORKDIR /home/project
-COPY ./scripts/docker-build.cross.sh ./docker-build.sh
-
-# install vcpkg
-## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
-ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
-ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
-ENV VCPKG_DISABLE_METRICS 1
-RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
-RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
-ENV VCPKG_ROOT "/home/project/vcpkg"
 
 # cross compiler settings
 ENV CC $cc
@@ -80,9 +67,28 @@ ENV MAKE $CROSS_MAKE
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
 ENV CMAKE_GENERATOR $cmake_generator
-ENV VCPKG_TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
-ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
 
+
+# setup project env
+COPY ./cmake /home/cmake
+ENV PROJECT_DIR /home/project
+WORKDIR /home/project
+COPY ./scripts/docker-build.cross.sh ./docker-build.sh
+
+# install vcpkg
+## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
+ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
+ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
+ENV VCPKG_DISABLE_METRICS 1
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/project/vcpkg
+RUN /home/project/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+ENV VCPKG_ROOT "/home/project/vcpkg"
+
+ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+ENV PROJECT_DIR /home/project
+WORKDIR /home/project
 RUN mkdir build

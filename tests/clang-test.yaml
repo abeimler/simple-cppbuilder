@@ -32,9 +32,5 @@ metadataTest:
       value: clang
     - key: CXX
       value: clang++
-    - key: CMAKE
-      value: cmake
-    - key: MAKE
-      value: make
     - key: TOOLCHAIN_FILE
       value: /home/project/vcpkg/scripts/buildsystems/vcpkg.cmake

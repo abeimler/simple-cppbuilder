@@ -105,21 +105,6 @@ ARG cmake_generator="Ninja"
 ARG cmake_toolchain_file="/home/cmake/x86_64-w64-mingw32-toolchain.cmake"
 ARG cross_root "/usr/x86_64-w64-mingw32"
 
-# setup project env
-WORKDIR /home/project
-COPY ./cmake /home/cmake
-COPY ./scripts/docker-build.ci-mingw.sh ./docker-build.sh
-
-# install vcpkg
-## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
-WORKDIR /home
-ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
-ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
-ENV VCPKG_DISABLE_METRICS 1
-RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/vcpkg
-RUN /home/vcpkg/bootstrap-vcpkg.sh -disableMetrics
-ENV VCPKG_ROOT "/home/vcpkg"
-
 # cross compiler settings
 ENV CC $cc
 ENV CXX $cxx
@@ -137,10 +122,26 @@ ENV MAKE $CROSS_MAKE
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
 ENV CMAKE_GENERATOR $cmake_generator
-ENV VCPKG_TOOLCHAIN_FILE "/home/vcpkg/scripts/buildsystems/vcpkg.cmake"
-ENV TOOLCHAIN_FILE "/home/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
 
+# setup project env
+WORKDIR /home/project
+COPY ./cmake /home/cmake
+COPY ./scripts/docker-build.ci-mingw.sh ./docker-build.sh
+
+# install vcpkg
+## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
+ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
+ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
+ENV VCPKG_DISABLE_METRICS 1
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/vcpkg
+RUN /home/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+ENV VCPKG_ROOT "/home/vcpkg"
+
+ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+ENV PROJECT_DIR /home/project
 WORKDIR /home/project
 RUN mkdir build

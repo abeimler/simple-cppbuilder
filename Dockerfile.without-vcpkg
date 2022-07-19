@@ -18,11 +18,6 @@ RUN pacman-db-upgrade && \
 ENV CC "gcc"
 ENV CXX "g++"
 
-# setup project env
-WORKDIR /home/project
-COPY ./scripts/docker-build-without-toolchain.sh ./docker-build.sh
-COPY ./scripts/docker-test.sh ./docker-test.sh
-
 ENV CMAKE "cmake"
 ENV MAKE "make"
 
@@ -31,5 +26,10 @@ ENV TARGET "all"
 ENV BUILD_TYPE "Release"
 ENV CMAKE_GENERATOR "Ninja"
 ENV CMAKE_ARGS ""
+
+# setup project env
+WORKDIR /home/project
+COPY ./scripts/docker-build-without-toolchain.sh ./docker-build.sh
+COPY ./scripts/docker-test.sh ./docker-test.sh
 
 RUN mkdir build

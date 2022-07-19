@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include "example.h"
 
 unsigned int Factorial( unsigned int number ) {
@@ -13,5 +13,6 @@ TEST_CASE( "Factorials are computed", "[factorial]" ) {
 }
 
 TEST_CASE( "example", "[example]" ) {
-    REQUIRE( example::hello_world() == "Hello World!" );
+    using namespace std::string_literals;
+    REQUIRE( example::Foo::hello_world() == "Hello, World!\n"s );
 }

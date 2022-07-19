@@ -3,7 +3,10 @@ FROM abeimler/simple-cppbuilder:opengl-libs as base
 
 ## build stage
 FROM base as build
-RUN ./vcpkg/vcpkg install raylib
+WORKDIR $VCPKG_ROOT
+RUN git pull origin master
+RUN $VCPKG_ROOT/vcpkg install raylib
+WORKDIR $PROJECT_DIR
 COPY . .
 CMD ["./docker-build.sh"]
 

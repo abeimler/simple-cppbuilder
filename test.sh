@@ -28,24 +28,30 @@ container-structure-test test --image abeimler/simple-cppbuilder:ci-setup-cpp --
 
 
 
-docker-compose -f examples/example/docker-compose.yml up --build
+docker-compose -f examples/example/docker-compose.yml up --build example-gcc-debug-build-make example-gcc-debug-build
+docker-compose -f examples/example/docker-compose.yml up --build example-gcc-debug-test
+docker-compose -f examples/example/docker-compose.yml up --build example-gcc-release-build example-gcc-release-test
+docker-compose -f examples/example/docker-compose.yml up --build example-clang-debug-build example-clang-debug-test
+docker-compose -f examples/example/docker-compose.yml up --build example-clang-release-build example-clang-release-test
+docker-compose -f examples/example/docker-compose.yml up --build example-gcc-debug-test-cov
+docker-compose -f examples/example/docker-compose.yml up --build example-gcc-release-with-raylib
 docker-compose -f examples/example/docker-compose.yml down
 
-docker-compose -f examples/example/docker-compose-more.yml up --build
-docker-compose -f examples/cpp_starter_project/docker-compose.yml up --build
-docker-compose -f examples/web-example/docker-compose.yml up --build
-docker-compose -f examples/android-example/docker-compose.yml up --build
-
-docker-compose -f examples/example/docker-compose-more.yml down
-docker-compose -f examples/cpp_starter_project/docker-compose.yml down
-docker-compose -f examples/web-example/docker-compose.yml down
-docker-compose -f examples/android-example/docker-compose.yml down
-
-docker-compose -f examples/example/docker-compose-ci.yml up --build
-docker-compose -f examples/example/docker-compose-ci.yml down
-
-docker-compose -f examples/example-ci/docker-compose.yml up --build
+docker-compose -f examples/example-ci/docker-compose.yml up --build example-gcc-build example-gcc-test example-gcc-test-cov
+docker-compose -f examples/example-ci/docker-compose.yml up --build example-windows-build
 docker-compose -f examples/example-ci/docker-compose.yml down
+
+docker-compose -f examples/example/docker-compose.cross.yml up --build
+docker-compose -f examples/example/docker-compose.cross.yml down
+
+docker-compose -f examples/cpp_starter_project/docker-compose.yml up --build
+docker-compose -f examples/cpp_starter_project/docker-compose.yml down
+
+docker-compose -f examples/web-example/docker-compose.yml up --build
+docker-compose -f examples/web-example/docker-compose.yml down
+
+docker-compose -f examples/android-example/docker-compose.yml up --build
+docker-compose -f examples/android-example/docker-compose.yml down
 
 docker run -it --rm --name my-cpp-project -v "$PWD/examples/single":/home/project -w /home/project abeimler/simple-cppbuilder ./docker-build.sh
 docker run -it --rm --name my-cpp-project -v "$PWD/examples/single":/home/project -w /home/project abeimler/simple-cppbuilder-ci ./docker-build.sh

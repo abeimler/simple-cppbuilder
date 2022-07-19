@@ -1,14 +1,14 @@
-#include <iostream>
+#include <fmt/core.h>
 #include "example.h"
 
 namespace example {
 
-std::string hello_world() {
-  return "Hello World!";
+std::string Foo::hello_world() {
+  return "Hello, World!\n";
 }
 
-void print_hello_world() {
-  std::cout << hello_world();
+void Foo::print_hello_world() {
+  fmt::print("{:s}", hello_world());
 }
 
 }

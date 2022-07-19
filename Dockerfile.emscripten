@@ -32,22 +32,10 @@ RUN runuser -l yay -c \
     rm -rf /home/yay/.cache/*
 RUN /usr/lib/emsdk/emsdk install latest && /usr/lib/emsdk/emsdk activate latest
 
-# setup project env
-WORKDIR /home/project
 ARG setup_env_script="/usr/lib/emsdk/emsdk_env.sh"
 ENV SETUP_ENV_SCRIPT $setup_env_script
 RUN . $setup_env_script
-COPY ./cmake ./cmake
-COPY ./scripts/docker-build.setup-env.sh ./docker-build.sh
-COPY ./scripts/docker-test.setup-env.sh ./docker-test.sh
 
-# install vcpkg
-ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
-ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
-ENV VCPKG_DISABLE_METRICS 1
-RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
-RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
-ENV VCPKG_ROOT "/home/project/vcpkg"
 
 # cross compiler settings
 ENV CC $cc
@@ -76,9 +64,26 @@ ENV MAKE $CROSS_MAKE
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
 ENV CMAKE_GENERATOR $cmake_generator
-ENV VCPKG_TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
-ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
 
+# setup project env
+ENV PROJECT_DIR /home/project
+WORKDIR /home/project
+COPY ./cmake ./cmake
+COPY ./scripts/docker-build.setup-env.sh ./docker-build.sh
+COPY ./scripts/docker-test.setup-env.sh ./docker-test.sh
+
+# install vcpkg
+ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
+ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
+ENV VCPKG_DISABLE_METRICS 1
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
+RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
+ENV VCPKG_ROOT "/home/project/vcpkg"
+
+ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+WORKDIR /home/project
 RUN mkdir build

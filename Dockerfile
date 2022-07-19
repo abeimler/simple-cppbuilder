@@ -18,6 +18,15 @@ RUN pacman-db-upgrade && \
 # set default compiler
 ENV CC "gcc"
 ENV CXX "g++"
+ENV CMAKE "cmake"
+ENV MAKE "make"
+
+# build script settings
+ENV TARGET "all"
+ENV BUILD_TYPE "Release"
+ENV CMAKE_GENERATOR "Ninja"
+ENV CMAKE_ARGS ""
+
 
 # setup project env
 WORKDIR /home/project
@@ -26,19 +35,11 @@ COPY ./scripts/docker-test.sh ./docker-test.sh
 
 # install vcpkg
 ENV VCPKG_DISABLE_METRICS 1
-RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
-RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/project/vcpkg
+RUN /home/project/vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/project/vcpkg"
 
-# build script settings
-ENV TARGET "all"
-ENV BUILD_TYPE "Release"
-ENV CMAKE_GENERATOR "Ninja"
-ENV VCPKG_TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
-ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
-ENV CMAKE_ARGS ""
-
-ENV CMAKE "cmake"
-ENV MAKE "make"
+ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 
 RUN mkdir build

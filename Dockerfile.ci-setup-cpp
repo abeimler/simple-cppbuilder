@@ -52,12 +52,11 @@ ENV CONAN_SYSREQUIRES_MODE enabled
 
 ENV SETUP_ENV_SCRIPT ~/.cpprc
 
-ENV CMAKE "cmake"
-ENV MAKE "/root/ninja/ninja"
-
 # set default compiler
 ENV CC "/root/llvm/bin/clang"
 ENV CXX "/root/llvm/bin/clang++"
+ENV CMAKE "cmake"
+ENV MAKE "/root/ninja/ninja"
 
 # setup project env
 WORKDIR /home/project
@@ -65,6 +64,7 @@ RUN bash -c 'source ~/.cpprc'
 
 CMD source ~/.cpprc
 ENTRYPOINT [ "/bin/bash" ]
+
 
 
 ## ci image
@@ -83,16 +83,8 @@ RUN apt-get update -y && \
 # set default compiler
 ENV CC "/root/llvm/bin/clang"
 ENV CXX "/root/llvm/bin/clang++"
-
-# setup project env
-WORKDIR /home/project
-COPY ./scripts/docker-build.setup-cpp.sh ./docker-build.sh
-COPY ./scripts/docker-test.setup-cpp.sh ./docker-test.sh
-
-# install vcpkg
-ENV VCPKG_DISABLE_METRICS 1
-RUN /setup_cpp_linux --vcpkg true
-ENV VCPKG_ROOT "/root/vcpkg"
+ENV CMAKE "cmake"
+ENV MAKE "/root/ninja/ninja"
 
 # build script settings
 ENV TARGET "all"
@@ -102,14 +94,21 @@ ENV VCPKG_TOOLCHAIN_FILE "/root/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV TOOLCHAIN_FILE "/root/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV CMAKE_ARGS ""
 
-ENV SETUP_ENV_SCRIPT ~/.cpprc
-RUN bash -c 'source ~/.cpprc'
+# install vcpkg
+ENV VCPKG_DISABLE_METRICS 1
+RUN /setup_cpp_linux --vcpkg true
+ENV VCPKG_ROOT "/root/vcpkg"
 
-ENV CMAKE "cmake"
-ENV MAKE "/root/ninja/ninja"
+ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 
+# setup project env
+ENV PROJECT_DIR /home/project
 WORKDIR /home/project
+COPY ./scripts/docker-build.setup-cpp.sh ./docker-build.sh
+COPY ./scripts/docker-test.setup-cpp.sh ./docker-test.sh
 RUN mkdir build
 
+ENV SETUP_ENV_SCRIPT ~/.cpprc
+RUN bash -c 'source ~/.cpprc'
 CMD source ~/.cpprc
 ENTRYPOINT [ "/bin/bash" ]

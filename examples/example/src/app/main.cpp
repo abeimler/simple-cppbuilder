@@ -1,11 +1,9 @@
-#include <iostream>
-#include <iomanip>
 #include <cstdlib>
 
 #include "example.h"
 
-int main(int argc, char *argv[])
+int main([[maybe_unused]] int argc,[[maybe_unused]] char *argv[])
 {
-  example::print_hello_world();
+  example::Foo::print_hello_world();
   return EXIT_SUCCESS;
 }
