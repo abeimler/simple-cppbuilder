@@ -1,5 +1,5 @@
 ## base image
-FROM abeimler/simple-cppbuilder:base as base
+FROM abeimler/simple-cppbuilder:base AS base
 
 ARG extra_libraries
 ARG vcpkg_host_triplet="x64-linux"
@@ -9,8 +9,10 @@ ARG vcpkg_target_triplet="wasm32-emscripten"
 
 ARG cc="emcc"
 ARG cxx="em++"
-ARG cmake="emcmake cmake"
-ARG make="emmake make"
+ARG cross_cmake="emcmake cmake"
+ARG cross_make="emmake make"
+ARG cmake="cmake"
+ARG make="make"
 ARG cmake_toolchain_file="/usr/lib/emscripten/cmake/Modules/Platform/Emscripten.cmake"
 ARG cmake_generator="Unix Makefiles"
 
@@ -32,27 +34,21 @@ RUN runuser -l yay -c \
     rm -rf /home/yay/.cache/*
 RUN /usr/lib/emsdk/emsdk install latest && /usr/lib/emsdk/emsdk activate latest
 
-# setup project env
-WORKDIR /home/project
-COPY ./cmake ./cmake
-COPY ./scripts/docker-build.emscripten.sh ./docker-build.sh
-COPY ./scripts/docker-entrypoint.cross.sh /docker-entrypoint.sh
+ARG setup_env_script="/usr/lib/emsdk/emsdk_env.sh"
+ENV SETUP_ENV_SCRIPT $setup_env_script
+RUN . $setup_env_script
 
-# install vcpkg
-ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
-ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
-ENV VCPKG_DISABLE_METRICS 1
-RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
-RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
-ENV VCPKG_ROOT "/home/project/vcpkg"
 
 # cross compiler settings
 ENV CC $cc
 ENV CXX $cxx
+ENV CMAKE $cmake
+ENV MAKE $make
+
 ENV PROCESSOR $processor
 ENV TARGET_TRIPLET $vcpkg_target_triplet
-ENV CROSS_CMAKE $cmake
-ENV CROSS_MAKE $make
+ENV CROSS_CMAKE $cross_cmake
+ENV CROSS_MAKE $cross_make
 ENV CROSS_TOOLCHAIN $cmake_toolchain_file
 
 # compiler env settings
@@ -66,21 +62,36 @@ ENV PYTHON_PATH "/usr/bin"
 ENV NODE_PATH "/usr/bin"
 ENV PATH="${EMSDK_PATH}:${EMSCRIPTEN_PATH}:${CLANG_PATH}:${NODE_PATH}:${PYTHON_PATH}:${PATH}"
 
-ARG setup_env_script="/usr/lib/emsdk/emsdk_env.sh"
-ENV SETUP_ENV_SCRIPT $setup_env_script
 
-ENV CMAKE $CROSS_CMAKE
-ENV MAKE $CROSS_MAKE
+# install vcpkg
+ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
+ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
+ENV VCPKG_DISABLE_METRICS 1
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/project/vcpkg
+RUN /home/project/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+ENV VCPKG_ROOT "/home/project/vcpkg"
+
+ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+
 
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
 ENV CMAKE_GENERATOR $cmake_generator
-ENV VCPKG_TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
-ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
 
+ENV VCPKG_CHAINLOAD_TOOLCHAIN_FILE $CHAINLOAD_TOOLCHAIN_FILE
+
+# setup project env
+ENV PROJECT_DIR /home/project
+WORKDIR /home/project
+COPY ./cmake ./cmake
+COPY ./scripts/docker-build.setup-env.sh ./docker-build.sh
+COPY ./scripts/docker-test.setup-env.sh ./docker-test.sh
+
+
+ENV PROJECT_DIR /home/project
+WORKDIR /home/project
 RUN mkdir build
-ENTRYPOINT ["/docker-entrypoint.sh"]
-#CMD ["./docker-build.sh"]

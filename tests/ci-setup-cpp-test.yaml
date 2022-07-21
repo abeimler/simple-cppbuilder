@@ -1,0 +1,40 @@
+schemaVersion: 2.0.0
+
+commandTests:
+- name: compiler
+  command: $CC
+  args: ["--version"]
+  expectedOutput: [".*clang.*"]
+- name: compiler
+  command: $CXX
+  args: ["--version"]
+  expectedOutput: [".*clang.*"]
+- name: cmake
+  command: $CMAKE
+  args: ["--version"]
+  expectedOutput: [".*cmake version.*"]
+- name: make
+  command: $MAKE
+  args: ["--version"]
+  expectedOutput: [".*1.*"]
+- name: cppcheck
+  command: cppcheck
+  args: ["--version"]
+  expectedOutput: [".*Cppcheck.*"]
+
+
+fileExistenceTests:
+- name: "vcpkg"
+  path: "/root/vcpkg"
+  shouldExist: true
+- name: "llvm"
+  path: "/root/llvm"
+  shouldExist: true
+- name: 'cmake toolchain'
+  path: '/root/vcpkg/scripts/buildsystems/vcpkg.cmake'
+  shouldExist: true
+
+metadataTest:
+  env:
+    - key: TOOLCHAIN_FILE
+      value: /root/vcpkg/scripts/buildsystems/vcpkg.cmake

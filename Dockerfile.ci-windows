@@ -1,43 +1,38 @@
 ## base image
-FROM ubuntu:20.04 as base
+FROM ubuntu:22.04 AS base
 
 ARG extra_libraries
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update -y && apt-get install --no-install-recommends -y gnupg wget curl apt-transport-https software-properties-common && \
+RUN apt-get update -y -qq && apt-get install --no-install-recommends -y gnupg wget curl apt-transport-https software-properties-common && \
     add-apt-repository -y ppa:ubuntu-toolchain-r/test && \
-    apt-get update -y
+    apt-get update -y && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+# keys used by apt
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 40976EAF437D05B5
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1E9377A2BA9EF27F
 # Install packages available from standard repos
 RUN apt-get update -y && \
     apt-get install -yq \
-        gcc wget curl pkg-config zip unzip tar git build-essential && \
+        gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 wget curl pkg-config zip unzip tar git build-essential && \
     apt-get install -y  \
-        mingw-w64 clang binutils bison \
+        mingw-w64 mingw-w64-tools binutils bison \
         ${extra_libraries} \
         python3 python3-pip doxygen graphviz \
         cmake make ninja-build ccache cppcheck cmake-extras \
+        clang clang-tidy clang-format \
         valgrind gcovr linux-tools-common linux-tools-generic google-perftools \
         neovim emacs nano && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
-#bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
 
 # install powershell
 ENV PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache
-RUN curl -sSL https://github.com/PowerShell/PowerShell/releases/download/v7.2.1/powershell-lts_7.2.1-1.deb_amd64.deb -o /tmp/powershell.deb && \
-    apt-get update -y && apt-get install --no-install-recommends -y /tmp/powershell.deb && \
+RUN curl -sSL https://github.com/PowerShell/PowerShell/releases/download/v7.2.5/powershell-lts_7.2.5-1.deb_amd64.deb -o /tmp/powershell.deb && \
+    apt-get update -y && apt-get install -y /tmp/powershell.deb && \
     apt-get clean && rm -rf /var/lib/apt/lists/* && \
     rm /tmp/powershell.deb
 ENV POWERSHELL_TELEMETRY_OPTOUT 1
-RUN pwsh \
-        -NoLogo \
-        -NoProfile \
-        -Command " \
-          \$ErrorActionPreference = 'Stop' ; \
-          \$ProgressPreference = 'SilentlyContinue' ; \
-          while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
-            Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
-            Start-Sleep -Seconds 6 ; \
-          }"
 
 # install mxe (old)
 #RUN apt-get update -y && \
@@ -74,8 +69,8 @@ ENV CONAN_SYSREQUIRES_MODE enabled
 
 ENV CMAKE "cmake"
 ENV MAKE "make"
-ENV CC "gcc"
-ENV CXX "g++"
+ENV CC "x86_64-w64-mingw32-gcc"
+ENV CXX "x86_64-w64-mingw32-g++"
 
 # setup project env
 WORKDIR /home/project
@@ -83,7 +78,7 @@ WORKDIR /home/project
 
 
 ## ci image for windows build
-FROM base as ci-base-windows
+FROM base AS ci-base-windows
 
 ARG extra_libraries
 ARG vcpkg_host_triplet="x64-linux"
@@ -92,38 +87,34 @@ ARG processor="x86_64"
 # e.g. x64-mingw-dynamic
 ARG vcpkg_target_triplet="x64-mingw-dynamic"
 
-# e.g. x86_64-w64-mingw32
-ARG cross_triple="x86_64-w64-mingw32"
-
-ARG cc="${cross_triple}-gcc"
-ARG cxx="${cross_triple}-g++"
+ARG cc="x86_64-w64-mingw32-gcc"
+ARG cxx="x86_64-w64-mingw32-g++"
 ARG cmake="cmake"
-ARG make="make"
-ARG cross_root="/usr/$cross_triple"
-ARG cmake_toolchain_file="/home/cmake/mingw-w64-toolchain.cmake"
-ARG cmake_generator="Unix Makefiles"
-
-
-# setup project env
-COPY ./cmake /home/cmake
-WORKDIR /home/project
-COPY ./scripts/docker-build.mingw.sh ./docker-build.sh
-COPY ./scripts/docker-entrypoint.cross.sh /docker-entrypoint.sh
+ARG make="ninja"
+ARG cmake_generator="Ninja"
+ARG cmake_toolchain_file="/home/cmake/x86_64-w64-mingw32.toolchain.cmake"
+ARG cross_root "/usr/x86_64-w64-mingw32"
 
 # install vcpkg
 ## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
 ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
 ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
 ENV VCPKG_DISABLE_METRICS 1
-RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
-RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
-ENV VCPKG_ROOT "/home/project/vcpkg"
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/vcpkg
+RUN /home/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+ENV VCPKG_ROOT "/home/vcpkg"
+
+ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+
 
 # cross compiler settings
 ENV CC $cc
 ENV CXX $cxx
+ENV CMAKE $cmake
+ENV MAKE $make
+
 ENV PROCESSOR $processor
-ENV CROSS_TRIPLET $cross_triple
 ENV TARGET_TRIPLET $vcpkg_target_triplet
 ENV CROSS_CMAKE $cmake
 ENV CROSS_MAKE $make
@@ -131,24 +122,18 @@ ENV CROSS "${cross_triple}-"
 ENV CROSS_ROOT $cross_root
 ENV CROSS_TOOLCHAIN $cmake_toolchain_file
 
-# compiler env settings
-# e.g. mingw-env, emsdk_env.sh
-RUN mkdir -p /home/cross
-RUN touch /home/cross/.bashrc
-ARG setup_env_script="/home/cross/.bashrc"
-ENV SETUP_ENV_SCRIPT $setup_env_script
-
-ENV CMAKE $CROSS_CMAKE
-ENV MAKE $CROSS_MAKE
-
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
 ENV CMAKE_GENERATOR $cmake_generator
-ENV VCPKG_TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
-ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
 
+# setup project env
+WORKDIR /home/project
+COPY ./cmake /home/cmake
+COPY ./scripts/docker-build.ci-mingw.sh ./docker-build.sh
+
+ENV PROJECT_DIR /home/project
+WORKDIR /home/project
 RUN mkdir build
-ENTRYPOINT ["/docker-entrypoint.sh"]

@@ -1,5 +1,5 @@
 ## base image
-FROM abeimler/simple-cppbuilder:base as base
+FROM abeimler/simple-cppbuilder:base AS base
 
 ARG extra_libraries
 ARG vcpkg_host_triplet="x64-linux"
@@ -12,8 +12,8 @@ ARG cross_triplet="x86_64-w64-mingw32.shared"
 ARG cc="${cross_triplet}-gcc"
 ARG cxx="${cross_triplet}-g++"
 ARG cmake="${cross_triplet}-cmake"
-ARG make="ninja"
-ARG cmake_generator="Ninja"
+ARG make="make"
+ARG cmake_generator="Unix Makefiles"
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \
@@ -25,43 +25,47 @@ RUN pacman-db-upgrade && \
 # install windows tools from AUR
 RUN runuser -l yay -c \
     "yay -Syu --noconfirm && yay -S --noconfirm \
-        powershell" && \
+        powershell-bin" && \
     runuser -l yay -c "yay -Scc --noconfirm" && \
     rm -rf /home/yay/.cache/*
 
 # install mxe
 RUN pacman-db-upgrade && \
     pacman -S --noconfirm  \
-        bzip2 lzip p7zip unzip xz perl ruby gperf intltool perl-xml-parser 
+        bzip2 lzip p7zip unzip xz perl ruby gperf intltool perl-xml-parser  && \
+    pacman -Scc --noconfirm
 ARG mxe_source_dir="/opt/mxe"
 RUN git clone --depth 1 https://github.com/mxe/mxe.git $mxe_source_dir
-RUN cd $mxe_source_dir && make cc MXE_TARGETS="${cross_triplet}"
-RUN cd $mxe_source_dir && make ccache cmake cmake-conf ninja --jobs=4 JOBS=2 MXE_TARGETS="${cross_triplet}" 
-RUN cd $mxe_source_dir && make clean-junk
-#RUN cd $mxe_source_dir && rm -rf $mxe_source_dir/log $mxe_source_dir/tmp-*
+WORKDIR $mxe_source_dir
+RUN make cc MXE_TARGETS="${cross_triplet}"
+RUN make ccache cmake cmake-conf ninja --jobs=4 JOBS=2 MXE_TARGETS="${cross_triplet}" 
+RUN make clean-junk
+#RUN rm -rf $mxe_source_dir/log $mxe_source_dir/tmp-*
 ENV MXE_SOURCE_DIR $mxe_source_dir
 ENV PATH="${mxe_source_dir}/usr/bin:${PATH}"
 ARG cross_root="${mxe_source_dir}/usr"
 ARG cmake_toolchain_file="${cross_root}/${cross_triplet}/share/cmake/mxe-conf.cmake"
 
-# setup project env
-WORKDIR /home/project
-COPY ./cmake ./cmake
-COPY ./scripts/docker-build.mxe.sh ./docker-build.sh
-COPY ./scripts/docker-entrypoint.cross.sh /docker-entrypoint.sh
-
 # install vcpkg
 ## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
+WORKDIR /home/project
 ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
 ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
 ENV VCPKG_DISABLE_METRICS 1
-RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
-RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/project/vcpkg
+RUN /home/project/vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/project/vcpkg"
+
+ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+
 
 # cross compiler settings
 ENV CC $cc
 ENV CXX $cxx
+ENV CMAKE $cmake
+ENV MAKE $make
+
 ENV PROCESSOR $processor
 ENV CROSS_TRIPLET $cross_triplet
 ENV TARGET_TRIPLET $vcpkg_target_triplet
@@ -75,19 +79,20 @@ RUN mkdir -p /home/cross
 RUN touch /home/cross/.bashrc
 ARG setup_env_script="/home/cross/.bashrc"
 ENV SETUP_ENV_SCRIPT $setup_env_script
-
-ENV CMAKE $CROSS_CMAKE
-ENV MAKE $CROSS_MAKE
+RUN . $setup_env_script
 
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
 ENV CMAKE_GENERATOR $cmake_generator
-ENV VCPKG_TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
-ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
 
+# setup project env
+WORKDIR /home/project
+COPY ./cmake /home/cmake
+COPY ./scripts/docker-build.mxe.sh ./docker-build.sh
+
+ENV PROJECT_DIR /home/project
+WORKDIR /home/project
 RUN mkdir build
-ENTRYPOINT ["/docker-entrypoint.sh"]
-#CMD ["./docker-build.sh"]

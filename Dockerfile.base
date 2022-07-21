@@ -1,5 +1,5 @@
 ## base image
-FROM archlinux:base-devel as base
+FROM archlinux:base-devel AS base
 
 ARG extra_libraries
 
@@ -51,12 +51,13 @@ ENV CONAN_SYSREQUIRES_SUDO 0
 # leaving this flag undefined can cause some installation failures.
 ENV CONAN_SYSREQUIRES_MODE enabled
 
-ENV CMAKE "cmake"
-ENV MAKE "make"
 
 # set default compiler
 ENV CC "gcc"
 ENV CXX "g++"
+ENV CMAKE "cmake"
+ENV MAKE "make"
 
 # setup project env
+ENV PROJECT_DIR /home/project
 WORKDIR /home/project

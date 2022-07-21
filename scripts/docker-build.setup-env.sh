@@ -1,0 +1,13 @@
+#!/bin/bash
+
+source $SETUP_ENV_SCRIPT
+
+set -euo pipefail
+
+${CROSS_CMAKE} -B build -S . -G "${CMAKE_GENERATOR}" -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" -DCMAKE_TOOLCHAIN_FILE="${TOOLCHAIN_FILE}" \
+    -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE="${CHAINLOAD_TOOLCHAIN_FILE}" \
+    -DVCPKG_TARGET_TRIPLET="${TARGET_TRIPLET}" \
+    ${CMAKE_ARGS}
+
+#cmake --build build --target "${TARGET}"
+cd build && ${CROSS_MAKE} "${TARGET}"

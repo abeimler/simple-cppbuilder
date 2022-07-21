@@ -1,5 +1,5 @@
 ## base image
-FROM abeimler/simple-cppbuilder:base as base
+FROM abeimler/simple-cppbuilder:base AS base
 
 # default compiler versions
 ARG gcc_version=10
@@ -26,32 +26,32 @@ RUN runuser -l yay -c \
 # set default compiler
 ENV CC $cc
 ENV CXX $cxx
-RUN $CC -v
-RUN $CXX -v
+ENV CMAKE "cmake"
+ENV MAKE "make"
+
+
+# install vcpkg
+ENV VCPKG_DISABLE_METRICS 1
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/project/vcpkg
+RUN /home/project/vcpkg/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+ENV VCPKG_ROOT "/home/project/vcpkg"
+
+ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+
 
 # setup project env
 WORKDIR /home/project
 COPY ./scripts/docker-build.sh ./docker-build.sh
 COPY ./scripts/docker-test.sh ./docker-test.sh
 
-# install vcpkg
-ENV VCPKG_DISABLE_METRICS 1
-RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
-RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
-ENV VCPKG_ROOT "/home/project/vcpkg"
-
-ENV CMAKE "cmake"
-ENV MAKE "make"
-RUN $CMAKE --version
 
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
-ENV CMAKE_GENERATOR "Ninja"
-ENV VCPKG_TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
-ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
+ENV CMAKE_GENERATOR "Unix Makefiles"
 ENV CMAKE_ARGS ""
 
+ENV PROJECT_DIR /home/project
+WORKDIR /home/project
 RUN mkdir build
-#ENTRYPOINT ["/usr/bin/bash"]
-#CMD ["./docker-build.sh"]

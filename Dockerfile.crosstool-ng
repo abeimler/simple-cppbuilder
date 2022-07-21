@@ -1,5 +1,5 @@
 ## base image
-FROM abeimler/simple-cppbuilder:base as base
+FROM abeimler/simple-cppbuilder:base AS base
 
 ARG extra_libraries
 ARG processor="x86_64"
@@ -44,55 +44,57 @@ ENV PATH="${cross_root}/bin:${PATH}"
 ARG cc="${cross_triple}-gcc"
 ARG cxx="${cross_triple}-g++"
 
-# set default compiler
-ENV CC "gcc"
-ENV CXX "g++"
-
-# setup project env
-WORKDIR /home/project
-COPY ./cmake /home/cmake
-COPY ./scripts/docker-build.rpi.sh ./docker-build.sh
-COPY ./scripts/docker-entrypoint.cross.sh /docker-entrypoint.sh
+# compiler env settings
+#RUN cp ${crosstool_dir}/bash-completion/ct-ng /etc/bash_completion.d/ct-ng
 
 # install vcpkg
 ENV VCPKG_DEFAULT_HOST_TRIPLET $triplet_host
 ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
 ENV VCPKG_DISABLE_METRICS 1
-RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
-RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/project/vcpkg
+RUN /home/project/vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/project/vcpkg"
 
-# cross compiler settings
+ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+# set default compiler
 ENV CC $cc
 ENV CXX $cxx
+ENV CMAKE $cmake
+ENV MAKE $make
+
+# cross compiler settings
 ENV PROCESSOR $processor
 ENV CROSS_TRIPLET $cross_triple
 ENV TARGET_TRIPLET $vcpkg_target_triplet
-ENV CROSS_CMAKE $cmake
-ENV CROSS_MAKE $make
+ENV CROSS_CMAKE $cross_cmake
+ENV CROSS_MAKE $cross_make
 ENV CROSS "${cross_triple}-"
+ENV CROSS_ROOT $cross_root
 ENV CROSS_TOOLCHAIN $cmake_toolchain_file
 
-# compiler env settings
-#RUN cp ${crosstool_dir}/bash-completion/ct-ng /etc/bash_completion.d/ct-ng
-
-RUN mkdir -p /home/cross
-RUN touch /home/cross/.bashrc
-ARG setup_env_script="/home/cross/.bashrc"
-ENV SETUP_ENV_SCRIPT $setup_env_script
-
-ENV CMAKE $CROSS_CMAKE
-ENV MAKE $CROSS_MAKE
 
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
 ENV CMAKE_GENERATOR $cmake_generator
-ENV VCPKG_TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
-ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
 
+ENV VCPKG_CHAINLOAD_TOOLCHAIN_FILE $CHAINLOAD_TOOLCHAIN_FILE
+
+# setup project env
+WORKDIR /home/project
+COPY ./cmake /home/cmake
+COPY ./scripts/docker-build.crosstool-ng.sh ./docker-build.sh
+
+RUN mkdir -p /home/cross
+RUN touch /home/cross/.bashrc
+ARG setup_env_script="/home/cross/.bashrc"
+ENV SETUP_ENV_SCRIPT $setup_env_script
+RUN . $setup_env_script
+
+ENV PROJECT_DIR /home/project
+WORKDIR /home/project
 RUN mkdir build
-ENTRYPOINT ["/docker-entrypoint.sh"]
-#CMD ["./docker-build.sh"]

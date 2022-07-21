@@ -16,7 +16,20 @@ commandTests:
 - name: make
   command: $MAKE
   args: ["--version"]
-  expectedOutput: [".*GNU Make.*"]
+  expectedOutput: [".*1.*"]
+- name: clang-tidy
+  command: clang-tidy
+  args: ["--version"]
+  expectedOutput: [".*LLVM*"]
+- name: clang-format
+  command: clang-format
+  args: ["--version"]
+  expectedOutput: [".*clang-format.*"]
+- name: cppcheck
+  command: cppcheck
+  args: ["--version"]
+  expectedOutput: [".*Cppcheck.*"]
+
 
 fileExistenceTests:
 - name: 'vcpkg'
@@ -28,13 +41,5 @@ fileExistenceTests:
 
 metadataTest:
   env:
-    - key: CC
-      value: gcc
-    - key: CXX
-      value: g++
-    - key: CMAKE
-      value: cmake
-    - key: MAKE
-      value: make
     - key: TOOLCHAIN_FILE
       value: /home/project/vcpkg/scripts/buildsystems/vcpkg.cmake

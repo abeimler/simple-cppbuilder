@@ -1,0 +1,34 @@
+schemaVersion: 2.0.0
+
+commandTests:
+- name: mingw c compiler
+  command: $CC
+  args: ["--version"]
+  expectedOutput: [".*x86_64-w64-mingw32-gcc.*"]
+- name: mingw c++ compiler
+  command: $CXX
+  args: ["--version"]
+  expectedOutput: [".*x86_64-w64-mingw32-g\\+\\+*"]
+- name: cmake
+  command: $CMAKE
+  args: ["--version"]
+  expectedOutput: [".*cmake version.*"]
+- name: make
+  command: $MAKE
+  args: ["--version"]
+  expectedOutput: [".*1.*"]
+- name: powershell
+  command: pwsh
+  args: ["-Version"]
+  expectedOutput: [".*PowerShell.*"]
+
+fileExistenceTests:
+- name: 'vcpkg'
+  path: '/home/vcpkg/vcpkg'
+  shouldExist: true
+- name: 'cmake toolchain'
+  path: '/home/cmake/x86_64-w64-mingw32.toolchain.cmake'
+  shouldExist: true
+- name: 'cross root'
+  path: '/usr/x86_64-w64-mingw32'
+  shouldExist: true

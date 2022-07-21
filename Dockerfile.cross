@@ -1,5 +1,5 @@
 ## base image
-FROM abeimler/simple-cppbuilder:base as base
+FROM abeimler/simple-cppbuilder:base AS base
 
 ARG extra_libraries
 ARG vcpkg_host_triplet="x64-linux"
@@ -13,15 +13,17 @@ ARG cross_triple
 
 ARG cc="${cross_triple}-gcc"
 ARG cxx="${cross_triple}-g++"
-ARG cmake="${cross_triple}-cmake"
-ARG make="${cross_triple}-make"
+ARG cmake="cmake"
+ARG make="make"
+ARG cross_cmake="${cross_triple}-cmake"
+ARG cross_make="${cross_triple}-make"
 ARG cross_root="/usr/$cross_triple"
 ARG cmake_toolchain_file
 ARG cmake_generator="Unix Makefiles"
 
 # e.g. mingw-w64-toolchain
 ARG install_toolchain="${cross_triple}-gcc" 
-# e.g. mingw-w64-cmake mingw-w64-configure mingw-w64-make mingw-w64-environment powershell ... mingw-w64-boost, mingw-w64-qt5-base, ... 
+# e.g. mingw-w64-cmake mingw-w64-configure mingw-w64-make mingw-w64-environment powershell-bin ... mingw-w64-boost, mingw-w64-qt5-base, ... 
 ARG install_extras_toolchain
 
 
@@ -39,32 +41,51 @@ RUN runuser -l yay -c \
     runuser -l yay -c "yay -Scc --noconfirm" && \
     rm -rf /home/yay/.cache/*
 
-# setup project env
-COPY ./cmake /home/cmake
-WORKDIR /home/project
-COPY ./scripts/docker-build.cross.sh ./docker-build.sh
-COPY ./scripts/docker-entrypoint.cross.sh /docker-entrypoint.sh
 
 # install vcpkg
 ## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
 ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
 ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
 ENV VCPKG_DISABLE_METRICS 1
-RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
-RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/project/vcpkg
+RUN /home/project/vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/project/vcpkg"
+
+ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+
 
 # cross compiler settings
 ENV CC $cc
 ENV CXX $cxx
+ENV CMAKE $cmake
+ENV MAKE $make
+
 ENV PROCESSOR $processor
 ENV CROSS_TRIPLET $cross_triple
 ENV TARGET_TRIPLET $vcpkg_target_triplet
-ENV CROSS_CMAKE $cmake
-ENV CROSS_MAKE $make
+ENV CROSS_CMAKE $cross_cmake
+ENV CROSS_MAKE $cross_make
 ENV CROSS "${cross_triple}-"
 ENV CROSS_ROOT $cross_root
 ENV CROSS_TOOLCHAIN $cmake_toolchain_file
+
+
+# build script settings
+ENV TARGET "all"
+ENV BUILD_TYPE "Release"
+ENV CMAKE_GENERATOR $cmake_generator
+ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
+ENV CMAKE_ARGS ""
+
+ENV VCPKG_CHAINLOAD_TOOLCHAIN_FILE $CHAINLOAD_TOOLCHAIN_FILE
+
+
+# setup project env
+COPY ./cmake /home/cmake
+WORKDIR /home/project
+ARG docker_build_script "docker-build.cross.sh"
+COPY ./scripts/$docker_build_script ./docker-build.sh
 
 # compiler env settings
 # e.g. mingw-env, emsdk_env.sh
@@ -72,19 +93,8 @@ RUN mkdir -p /home/cross
 RUN touch /home/cross/.bashrc
 ARG setup_env_script="/home/cross/.bashrc"
 ENV SETUP_ENV_SCRIPT $setup_env_script
+RUN . $setup_env_script
 
-ENV CMAKE $CROSS_CMAKE
-ENV MAKE $CROSS_MAKE
-
-# build script settings
-ENV TARGET "all"
-ENV BUILD_TYPE "Release"
-ENV CMAKE_GENERATOR $cmake_generator
-ENV VCPKG_TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
-ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
-ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
-ENV CMAKE_ARGS ""
-
+ENV PROJECT_DIR /home/project
+WORKDIR /home/project
 RUN mkdir build
-ENTRYPOINT ["/docker-entrypoint.sh"]
-#CMD ["./docker-build.sh"]

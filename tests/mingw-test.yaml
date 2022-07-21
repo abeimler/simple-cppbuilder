@@ -17,13 +17,23 @@ commandTests:
   command: $MAKE
   args: ["--version"]
   expectedOutput: [".*(GNU Make).*"]
+- name: environment
+  command: mingw-env
+  args: ["x86_64-w64-mingw32"]
+- name: powershell
+  command: pwsh
+  args: ["--version"]
+  expectedOutput: [".*(PowerShell).*"]
 
 fileExistenceTests:
 - name: 'vcpkg'
   path: '/home/project/vcpkg/vcpkg'
   shouldExist: true
+- name: 'cross root'
+  path: '/usr/x86_64-w64-mingw32'
+  shouldExist: true
 - name: 'cmake toolchain'
-  path: $CROSS_TOOLCHAIN
+  path: '/usr/share/mingw/toolchain-x86_64-w64-mingw32.cmake'
   shouldExist: true
 
 metadataTest:
@@ -32,9 +42,9 @@ metadataTest:
       value: x86_64-w64-mingw32-gcc
     - key: CXX
       value: x86_64-w64-mingw32-g++
-    - key: CMAKE
+    - key: CROSS_CMAKE
       value: x86_64-w64-mingw32-cmake
-    - key: MAKE
+    - key: CROSS_MAKE
       value: x86_64-w64-mingw32-make
     - key: CROSS_TOOLCHAIN
       value: /usr/share/mingw/toolchain-x86_64-w64-mingw32.cmake

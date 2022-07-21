@@ -20,16 +20,5 @@ commandTests:
 
 fileExistenceTests:
 - name: 'no vcpkg'
-  path: '/home/project/vcpkg/vcpkg'
+  path: '/home/project/vcpkg'
   shouldExist: false
-
-metadataTest:
-  env:
-    - key: CC
-      value: gcc
-    - key: CXX
-      value: g++
-    - key: CMAKE
-      value: cmake
-    - key: MAKE
-      value: make

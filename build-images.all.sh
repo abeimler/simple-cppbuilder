@@ -3,6 +3,7 @@
 ./build-images.sh
 
 ./build-images.mingw.sh
+./build-images.emscripten.sh
 
 ./build-images.arm.sh
 

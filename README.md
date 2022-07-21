@@ -93,8 +93,13 @@ Default image with some OpenGL dependencies: `mesa glu glfw-x11 libx11 libxrende
 
 #### `:ci`, `:ci-x64-mingw-w64`
 
-Alternative Ubuntu-based image with basic compilers.  
+Alternative Ubuntu-based image with basic compilers and tools.  
 _Nice base image for CI/CD._
+
+#### `:ci-setup-cpp`
+
+Alternative Ubuntu-based image with basic compilers and tools.  
+_Uses [setup-cpp](https://github.com/aminya/setup-cpp)._
 
 
 ### Cross-Compiler (experimental)
@@ -276,7 +281,7 @@ CMake Toolchain File `-DCMAKE_TOOLCHAIN_FILE`, default `./vcpkg/scripts/buildsys
 
 ### `CMAKE_ARGS`
 
-Custom CMake Arguments, e.g. `-DENABLE_COVERAGE:BOOL=ON`.  
+Custom CMake Arguments, e.g. `-DENABLE_TESTING:BOOL=ON -DOPT_ENABLE_COVERAGE:BOOL=ON -DENABLE_DEVELOPER_MODE:BOOL=OFF`.  
 
 
 ## License
@@ -292,7 +297,6 @@ As for any pre-built image usage, it is the image user's responsibility to ensur
 
 - [simple-cppbuilder DockerHub](https://hub.docker.com/r/abeimler/simple-cppbuilder)
 - [simple-cppbuilder GitHub](https://github.com/abeimler/simple-cppbuilder)
-- [simple-cppbuilder-raylib GitHub](https://github.com/abeimler/simple-cppbuilder-raylib)
 - [cpp_starter_project](https://github.com/lefticus/cpp_starter_project)
 - [cppdock](https://github.com/ricejasonf/cppdock)
 - Icon made by [me](https://hub.docker.com/u/abeimler) using C++-Icon made by [Freepik](https://www.freepik.com) from [Flaticon](https://www.flaticon.com/)
