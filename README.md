@@ -96,7 +96,7 @@ Default image with some OpenGL dependencies: `mesa glu glfw-x11 libx11 libxrende
 Alternative Ubuntu-based image with basic compilers and tools.  
 _Nice base image for CI/CD._
 
-#### `:ci2`
+#### `:ci-setup-cpp`
 
 Alternative Ubuntu-based image with basic compilers and tools.  
 _Uses [setup-cpp](https://github.com/aminya/setup-cpp)._
@@ -281,7 +281,7 @@ CMake Toolchain File `-DCMAKE_TOOLCHAIN_FILE`, default `./vcpkg/scripts/buildsys
 
 ### `CMAKE_ARGS`
 
-Custom CMake Arguments, e.g. `-DENABLE_COVERAGE:BOOL=ON`.  
+Custom CMake Arguments, e.g. `-DENABLE_TESTING:BOOL=ON -DOPT_ENABLE_COVERAGE:BOOL=ON -DENABLE_DEVELOPER_MODE:BOOL=OFF`.  
 
 
 ## License
