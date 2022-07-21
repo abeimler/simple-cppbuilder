@@ -27,7 +27,7 @@ fileExistenceTests:
   path: '/home/vcpkg/vcpkg'
   shouldExist: true
 - name: 'cmake toolchain'
-  path: '/home/cmake/x86_64-w64-mingw32-toolchain.cmake'
+  path: '/home/cmake/x86_64-w64-mingw32.toolchain.cmake'
   shouldExist: true
 - name: 'cross root'
   path: '/usr/x86_64-w64-mingw32'

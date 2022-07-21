@@ -7,11 +7,17 @@ container-structure-test test --image abeimler/simple-cppbuilder:base --config t
 container-structure-test test --image abeimler/simple-cppbuilder --config tests/test.yaml
 container-structure-test test --image abeimler/simple-cppbuilder:without-vcpkg --config tests/without-vcpkg-test.yaml
 
+container-structure-test test --image abeimler/simple-cppbuilder:ci --config tests/ci-test.yaml
+container-structure-test test --image abeimler/simple-cppbuilder:ci-x64-mingw-w64 --config tests/ci-windows-test.yaml
+container-structure-test test --image abeimler/simple-cppbuilder:ci-setup-cpp --config tests/ci-setup-cpp-test.yaml
+
 container-structure-test test --image abeimler/simple-cppbuilder:clang --config tests/clang-test.yaml
-container-structure-test test --image abeimler/simple-cppbuilder:gcc-10 --config tests/gcc10-test.yaml
-container-structure-test test --image abeimler/simple-cppbuilder:gcc-9 --config tests/gcc9-test.yaml
 
 container-structure-test test --image abeimler/simple-cppbuilder:emscripten --config tests/emscripten-test.yaml
+
+
+container-structure-test test --image abeimler/simple-cppbuilder:gcc-10 --config tests/gcc10-test.yaml
+container-structure-test test --image abeimler/simple-cppbuilder:gcc-9 --config tests/gcc9-test.yaml
 
 container-structure-test test --image abeimler/simple-cppbuilder:x64-mingw-w64 --config tests/mingw-test.yaml
 container-structure-test test --image abeimler/simple-cppbuilder:x64-mingw-w64-mxe --config tests/mxe-test.yaml
@@ -21,10 +27,6 @@ container-structure-test test --image abeimler/simple-cppbuilder:aarch64-linux -
 container-structure-test test --image abeimler/simple-cppbuilder:arm-android --config tests/arm-android-test.yaml
 
 container-structure-test test --image abeimler/simple-cppbuilder:rpi4 --config tests/rpi4-test.yaml
-
-container-structure-test test --image abeimler/simple-cppbuilder:ci --config tests/ci-test.yaml
-container-structure-test test --image abeimler/simple-cppbuilder:ci-x64-mingw-w64 --config tests/ci-windows-test.yaml
-container-structure-test test --image abeimler/simple-cppbuilder:ci-setup-cpp --config tests/ci-setup-cpp-test.yaml
 
 
 

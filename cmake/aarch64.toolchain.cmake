@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_SYSTEM_NAME Linux)
-set(CMAKE_SYSTEM_PROCESSOR arm)
+set(CMAKE_SYSTEM_PROCESSOR arm64)
 
 #set(CMAKE_SYSROOT $ENV{CROSS_ROOT})
 set(CMAKE_FIND_ROOT_PATH $ENV{CROSS_ROOT})

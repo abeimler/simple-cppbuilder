@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.16)
 
 # src: https://aur.archlinux.org/cgit/aur.git/tree/toolchain-mingw.cmake?h=mingw-w64-cmake
 
@@ -14,9 +14,9 @@ set(CMAKE_CXX_COMPILER $ENV{CROSS_TRIPLET}-g++)
 set(CMAKE_RC_COMPILER $ENV{CROSS_TRIPLET}-windres)
 set(CMAKE_MC_COMPILER $ENV{CROSS_TRIPLET}-windmc)
 # These are needed for compiling lapack (RHBZ #753906)
-#set(CMAKE_Fortran_COMPILER $ENV{CROSS_TRIPLET}-gfortran)
-#set(CMAKE_AR:FILEPATH $ENV{CROSS_TRIPLET}-ar)
-#set(CMAKE_RANLIB:FILEPATH $ENV{CROSS_TRIPLET}-ranlib)
+set(CMAKE_Fortran_COMPILER $ENV{CROSS_TRIPLET}-gfortran)
+set(CMAKE_AR:FILEPATH $ENV{CROSS_TRIPLET}-ar)
+set(CMAKE_RANLIB:FILEPATH $ENV{CROSS_TRIPLET}-ranlib)
 
 # search for programs in the build host directories
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)

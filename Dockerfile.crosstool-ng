@@ -44,36 +44,6 @@ ENV PATH="${cross_root}/bin:${PATH}"
 ARG cc="${cross_triple}-gcc"
 ARG cxx="${cross_triple}-g++"
 
-# set default compiler
-ENV CC "gcc"
-ENV CXX "g++"
-
-# cross compiler settings
-ENV CC $cc
-ENV CXX $cxx
-ENV PROCESSOR $processor
-ENV CROSS_TRIPLET $cross_triple
-ENV TARGET_TRIPLET $vcpkg_target_triplet
-ENV CROSS_CMAKE $cmake
-ENV CROSS_MAKE $make
-ENV CROSS "${cross_triple}-"
-ENV CROSS_TOOLCHAIN $cmake_toolchain_file
-
-ENV CMAKE $CROSS_CMAKE
-ENV MAKE $CROSS_MAKE
-
-# build script settings
-ENV TARGET "all"
-ENV BUILD_TYPE "Release"
-ENV CMAKE_GENERATOR $cmake_generator
-ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
-ENV CMAKE_ARGS ""
-
-# setup project env
-WORKDIR /home/project
-COPY ./cmake /home/cmake
-COPY ./scripts/docker-build.crosstool-ng.sh ./docker-build.sh
-
 # compiler env settings
 #RUN cp ${crosstool_dir}/bash-completion/ct-ng /etc/bash_completion.d/ct-ng
 
@@ -87,6 +57,37 @@ ENV VCPKG_ROOT "/home/project/vcpkg"
 
 ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+# set default compiler
+ENV CC $cc
+ENV CXX $cxx
+ENV CMAKE $cmake
+ENV MAKE $make
+
+# cross compiler settings
+ENV PROCESSOR $processor
+ENV CROSS_TRIPLET $cross_triple
+ENV TARGET_TRIPLET $vcpkg_target_triplet
+ENV CROSS_CMAKE $cross_cmake
+ENV CROSS_MAKE $cross_make
+ENV CROSS "${cross_triple}-"
+ENV CROSS_ROOT $cross_root
+ENV CROSS_TOOLCHAIN $cmake_toolchain_file
+
+
+# build script settings
+ENV TARGET "all"
+ENV BUILD_TYPE "Release"
+ENV CMAKE_GENERATOR $cmake_generator
+ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
+ENV CMAKE_ARGS ""
+
+ENV VCPKG_CHAINLOAD_TOOLCHAIN_FILE $CHAINLOAD_TOOLCHAIN_FILE
+
+# setup project env
+WORKDIR /home/project
+COPY ./cmake /home/cmake
+COPY ./scripts/docker-build.crosstool-ng.sh ./docker-build.sh
 
 RUN mkdir -p /home/cross
 RUN touch /home/cross/.bashrc

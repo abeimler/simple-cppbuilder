@@ -30,9 +30,12 @@ fileExistenceTests:
   path: $CROSS_TOOLCHAIN
   shouldExist: true
 - name: 'emsdk'
+  path: $EMSDK
+  shouldExist: true
+- name: 'emsdk path'
   path: $EMSDK_PATH
   shouldExist: true
-- name: 'emscripten'
+- name: 'emscripten path'
   path: $EMSCRIPTEN_PATH
   shouldExist: true
 - name: 'emscripten llvm'
@@ -41,6 +44,10 @@ fileExistenceTests:
 - name: 'em config'
   path: $EM_CONFIG
   shouldExist: true
+- name: 'em env'
+  path: '/usr/lib/emsdk/emsdk_env.sh'
+  shouldExist: true
+
 
 metadataTest:
   env:
@@ -48,9 +55,11 @@ metadataTest:
       value: emcc
     - key: CXX
       value: em++
-    - key: CMAKE
-      value: emcmake cmake
-    - key: MAKE
-      value: emmake make
+    - key: CROSS_CMAKE
+      value: 'emcmake cmake'
+    - key: CROSS_MAKE
+      value: 'emmake make'
     - key: CROSS_TOOLCHAIN
       value: /usr/lib/emscripten/cmake/Modules/Platform/Emscripten.cmake
+    - key: EMSDK
+      value: /usr/lib/emsdk
