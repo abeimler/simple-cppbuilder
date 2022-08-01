@@ -85,6 +85,7 @@ ENV CMAKE_ARGS ""
 WORKDIR /home/project
 COPY ./scripts/docker-build.sh ./docker-build.sh
 COPY ./scripts/docker-test.sh ./docker-test.sh
+COPY ./scripts/docker-test-coverage.sh ./docker-test-coverage.sh
 
 # install vcpkg
 ENV VCPKG_DISABLE_METRICS 1

@@ -106,6 +106,7 @@ ENV PROJECT_DIR /home/project
 WORKDIR /home/project
 COPY ./scripts/docker-build.setup-cpp.sh ./docker-build.sh
 COPY ./scripts/docker-test.setup-cpp.sh ./docker-test.sh
+COPY ./scripts/docker-test-coverage.sh ./docker-test-coverage.sh
 RUN mkdir build
 
 ENV SETUP_ENV_SCRIPT ~/.cpprc

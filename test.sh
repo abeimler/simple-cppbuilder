@@ -36,26 +36,27 @@ docker-compose -f examples/example/docker-compose.yml up --build example-gcc-rel
 docker-compose -f examples/example/docker-compose.yml up --build example-clang-debug-build example-clang-debug-test
 docker-compose -f examples/example/docker-compose.yml up --build example-clang-release-build example-clang-release-test
 docker-compose -f examples/example/docker-compose.yml up --build example-gcc-debug-test-cov
+docker-compose -f examples/example/docker-compose.yml up --build example-gcc-debug-test-lcov
 docker-compose -f examples/example/docker-compose.yml up --build example-gcc-release-with-raylib
-docker-compose -f examples/example/docker-compose.yml down
+docker-compose -f examples/example/docker-compose.yml down --volumes --rmi local
 
 docker-compose -f examples/example-ci/docker-compose.yml up --build example-gcc-build example-gcc-test example-gcc-test-cov
 docker-compose -f examples/example-ci/docker-compose.yml up --build example-windows-build
-docker-compose -f examples/example-ci/docker-compose.yml down
+docker-compose -f examples/example-ci/docker-compose.yml down --volumes --rmi local
 
 docker-compose -f examples/example/docker-compose.cross.yml up --build example-mingw-release-build
 docker-compose -f examples/example/docker-compose.cross.yml up --build example-arm64-release-build
 docker-compose -f examples/example/docker-compose.cross.yml up --build example-rpi4-release-build
-docker-compose -f examples/example/docker-compose.cross.yml down
+docker-compose -f examples/example/docker-compose.cross.yml down --volumes --rmi local
 
 docker-compose -f examples/cpp_starter_project/docker-compose.yml up --build
-docker-compose -f examples/cpp_starter_project/docker-compose.yml down
+docker-compose -f examples/cpp_starter_project/docker-compose.yml down --volumes --rmi local
 
 docker-compose -f examples/web-example/docker-compose.yml up --build
-docker-compose -f examples/web-example/docker-compose.yml down
+docker-compose -f examples/web-example/docker-compose.yml down --volumes --rmi local
 
 docker-compose -f examples/android-example/docker-compose.yml up --build
-docker-compose -f examples/android-example/docker-compose.yml down
+docker-compose -f examples/android-example/docker-compose.yml down --volumes --rmi local
 
 docker run -it --rm --name my-cpp-project -v "$PWD/examples/single":/home/project -w /home/project abeimler/simple-cppbuilder ./docker-build.sh
 docker run -it --rm --name my-cpp-project -v "$PWD/examples/single":/home/project -w /home/project abeimler/simple-cppbuilder-ci ./docker-build.sh
