@@ -8,6 +8,7 @@ build/*
 !.vscode/launch.json
 !.vscode/extensions.json 
 .gitignore
+.dockerignore
 Dockerfile
 docker-compose.yml
 docker-compose.*.yml

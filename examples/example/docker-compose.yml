@@ -38,7 +38,7 @@ services:
       TARGET: all
       BUILD_TYPE: Debug
       CMAKE_GENERATOR: Ninja
-      CMAKE_ARGS: -DENABLE_DEVELOPER_MODE:BOOL=OFF -DENABLE_TESTING:BOOL=ON
+      CMAKE_ARGS: -DENABLE_DEVELOPER_MODE:BOOL=ON -DENABLE_TESTING:BOOL=ON
   # gcc Release
   example-gcc-release-build:
     build:
@@ -63,7 +63,7 @@ services:
       TARGET: all
       BUILD_TYPE: RelWithDebInfo
       CMAKE_GENERATOR: Ninja
-      CMAKE_ARGS: -DENABLE_DEVELOPER_MODE:BOOL=OFF -DENABLE_TESTING:BOOL=ON
+      CMAKE_ARGS: -DENABLE_DEVELOPER_MODE:BOOL=ON -DENABLE_TESTING:BOOL=ON
   # clang Debug
   example-clang-debug-build:
     build:
@@ -88,7 +88,7 @@ services:
       TARGET: all
       BUILD_TYPE: Debug
       CMAKE_GENERATOR: Ninja
-      CMAKE_ARGS: -DENABLE_DEVELOPER_MODE:BOOL=OFF -DENABLE_TESTING:BOOL=ON
+      CMAKE_ARGS: -DENABLE_DEVELOPER_MODE:BOOL=ON -DENABLE_TESTING:BOOL=ON
   # clang Release
   example-clang-release-build:
     build:
@@ -113,7 +113,7 @@ services:
       TARGET: all
       BUILD_TYPE: RelWithDebInfo
       CMAKE_GENERATOR: Ninja
-      CMAKE_ARGS: -DENABLE_DEVELOPER_MODE:BOOL=OFF -DENABLE_TESTING:BOOL=ON
+      CMAKE_ARGS: -DENABLE_DEVELOPER_MODE:BOOL=ON -DENABLE_TESTING:BOOL=ON
   # example with test coverage
   example-gcc-debug-test-cov:
     build:
@@ -126,7 +126,20 @@ services:
       TARGET: all
       BUILD_TYPE: Debug
       CMAKE_GENERATOR: Ninja
-      CMAKE_ARGS: -DENABLE_DEVELOPER_MODE:BOOL=OFF -DENABLE_TESTING:BOOL=ON -DOPT_ENABLE_COVERAGE:BOOL=ON
+      CMAKE_ARGS: -DENABLE_DEVELOPER_MODE:BOOL=ON -DENABLE_TESTING:BOOL=ON -DOPT_ENABLE_COVERAGE:BOOL=ON
+  # example with test coverage (run lcov)
+  example-gcc-debug-test-lcov:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test-coverage
+    environment:
+      CC: gcc
+      CXX: g++
+      TARGET: all
+      BUILD_TYPE: Debug
+      CMAKE_GENERATOR: Ninja
+      CMAKE_ARGS: -DENABLE_DEVELOPER_MODE:BOOL=ON -DENABLE_TESTING:BOOL=ON -DOPT_ENABLE_COVERAGE:BOOL=ON
   # example with dependency raylib (vcpkg)
   example-gcc-release-with-raylib:
     build:

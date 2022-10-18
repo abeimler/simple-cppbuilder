@@ -44,6 +44,7 @@ ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 WORKDIR /home/project
 COPY ./scripts/docker-build.sh ./docker-build.sh
 COPY ./scripts/docker-test.sh ./docker-test.sh
+COPY ./scripts/docker-test-coverage.sh ./docker-test-coverage.sh
 
 
 # build script settings

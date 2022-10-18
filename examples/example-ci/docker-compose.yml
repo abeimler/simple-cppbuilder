@@ -19,7 +19,7 @@ services:
     environment:
       TARGET: all
       BUILD_TYPE: RelWithDebInfo
-      CMAKE_ARGS: -DENABLE_TESTING:BOOL=ON -DENABLE_DEVELOPER_MODE:BOOL=OFF
+      CMAKE_ARGS: -DENABLE_TESTING:BOOL=ON -DENABLE_DEVELOPER_MODE:BOOL=ON
   # example with test coverage
   example-gcc-test-cov:
     build:
@@ -29,7 +29,7 @@ services:
     environment:
       TARGET: all
       BUILD_TYPE: Debug
-      CMAKE_ARGS: -DENABLE_TESTING:BOOL=ON -DOPT_ENABLE_COVERAGE:BOOL=ON -DENABLE_DEVELOPER_MODE:BOOL=OFF
+      CMAKE_ARGS: -DENABLE_TESTING:BOOL=ON -DOPT_ENABLE_COVERAGE:BOOL=ON -DENABLE_DEVELOPER_MODE:BOOL=ON
   # mingw
   example-windows-build:
     build:

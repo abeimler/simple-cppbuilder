@@ -31,5 +31,6 @@ ENV CMAKE_ARGS ""
 WORKDIR /home/project
 COPY ./scripts/docker-build-without-toolchain.sh ./docker-build.sh
 COPY ./scripts/docker-test.sh ./docker-test.sh
+COPY ./scripts/docker-test-coverage.sh ./docker-test-coverage.sh
 
 RUN mkdir build

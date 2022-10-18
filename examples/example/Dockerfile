@@ -7,9 +7,15 @@ RUN git pull origin master
 WORKDIR $PROJECT_DIR
 COPY . .
 CMD ["./docker-build.sh"]
+
 ## test stage
 FROM build as test
 CMD ["./docker-test.sh"]
+
+## test (coverage) stage
+FROM test as test-coverage
+COPY ./docker-test-coverage.sh ./docker-test-coverage.sh
+CMD ["./docker-test-coverage.sh"]
 
 
 # image using clang

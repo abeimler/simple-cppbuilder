@@ -63,7 +63,8 @@ ARG extra_libraries
 # Install packages available from standard repos
 RUN apt-get update -y && \
     apt-get install --no-install-recommends -y  \
-        git ${extra_libraries} && \
+        git ${extra_libraries} \
+        curl gnupg coreutils && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 
@@ -79,11 +80,23 @@ ENV BUILD_TYPE "Release"
 ENV CMAKE_GENERATOR "Ninja"
 ENV CMAKE_ARGS ""
 
+# install CodeCov
+WORKDIR /home/codecov
+RUN curl -Os https://uploader.codecov.io/latest/linux/codecov
+RUN curl https://keybase.io/codecovsecurity/pgp_keys.asc | gpg --no-default-keyring --keyring trustedkeys.gpg --import
+RUN curl -Os https://uploader.codecov.io/latest/alpine/codecov
+RUN curl -Os https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM
+RUN curl -Os https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM.sig
+RUN gpgv codecov.SHA256SUM.sig codecov.SHA256SUM
+RUN shasum -a 256 -c codecov.SHA256SUM
+RUN chmod +x codecov
+ENV CODECOV "/home/codecov/codecov"
 
 # setup project env
 WORKDIR /home/project
 COPY ./scripts/docker-build.sh ./docker-build.sh
 COPY ./scripts/docker-test.sh ./docker-test.sh
+COPY ./scripts/docker-test-coverage.sh ./docker-test-coverage.sh
 
 # install vcpkg
 ENV VCPKG_DISABLE_METRICS 1
