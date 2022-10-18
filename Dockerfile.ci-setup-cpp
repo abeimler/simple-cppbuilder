@@ -13,14 +13,31 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1E9377A2BA9EF27F
 # Install basic packages available from standard repos
 RUN apt-get update -y -qq && \
     apt-get install --no-install-recommends -yq \
-        wget curl pkg-config zip unzip tar git && \
+        wget curl pkg-config zip unzip tar git \
+        gnupg coreutils && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# install CodeCov
+WORKDIR /home/codecov
+RUN curl -Os https://uploader.codecov.io/latest/linux/codecov
+RUN curl https://keybase.io/codecovsecurity/pgp_keys.asc | gpg --no-default-keyring --keyring trustedkeys.gpg --import
+RUN curl -Os https://uploader.codecov.io/latest/alpine/codecov
+RUN curl -Os https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM
+RUN curl -Os https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM.sig
+RUN gpgv codecov.SHA256SUM.sig codecov.SHA256SUM
+RUN shasum -a 256 -c codecov.SHA256SUM
+RUN chmod +x codecov
+ENV CODECOV "/home/codecov/codecov"
+
+# download setup_cpp
+ARG setup_cpp_linux_version="0.20.1"
+ARG setup_cpp_linux_download_url="https://github.com/aminya/setup-cpp/releases/download/v${setup_cpp_linux_version}/setup_cpp_linux"
 # add setup_cpp
-RUN wget --no-verbose "https://github.com/aminya/setup-cpp/releases/download/v0.18.0/setup_cpp_linux" -O /setup_cpp_linux
+RUN wget --no-verbose ${setup_cpp_linux_download_url} -O /setup_cpp_linux
 RUN chmod +x /setup_cpp_linux
 RUN /setup_cpp_linux --compiler llvm --gcc true --make true --cmake true --ninja true --ccache true --doxygen true --gcovr true --cppcheck true --clangtidy true --clangformat true
-
+RUN rm -rf /tmp/*
+RUN cp /root/.cpprc /root/.bashrc
 
 # Install more tools from standard repos
 RUN apt-get update -y && \

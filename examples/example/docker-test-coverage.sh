@@ -8,14 +8,6 @@ ${CMAKE} --build build --target "${TARGET}"
 
 ctest --build-test --test-dir build
 
-ls -lah .
-ls -lah build
-ls -lah build/test
-ls -lah build/src
-ls -lah build/src/example
-ls -lah build/src/example/CMakeFiles
-
-gcovr -r . build
-lcov --capture --no-external --base-directory . --directory build --output-file build/coverage.info
+lcov --capture --directory build --output-file build/coverage.info
 lcov --remove build/coverage.info '/usr/*' --output-file build/coverage.info # filter system-files
-lcov --list build/coverage.info
+lcov --list build/coverage.info # debug info

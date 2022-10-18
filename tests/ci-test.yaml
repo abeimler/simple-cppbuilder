@@ -38,6 +38,9 @@ fileExistenceTests:
 - name: 'cmake toolchain'
   path: '/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake'
   shouldExist: true
+- name: 'codecov'
+  path: '/home/codecov/codecov'
+  shouldExist: true
 
 metadataTest:
   env:

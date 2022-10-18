@@ -8,7 +8,7 @@ ${CMAKE} --build build --target "${TARGET}"
 
 ctest --build-test --test-dir build
 
-gcovr -r . build
-lcov --capture --no-external --base-directory . --directory build --output-file build/coverage.info
+# Create lcov report
+lcov --capture --directory build --output-file build/coverage.info
 lcov --remove build/coverage.info '/usr/*' --output-file build/coverage.info # filter system-files
-lcov --list build/coverage.info
+#lcov --list build/coverage.info # debug info

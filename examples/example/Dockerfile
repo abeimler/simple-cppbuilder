@@ -7,16 +7,13 @@ RUN git pull origin master
 WORKDIR $PROJECT_DIR
 COPY . .
 CMD ["./docker-build.sh"]
+
 ## test stage
 FROM build as test
-#COPY ./docker-build.sh ./docker-build.sh
-#COPY ./docker-build.sh ./docker-build.sh
-#COPY ./docker-build.sh ./docker-build.sh
 CMD ["./docker-test.sh"]
+
 ## test (coverage) stage
 FROM test as test-coverage
-#COPY ./docker-build.sh ./docker-build.sh
-#COPY ./docker-test.sh ./docker-test.sh
 COPY ./docker-test-coverage.sh ./docker-test-coverage.sh
 CMD ["./docker-test-coverage.sh"]
 

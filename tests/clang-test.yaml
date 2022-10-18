@@ -16,7 +16,7 @@ commandTests:
 - name: make
   command: $MAKE
   args: ["--version"]
-  expectedOutput: [".*GNU Make.*"]
+  expectedOutput: [".*1.*"]
 
 fileExistenceTests:
 - name: 'vcpkg'

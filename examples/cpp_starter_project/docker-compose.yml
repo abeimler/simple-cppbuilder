@@ -104,7 +104,7 @@ services:
       TARGET: all
       BUILD_TYPE: Debug
       CMAKE_GENERATOR: Ninja
-      CMAKE_ARGS: -DENABLE_COVERAGE:BOOL=TRUE
+      CMAKE_ARGS: -DENABLE_COVERAGE:BOOL=ON
   # clang Release with different libs
   cpp_starter_project-fltk-clang-release-build:
     build:

@@ -37,7 +37,7 @@ set(OPT_WARNINGS_AS_ERRORS OFF)
 include(FetchContent)
 # Add project_options
 # https://github.com/cpp-best-practices/project_options
-FetchContent_Declare(_project_options URL https://github.com/cpp-best-practices/project_options/archive/refs/tags/v0.24.0.zip)
+FetchContent_Declare(_project_options URL https://github.com/cpp-best-practices/project_options/archive/refs/tags/v0.25.2.zip)
 FetchContent_MakeAvailable(_project_options)
 include(${_project_options_SOURCE_DIR}/Index.cmake)
 
@@ -80,29 +80,38 @@ set(ENABLE_CPPCHECK OFF)
 set(ENABLE_SANITIZER_ADDRESS OFF)
 set(ENABLE_SANITIZER_UNDEFINED_BEHAVIOR OFF)
 set(ENABLE_COVERAGE OFF)
+set(ENABLE_INCLUDE_WHAT_YOU_USE OFF)
+set(ENABLE_INTERPROCEDURAL_OPTIMIZATION OFF)
 
 option(ENABLE_CHECKING "Enable Static analyzer" OFF)
+option(ENABLE_CHECKING_INCLUDE_WHAT_YOU_USE "Enable Static analyzer for include-what-you-use" OFF)
 if(ENABLE_CHECKING)
   set(ENABLE_CLANG_TIDY "ENABLE_CLANG_TIDY")
   set(ENABLE_CPPCHECK "ENABLE_CPPCHECK")
+  set(ENABLE_INCLUDE_WHAT_YOU_USE "ENABLE_INCLUDE_WHAT_YOU_USE")
+endif()
+if(ENABLE_CHECKING_INCLUDE_WHAT_YOU_USE)
+  set(ENABLE_INCLUDE_WHAT_YOU_USE "ENABLE_INCLUDE_WHAT_YOU_USE")
 endif()
 
 option(ENABLE_TESTING "Enable the tests" ${PROJECT_IS_TOP_LEVEL})
+option(DISABLE_SANITIZER "Disable Sanitizer" OFF)
 if(ENABLE_TESTING)
-  if (NOT DEFINED OPT_ENABLE_COVERAGE)
+  if(NOT DEFINED OPT_ENABLE_COVERAGE)
     set(ENABLE_COVERAGE "ENABLE_COVERAGE")
   endif()
 
-  if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
-    set(ENABLE_SANITIZER_ADDRESS "ENABLE_SANITIZER_ADDRESS")
-    set(ENABLE_SANITIZER_UNDEFINED_BEHAVIOR "ENABLE_SANITIZER_UNDEFINED_BEHAVIOR")
-  else()
-  # FIXME: Catch2d.lib(catch_istream.cpp.obj) : error LNK2038: mismatch detected for 'annotate_vector': value '0' doesn't match value '1'
-  #  # or it is MSVC and has run vcvarsall
-  #  string(FIND "$ENV{PATH}" "$ENV{VSINSTALLDIR}" index_of_vs_install_dir)
-  #  if(MSVC AND "${index_of_vs_install_dir}" STREQUAL "-1")
-  #    set(ENABLE_SANITIZER_ADDRESS "ENABLE_SANITIZER_ADDRESS")
-  #  endif()
+  if(NOT DISABLE_SANITIZER)
+    if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
+      set(ENABLE_SANITIZER_ADDRESS "ENABLE_SANITIZER_ADDRESS")
+      set(ENABLE_SANITIZER_UNDEFINED_BEHAVIOR "ENABLE_SANITIZER_UNDEFINED_BEHAVIOR")
+    else()
+      # or it is MSVC and has run vcvarsall
+      string(FIND "$ENV{PATH}" "$ENV{VSINSTALLDIR}" index_of_vs_install_dir)
+      if(MSVC AND "${index_of_vs_install_dir}" STREQUAL "-1")
+        set(ENABLE_SANITIZER_ADDRESS "ENABLE_SANITIZER_ADDRESS")
+      endif()
+    endif()
   endif()
 endif()
 
@@ -155,7 +164,6 @@ include(cmake/CPM.cmake)
 CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.9.0")
 CPMAddPackage("gh:TheLartians/Format.cmake@1.7.3")
 
-#add_subdirectory(libs)
 
 if(ENABLE_TESTING)
   # This variable is set by project() in CMake 3.21+
