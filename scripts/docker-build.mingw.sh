@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-source $SETUP_ENV_SCRIPT $CROSS_TRIPLET
+. $SETUP_ENV_SCRIPT $CROSS_TRIPLET
 
 set -euo pipefail
 
@@ -14,4 +14,5 @@ ${CROSS_CMAKE} \
 
 # @FIXME: "CMake Error: Unknown argument --build" with ${CROSS_CMAKE} ... use ninja, ${CROSS_MAKE} = ninja
 #cmake -B build --build build --target "${TARGET}"
-cd build && ${CROSS_MAKE} "${TARGET}"
+cd build
+${CROSS_MAKE} "${TARGET}"

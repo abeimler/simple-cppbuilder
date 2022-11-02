@@ -24,7 +24,9 @@ Based on [archlinux:base-devel](https://hub.docker.com/_/archlinux) with [yay](h
 
 You can find a full C++ project example [here](https://github.com/abeimler/simple-cppbuilder/tree/main/examples/example).
 
-### Create a `Dockerfile` in your C++ project
+### Add Docker into your C++ Project
+
+1. Create a `Dockerfile` in your C++ project
 
 ```Dockerfile
 ## build stage
@@ -37,7 +39,7 @@ FROM build as test
 CMD ["./docker-test.sh"]
 ```
 
-You can then build and run the Docker image:
+2. Build and run the Docker image:
 
 ```bash
 $ docker build -t my-cpp-project .
@@ -66,7 +68,7 @@ Default image with gcc, buildtools, [conan](https://conan.io/) installed and [vc
 
 Default image with clang compiler.
 
-#### `:gcc10`, `:gcc9`
+#### `:gcc10`, `:gcc9` (outdated)
 
 Default image with gcc compiler.
 
@@ -282,6 +284,71 @@ CMake Toolchain File `-DCMAKE_TOOLCHAIN_FILE`, default `./vcpkg/scripts/buildsys
 ### `CMAKE_ARGS`
 
 Custom CMake Arguments, e.g. `-DENABLE_TESTING:BOOL=ON -DOPT_ENABLE_COVERAGE:BOOL=ON -DENABLE_DEVELOPER_MODE:BOOL=OFF`.  
+
+
+## More Environment Variables
+
+Here are some Environment Variables you can use in your build script, such as paths, scripts and programs.
+
+### `MAKE`
+
+`make` or `ninja`.
+
+### `PROJECT_DIR`
+
+Project-Home folder, `/home/project`.
+
+### `VCPKG_ROOT`
+
+Path to vcpkg, `/home/project/vcpkg`.
+
+### `VCPKG_TOOLCHAIN_FILE`
+
+vcpkg Toolchain, `/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake`.
+
+
+### `CODECOV`
+
+Path to [codedov uploader](https://about.codecov.io/blog/introducing-codecovs-new-uploader/), `/home/codecov/codecov`.
+
+_(Used in CI/CD images)_
+
+
+### `VCPKG_DEFAULT_HOST_TRIPLET`, `VCPKG_DEFAULT_TRIPLET`
+
+vcpkg target- and host-triplet.
+
+_(Used in cross-compiler images)_
+
+### `VCPKG_CHAINLOAD_TOOLCHAIN_FILE`
+
+alternate CMake toolchain (for vcpkg)
+
+_(Used in cross-compiler images)_
+
+### `CROSS_TOOLCHAIN`
+
+Path to CMake Toolchain, `/home/cmake/x86_64-w64-mingw32.toolchain.cmake`.
+
+_(Used in cross-compiler images)_
+
+### `SETUP_ENV_SCRIPT`
+
+source or setup-environment-script for cross compiler tools, `/usr/lib/emsdk/emsdk_env.sh` or `	~/.cpprc`, ...
+
+_(Used in cross-compiler images)_
+
+### `EM_CACHE`, `EM_CONFIG`, `EMSCRIPTEN_PATH`, `EMSDK`, `EMSDK_PATH`
+
+Paths for emscripten, emsdk and configs.
+
+* `EM_CACHE`: `/usr/lib/emsdk/upstream/emscripten/cache`
+* `EM_CONFIG`: `/usr/lib/emsdk/.emscripten`
+* `EMSCRIPTEN_PATH`: `/usr/lib/emscripten`
+* `EMSDK`: `/usr/lib/emsdk`
+* `EMSDK_PATH`: `/usr/lib/emsdk`
+
+_(Used in emscripten images)_
 
 
 ## License

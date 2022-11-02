@@ -9,9 +9,10 @@
 
 ./build-images.android.sh
 ./build-images.android-21.sh
+./build-images.android-24.sh
 
-./build-images.arm.crosstool.sh
-./build-images.rpi.sh
+#./build-images.arm.crosstool.sh
+#./build-images.rpi.sh
 
-./build-images.gcc.sh
-./build-images.mingw.mxe.sh
+#./build-images.gcc.sh
+#./build-images.mingw.mxe.sh

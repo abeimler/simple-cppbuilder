@@ -30,7 +30,7 @@ RUN python3 -m pip install --upgrade pip setuptools && \
     conan --version
 # Install more pip tools
 RUN python3 -m pip install --upgrade pip setuptools && \
-    python3 -m pip install cogapp coverage
+    python3 -m pip install cogapp coverage cmake-format cmakelint
 
 # thx to https://github.com/lefticus/cpp_starter_project/pull/121
 
@@ -82,11 +82,10 @@ ENV CMAKE_ARGS ""
 
 # install CodeCov
 WORKDIR /home/codecov
-RUN curl -Os https://uploader.codecov.io/latest/linux/codecov
 RUN curl https://keybase.io/codecovsecurity/pgp_keys.asc | gpg --no-default-keyring --keyring trustedkeys.gpg --import
-RUN curl -Os https://uploader.codecov.io/latest/alpine/codecov
-RUN curl -Os https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM
-RUN curl -Os https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM.sig
+ADD https://uploader.codecov.io/latest/alpine/codecov codecov
+ADD https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM codecov.SHA256SUM
+ADD https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM.sig codecov.SHA256SUM.sig
 RUN gpgv codecov.SHA256SUM.sig codecov.SHA256SUM
 RUN shasum -a 256 -c codecov.SHA256SUM
 RUN chmod +x codecov
@@ -110,3 +109,7 @@ ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 ENV PROJECT_DIR /home/project
 WORKDIR /home/project
 RUN mkdir build
+
+COPY ./scripts/docker-entrypoint.ci.sh /docker-entrypoint.sh
+ENTRYPOINT ["/bin/bash", "-c", "/docker-entrypoint.sh"]
+CMD ["/bin/bash"]

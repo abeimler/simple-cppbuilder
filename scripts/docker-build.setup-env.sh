@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-source $SETUP_ENV_SCRIPT
+. $SETUP_ENV_SCRIPT
 
 set -euo pipefail
 
@@ -10,4 +10,5 @@ ${CROSS_CMAKE} -B build -S . -G "${CMAKE_GENERATOR}" -DCMAKE_BUILD_TYPE="${BUILD
     ${CMAKE_ARGS}
 
 #cmake --build build --target "${TARGET}"
-cd build && ${CROSS_MAKE} "${TARGET}"
+cd build 
+${CROSS_MAKE} "${TARGET}"
