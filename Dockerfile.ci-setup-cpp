@@ -19,25 +19,24 @@ RUN apt-get update -y -qq && \
 
 # install CodeCov
 WORKDIR /home/codecov
-RUN curl -Os https://uploader.codecov.io/latest/linux/codecov
 RUN curl https://keybase.io/codecovsecurity/pgp_keys.asc | gpg --no-default-keyring --keyring trustedkeys.gpg --import
-RUN curl -Os https://uploader.codecov.io/latest/alpine/codecov
-RUN curl -Os https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM
-RUN curl -Os https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM.sig
+ADD https://uploader.codecov.io/latest/alpine/codecov codecov
+ADD https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM codecov.SHA256SUM
+ADD https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM.sig codecov.SHA256SUM.sig
 RUN gpgv codecov.SHA256SUM.sig codecov.SHA256SUM
 RUN shasum -a 256 -c codecov.SHA256SUM
 RUN chmod +x codecov
 ENV CODECOV "/home/codecov/codecov"
 
 # download setup_cpp
-ARG setup_cpp_linux_version="0.20.1"
+ARG setup_cpp_linux_version="0.21.0"
 ARG setup_cpp_linux_download_url="https://github.com/aminya/setup-cpp/releases/download/v${setup_cpp_linux_version}/setup_cpp_linux"
 # add setup_cpp
 RUN wget --no-verbose ${setup_cpp_linux_download_url} -O /setup_cpp_linux
 RUN chmod +x /setup_cpp_linux
-RUN /setup_cpp_linux --compiler llvm --gcc true --make true --cmake true --ninja true --ccache true --doxygen true --gcovr true --cppcheck true --clangtidy true --clangformat true
+RUN /setup_cpp_linux --compiler llvm --gcc true --make true --cmake true --ninja true --ccache true --doxygen true --gcovr true --cppcheck true --clangtidy true --clangformat true --conan true
 RUN rm -rf /tmp/*
-RUN cp /root/.cpprc /root/.bashrc
+#RUN cp /root/.cpprc /root/.bashrc
 
 # Install more tools from standard repos
 RUN apt-get update -y && \
@@ -50,7 +49,7 @@ RUN apt-get update -y && \
 
 # Install more pip tools
 RUN python3 -m pip install --upgrade pip setuptools && \
-    python3 -m pip install cogapp coverage
+    python3 -m pip install cogapp coverage cmake-format cmakelint
 
 ## Cleanup cached apt data we don't need anymore
 RUN apt-get autoremove -y && apt-get clean && \
@@ -79,8 +78,9 @@ ENV MAKE "/root/ninja/ninja"
 WORKDIR /home/project
 RUN bash -c 'source ~/.cpprc'
 
-CMD source ~/.cpprc
-ENTRYPOINT [ "/bin/bash" ]
+COPY ./scripts/docker-entrypoint.setup-cpp.sh /docker-entrypoint.sh
+ENTRYPOINT ["/bin/bash", "-c", "/docker-entrypoint.sh"]
+CMD ["/bin/bash"]
 
 
 
@@ -115,7 +115,7 @@ ENV CMAKE_ARGS ""
 ENV VCPKG_DISABLE_METRICS 1
 RUN /setup_cpp_linux --vcpkg true
 ENV VCPKG_ROOT "/root/vcpkg"
-
+RUN /root/vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 
 # setup project env
@@ -123,10 +123,7 @@ ENV PROJECT_DIR /home/project
 WORKDIR /home/project
 COPY ./scripts/docker-build.setup-cpp.sh ./docker-build.sh
 COPY ./scripts/docker-test.setup-cpp.sh ./docker-test.sh
-COPY ./scripts/docker-test-coverage.sh ./docker-test-coverage.sh
+COPY ./scripts/docker-test-coverage.setup-cpp.sh ./docker-test-coverage.sh
 RUN mkdir build
 
-ENV SETUP_ENV_SCRIPT ~/.cpprc
 RUN bash -c 'source ~/.cpprc'
-CMD source ~/.cpprc
-ENTRYPOINT [ "/bin/bash" ]

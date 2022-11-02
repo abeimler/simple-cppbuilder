@@ -13,6 +13,8 @@ docker build --force-rm=true -f ./Dockerfile.cross \
     --build-arg setup_env_script="mingw-env" \
     --build-arg cmake_toolchain_file="/usr/share/mingw/toolchain-x86_64-w64-mingw32.cmake" \
     --build-arg docker_build_script="docker-build.mingw.sh" \
+    --build-arg docker_test_script="docker-test.mingw.sh" \
+    --build-arg docker_entrypoint="docker-entrypoint.mingw.sh" \
     -t abeimler/simple-cppbuilder:x64-mingw-w64 .
 
 docker build --force-rm=true -f ./Dockerfile.cross \
@@ -28,5 +30,7 @@ docker build --force-rm=true -f ./Dockerfile.cross \
     --build-arg setup_env_script="mingw-env" \
     --build-arg cmake_toolchain_file="/usr/share/mingw/toolchain-i686-w64-mingw32.cmake" \
     --build-arg docker_build_script="docker-build.mingw.sh" \
+    --build-arg docker_test_script="docker-test.mingw.sh" \
+    --build-arg docker_entrypoint="docker-entrypoint.mingw.sh" \
     -t abeimler/simple-cppbuilder:x86-mingw-w64 .
 

@@ -38,7 +38,7 @@ RUN python -m pip install --upgrade pip setuptools && \
     conan --version
 # Install more pip tools
 RUN python -m pip install --upgrade pip setuptools && \
-    python -m pip install cogapp coverage
+    python -m pip install cogapp coverage cmake-format cmakelint
 
 # thx to https://github.com/lefticus/cpp_starter_project/pull/121
 

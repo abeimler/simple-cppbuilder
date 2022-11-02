@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. $SETUP_ENV_SCRIPT
+. $SETUP_ENV_SCRIPT $CROSS_TRIPLET
 
 set -euo pipefail
 
@@ -9,7 +9,6 @@ ${CROSS_CMAKE} -B build -S . -G "${CMAKE_GENERATOR}" -DCMAKE_BUILD_TYPE="${BUILD
     -DVCPKG_TARGET_TRIPLET="${TARGET_TRIPLET}" \
     ${CMAKE_ARGS}
 
-# @FIXME: "CMake Error: Unknown argument --build" with ${CROSS_CMAKE} ... use ninja, ${CROSS_MAKE} = ninja
-#cmake -B build --build build --target "${TARGET}"
-cd build 
-${CROSS_MAKE} "${TARGET}"
+${CROSS_CMAKE} --build build --target "${TARGET}"
+
+ctest --build-test --test-dir build

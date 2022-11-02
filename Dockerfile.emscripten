@@ -91,7 +91,6 @@ COPY ./cmake ./cmake
 COPY ./scripts/docker-build.setup-env.sh ./docker-build.sh
 COPY ./scripts/docker-test.setup-env.sh ./docker-test.sh
 
-
 ENV PROJECT_DIR /home/project
 WORKDIR /home/project
 RUN mkdir build
