@@ -137,7 +137,3 @@ COPY ./scripts/docker-build.ci-mingw.sh ./docker-build.sh
 ENV PROJECT_DIR /home/project
 WORKDIR /home/project
 RUN mkdir build
-
-COPY ./scripts/docker-entrypoint.ci.sh /docker-entrypoint.sh
-ENTRYPOINT ["/bin/bash", "-c", "/docker-entrypoint.sh"]
-CMD ["/bin/bash"]
