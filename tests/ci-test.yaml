@@ -29,6 +29,10 @@ commandTests:
   command: cppcheck
   args: ["--version"]
   expectedOutput: [".*Cppcheck.*"]
+- name: task
+  command: task
+  args: ["--version"]
+  expectedOutput: [".*Task.*"]
 
 
 fileExistenceTests:

@@ -29,12 +29,12 @@ RUN chmod +x codecov
 ENV CODECOV "/home/codecov/codecov"
 
 # download setup_cpp
-ARG setup_cpp_linux_version="0.21.0"
+ARG setup_cpp_linux_version="0.24.1"
 ARG setup_cpp_linux_download_url="https://github.com/aminya/setup-cpp/releases/download/v${setup_cpp_linux_version}/setup_cpp_linux"
 # add setup_cpp
 RUN wget --no-verbose ${setup_cpp_linux_download_url} -O /setup_cpp_linux
 RUN chmod +x /setup_cpp_linux
-RUN /setup_cpp_linux --compiler llvm --gcc true --make true --cmake true --ninja true --ccache true --doxygen true --gcovr true --cppcheck true --clangtidy true --clangformat true --conan true
+RUN /setup_cpp_linux --compiler llvm --gcc true --make true --cmake true --ninja true --ccache true --doxygen true --gcovr true --cppcheck true --clangtidy true --clangformat true --conan true --task true
 RUN rm -rf /tmp/*
 #RUN cp /root/.cpprc /root/.bashrc
 

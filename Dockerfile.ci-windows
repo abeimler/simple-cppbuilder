@@ -129,6 +129,11 @@ ENV CMAKE_GENERATOR $cmake_generator
 ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
 
+# install task
+ADD https://taskfile.dev/install.sh /tmp/taskfile_install.sh
+RUN chmod +x /tmp/taskfile_install.sh
+RUN /tmp/taskfile_install.sh -d -b /usr/local/bin && rm /tmp/taskfile_install.sh
+
 # setup project env
 WORKDIR /home/project
 COPY ./cmake /home/cmake
