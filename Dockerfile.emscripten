@@ -35,7 +35,10 @@ RUN runuser -l yay -c \
 RUN /usr/lib/emsdk/emsdk install latest && /usr/lib/emsdk/emsdk activate latest
 
 ARG setup_env_script="/usr/lib/emsdk/emsdk_env.sh"
+ARG setup_env_script_args=""
 ENV SETUP_ENV_SCRIPT $setup_env_script
+ENV SETUP_ENV_SCRIPT_ARGS $setup_env_script_args
+RUN echo 'source "$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS"' >> $HOME/.bash_profile
 RUN . $setup_env_script
 
 
@@ -90,6 +93,8 @@ WORKDIR /home/project
 COPY ./cmake ./cmake
 COPY ./scripts/docker-build.setup-env.sh ./docker-build.sh
 COPY ./scripts/docker-test.setup-env.sh ./docker-test.sh
+COPY ./taskfiles/*.yml /home/taskfiles/
+COPY ./taskfiles/TaskfileCross.yml /home/taskfiles/Taskfile.yml
 
 ENV PROJECT_DIR /home/project
 WORKDIR /home/project

@@ -86,14 +86,19 @@ COPY ./cmake /home/cmake
 WORKDIR /home/project
 ARG docker_build_script "docker-build.cross.sh"
 COPY ./scripts/$docker_build_script ./docker-build.sh
+COPY ./taskfiles/*.yml /home/taskfiles/
+COPY ./taskfiles/TaskfileCross.yml /home/taskfiles/Taskfile.yml
 
 # compiler env settings
 # e.g. mingw-env, emsdk_env.sh
 RUN mkdir -p /home/cross
 RUN touch /home/cross/.bashrc
 ARG setup_env_script="/home/cross/.bashrc"
+ARG setup_env_script_args=""
 ENV SETUP_ENV_SCRIPT $setup_env_script
-RUN . $setup_env_script
+ENV SETUP_ENV_SCRIPT_ARGS $setup_env_script_args
+RUN echo 'source "$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS"' >> $HOME/.bash_profile
+RUN . $setup_env_script $setup_env_script_args
 
 ENV PROJECT_DIR /home/project
 WORKDIR /home/project

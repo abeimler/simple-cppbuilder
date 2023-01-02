@@ -32,10 +32,11 @@ ENV CODECOV "/home/codecov/codecov"
 ARG setup_cpp_linux_version="0.24.1"
 ARG setup_cpp_linux_download_url="https://github.com/aminya/setup-cpp/releases/download/v${setup_cpp_linux_version}/setup_cpp_linux"
 # add setup_cpp
-RUN wget --no-verbose ${setup_cpp_linux_download_url} -O /setup_cpp_linux
+ADD ${setup_cpp_linux_download_url} /setup_cpp_linux
 RUN chmod +x /setup_cpp_linux
 RUN /setup_cpp_linux --compiler llvm --gcc true --make true --cmake true --ninja true --ccache true --doxygen true --gcovr true --cppcheck true --clangtidy true --clangformat true --conan true --task true
 RUN rm -rf /tmp/*
+RUN echo 'source /root/.cpprc' >> $HOME/.bash_profile
 #RUN cp /root/.cpprc /root/.bashrc
 
 # Install more tools from standard repos
@@ -124,6 +125,8 @@ WORKDIR /home/project
 COPY ./scripts/docker-build.setup-cpp.sh ./docker-build.sh
 COPY ./scripts/docker-test.setup-cpp.sh ./docker-test.sh
 COPY ./scripts/docker-test-coverage.setup-cpp.sh ./docker-test-coverage.sh
+COPY ./taskfiles/*.yml /home/taskfiles/
+COPY ./taskfiles/TaskfileSetupCpp.yml /home/taskfiles/Taskfile.yml
 RUN mkdir build
 
 RUN bash -c 'source ~/.cpprc'

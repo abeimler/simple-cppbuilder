@@ -28,12 +28,14 @@ RUN cd /
 # install extra packages from AUR
 RUN runuser -l yay -c \
     "yay -Syu --noconfirm && yay -S --noconfirm \
-        extra-cmake-modules-git lcov cccc go-task-bin" && \
+        extra-cmake-modules-git lcov cccc" && \
     runuser -l yay -c "yay -Scc --noconfirm" && \
     rm -rf /home/yay/.cache/*
 
 # install task
-RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin 
+ADD https://taskfile.dev/install.sh /tmp/taskfile_install.sh
+RUN chmod +x /tmp/taskfile_install.sh
+RUN /tmp/taskfile_install.sh -d -b /usr/local/bin && rm /tmp/taskfile_install.sh
 
 # Install conan
 RUN python -m pip install --upgrade pip setuptools && \

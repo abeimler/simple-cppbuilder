@@ -41,6 +41,8 @@ RUN runuser -l yay -c \
 # setup project env
 WORKDIR /home/project
 COPY ./scripts/docker-build.android.sh ./docker-build.sh
+COPY ./taskfiles/*.yml /home/taskfiles/
+COPY ./taskfiles/TaskfileCross.yml /home/taskfiles/Taskfile.yml
 
 # install vcpkg
 ## https://github.com/microsoft/vcpkg/blob/master/docs/users/android.md
@@ -68,9 +70,12 @@ ENV ANDROID_PLATFORM_TOOLS "${ANDROID_HOME}/platform-tools"
 ARG cmake_toolchain_file="${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake"
 ENV CROSS_TOOLCHAIN "${ANDROID_TOOLCHAIN_FILE}"
 
-ARG setup_env_script="android-env $android_abi"
+ARG setup_env_script="android-env"
+ARG setup_env_script_args="$android_abi"
 ENV SETUP_ENV_SCRIPT $setup_env_script
-RUN . $setup_env_script
+ENV SETUP_ENV_SCRIPT_ARGS $setup_env_script_args
+#RUN echo 'source "$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS"' >> $HOME/.bash_profile
+RUN . $setup_env_script $setup_env_script_args
 
 ENV CMAKE $CROSS_CMAKE
 ENV MAKE $CROSS_MAKE
@@ -81,7 +86,8 @@ ENV BUILD_TYPE "Release"
 ENV CMAKE_GENERATOR $cmake_generator
 ENV VCPKG_TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
-ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
+ENV CHAINLOAD_TOOLCHAIN_FILE $ANDROID_TOOLCHAIN_FILE
+ENV CROSS_CMAKE_ARGS -DANDROID_ABI="$ANDROID_ABI"
 ENV CMAKE_ARGS ""
 
 RUN mkdir build

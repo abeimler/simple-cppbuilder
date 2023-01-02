@@ -1,0 +1,45 @@
+---
+version: "3"
+
+vars:
+  PROJECT_DIR: '{{.PROJECT_DIR | default "."}}'
+  CMAKE: '{{.CMAKE | default "cmake"}}'
+  MAKE: '{{.MAKE | default "make"}}'
+  TARGET: '{{.TARGET | default "all"}}'
+  CMAKE_GENERATOR: '{{.CMAKE_GENERATOR | default "Ninja Multi-Config"}}'
+  BUILD_TYPE: '{{.BUILD_TYPE | default "Release"}}'
+
+tasks:
+  configure:
+    dir: '{{.PROJECT_DIR}}'
+    cmds:
+      - source ~/.cpprc
+      - >
+        {{.CMAKE}} -B build -S . -G "{{.CMAKE_GENERATOR}}" \
+            -DCMAKE_BUILD_TYPE="{{.BUILD_TYPE}}" \
+            {{.CMAKE_ARGS}}
+
+  build:
+    dir: '{{.PROJECT_DIR}}'
+    cmds:
+      - task: configure
+      - '{{.CMAKE}} --build build --target "{{.TARGET}}"'
+
+  test:
+    dir: '{{.PROJECT_DIR}}'
+    cmds:
+      - task: build
+      - ctest --build-test --test-dir build
+
+  coverage:
+    dir: '{{.PROJECT_DIR}}'
+    cmds:
+      - task: test
+      - lcov --capture --directory build --output-file build/coverage.info
+      - lcov --remove build/coverage.info '/usr/*' --output-file build/coverage.info
+
+  coverage:debug:
+    dir: '{{.PROJECT_DIR}}'
+    cmds:
+      - task: coverage
+      - lcov --list build/coverage.info

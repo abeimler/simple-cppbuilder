@@ -33,6 +33,8 @@ WORKDIR /home/project
 COPY ./scripts/docker-build.sh ./docker-build.sh
 COPY ./scripts/docker-test.sh ./docker-test.sh
 COPY ./scripts/docker-test-coverage.sh ./docker-test-coverage.sh
+COPY ./taskfiles/*.yml /home/taskfiles/
+COPY ./taskfiles/TaskfileDefault.yml /home/taskfiles/Taskfile.yml
 
 # install vcpkg
 ENV VCPKG_DISABLE_METRICS 1

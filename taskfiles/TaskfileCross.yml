@@ -1,0 +1,39 @@
+---
+version: "3"
+
+vars:
+  VCPKG_ROOT: '{{.VCPKG_ROOT | default "./vcpkg"}}'
+  PROJECT_DIR: '{{.PROJECT_DIR | default "."}}'
+  CMAKE: '{{.CMAKE | default "cmake"}}'
+  MAKE: '{{.MAKE | default "make"}}'
+  CROSS_CMAKE: '{{.CROSS_CMAKE | default "cmake"}}'
+  CROSS_MAKE: '{{.CROSS_MAKE | default "make"}}'
+  TARGET: '{{.TARGET | default "all"}}'
+  CMAKE_GENERATOR: '{{.CMAKE_GENERATOR | default "Ninja Multi-Config"}}'
+  BUILD_TYPE: '{{.BUILD_TYPE | default "Release"}}'
+  TOOLCHAIN_FILE: '{{.TOOLCHAIN_FILE | default "./vcpkg/scripts/buildsystems/vcpkg.cmake"}}'
+
+tasks:
+  configure:
+    dir: '{{.PROJECT_DIR}}'
+    cmds:
+      - . {{.SETUP_ENV_SCRIPT}} {{.SETUP_ENV_SCRIPT_ARGS}}
+      - >
+        {{.CROSS_CMAKE}} -B build -S . -G "{{.CMAKE_GENERATOR}}" \
+            -DCMAKE_BUILD_TYPE="{{.BUILD_TYPE}}" \
+            -DCMAKE_TOOLCHAIN_FILE="{{.TOOLCHAIN_FILE}}" \
+            -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE="{{.CHAINLOAD_TOOLCHAIN_FILE}}" \
+            -DVCPKG_TARGET_TRIPLET="{{.TARGET_TRIPLET}}" \
+            {{.CROSS_CMAKE_ARGS}} {{.CMAKE_ARGS}}
+
+  build:
+    dir: '{{.PROJECT_DIR}}'
+    cmds:
+      - task: configure
+      - cd build && {{.CROSS_MAKE}} "{{.TARGET}}"
+
+  test:
+    dir: '{{.PROJECT_DIR}}'
+    cmds:
+      - task: build
+      - ctest --build-test

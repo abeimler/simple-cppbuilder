@@ -1,0 +1,59 @@
+version: '3'
+
+tasks:
+  base:
+    - container-structure-test test --image abeimler/simple-cppbuilder:base --config tests/base-test.yaml
+    - container-structure-test test --image abeimler/simple-cppbuilder --config tests/test.yaml
+    - docker-compose -f examples/example/docker-compose.yml up --build example-gcc-debug-build
+    - docker-compose -f examples/example/docker-compose.yml up --build example-gcc-debug-build-make
+    - docker-compose -f examples/example/docker-compose.yml up --build example-gcc-debug-test
+    - docker-compose -f examples/example/docker-compose.yml up --build example-gcc-release-build
+    - docker-compose -f examples/example/docker-compose.yml up --build example-gcc-release-test
+    - docker-compose -f examples/example/docker-compose.yml up --build example-gcc-debug-test-cov
+    - docker-compose -f examples/example/docker-compose.yml up --build example-gcc-debug-test-lcov
+    - docker-compose -f examples/example/docker-compose.yml down --volumes --rmi local
+
+  clang:
+    - container-structure-test test --image abeimler/simple-cppbuilder:clang --config tests/clang-test.yaml
+    - docker-compose -f examples/example/docker-compose.yml up --build example-clang-debug-build
+    - docker-compose -f examples/example/docker-compose.yml up --build example-clang-debug-test
+    - docker-compose -f examples/example/docker-compose.yml up --build example-clang-release-build
+    - docker-compose -f examples/example/docker-compose.yml up --build example-clang-release-test
+    - docker-compose -f examples/example/docker-compose.yml down --volumes --rmi local
+
+  cpp_starter_project:
+    - docker-compose -f examples/cpp_starter_project/docker-compose.yml up --build cpp_starter_project-gcc-debug-build cpp_starter_project-gcc-debug-test
+    - docker-compose -f examples/cpp_starter_project/docker-compose.yml up --build cpp_starter_project-clang-debug-build cpp_starter_project-clang-release-build
+    - docker-compose -f examples/cpp_starter_project/docker-compose.yml up --build cpp_starter_project-gcc-debug-test-cov
+    - docker-compose -f examples/cpp_starter_project/docker-compose.yml up --build cpp_starter_project-fltk-clang-release-build
+    - docker-compose -f examples/cpp_starter_project/docker-compose.yml up --build cpp_starter_project-gtkmm-clang-release-build
+    - docker-compose -f examples/cpp_starter_project/docker-compose.yml down --volumes --rmi local
+
+  ci:
+    - container-structure-test test --image abeimler/simple-cppbuilder:ci --config tests/ci-test.yaml
+    - container-structure-test test --image abeimler/simple-cppbuilder:ci-x64-mingw-w64 --config tests/ci-windows-test.yaml
+    - container-structure-test test --image abeimler/simple-cppbuilder:ci-setup-cpp --config tests/ci-setup-cpp-test.yaml
+    - docker-compose -f examples/example-ci/docker-compose.yml up --build example-gcc-build
+    - docker-compose -f examples/example-ci/docker-compose.yml up --build example-gcc-test
+    - docker-compose -f examples/example-ci/docker-compose.yml up --build example-gcc-test-cov
+    - docker-compose -f examples/example-ci/docker-compose.yml up --build example-windows-build
+    - docker-compose -f examples/example-ci/docker-compose.yml down --volumes --rmi local
+
+  single:
+    - docker run -it --rm --name my-cpp-project -v "$PWD/examples/single":/home/project -w /home/project abeimler/simple-cppbuilder ./docker-build.sh
+    - docker run -it --rm --name my-cpp-project -v "$PWD/examples/single":/home/project -w /home/project abeimler/simple-cppbuilder task -t /home/taskfiles/Taskfile.yml build
+
+  emscripten:
+    - container-structure-test test --image abeimler/simple-cppbuilder:emscripten --config tests/emscripten-test.yaml
+    - docker-compose -f examples/web-example/docker-compose.yml up --build
+    - docker-compose -f examples/web-example/docker-compose.yml down --volumes --rmi local
+
+  mingw:
+    - container-structure-test test --image abeimler/simple-cppbuilder:x64-mingw-w64 --config tests/mingw-test.yaml
+    - docker-compose -f examples/example/docker-compose.cross.yml up --build example-mingw-release-build
+    - docker-compose -f examples/example/docker-compose.cross.yml down --volumes --rmi local
+
+  android:
+    - container-structure-test test --image abeimler/simple-cppbuilder:arm-android --config tests/arm-android-test.yaml
+    - docker-compose -f examples/android-example/docker-compose.yml up --build
+    - docker-compose -f examples/android-example/docker-compose.yml down --volumes --rmi local

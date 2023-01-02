@@ -1,0 +1,5 @@
+version: '3'
+
+includes:
+  build: ./taskfiles/docker/Build.yml
+  test: ./taskfiles/docker/Test.yml

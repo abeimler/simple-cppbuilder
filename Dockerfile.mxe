@@ -92,6 +92,8 @@ ENV CMAKE_ARGS ""
 WORKDIR /home/project
 COPY ./cmake /home/cmake
 COPY ./scripts/docker-build.mxe.sh ./docker-build.sh
+COPY ./taskfiles/*.yml /home/taskfiles/
+COPY ./taskfiles/TaskfileCross.yml /home/taskfiles/Taskfile.yml
 
 ENV PROJECT_DIR /home/project
 WORKDIR /home/project
