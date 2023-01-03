@@ -77,6 +77,7 @@ RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/project/vcp
 RUN /home/project/vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/project/vcpkg"
 
+ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV VCPKG_CHAINLOAD_TOOLCHAIN_FILE $CHAINLOAD_TOOLCHAIN_FILE
 ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
@@ -86,7 +87,6 @@ ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
 ENV CMAKE_GENERATOR $cmake_generator
-ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
 
 # setup project env

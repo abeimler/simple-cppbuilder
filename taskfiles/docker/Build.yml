@@ -171,6 +171,7 @@ tasks:
           --build-arg cmake="android-armv7a-eabi-cmake" \
           --build-arg android_abi="armeabi-v7a" \
           --build-arg android_target="{{.ANDROID_TARGET}}" \
+          --build-arg android_ndk_version="{{.ANDROID_NDK_VERSION}}" \
           -t abeimler/simple-cppbuilder:arm-android-{{.ANDROID_TARGET}} .
       - |
         docker build --force-rm=true -f ./Dockerfile.android-v \
@@ -178,6 +179,7 @@ tasks:
           --build-arg cmake="android-aarch64-cmake" \
           --build-arg android_abi="arm64-v8a" \
           --build-arg android_target="{{.ANDROID_TARGET}}" \
+          --build-arg android_ndk_version="{{.ANDROID_NDK_VERSION}}" \
           -t abeimler/simple-cppbuilder:arm64-android{{.ANDROID_TARGET}} .
       - |
         docker build --force-rm=true -f ./Dockerfile.android-v \
@@ -185,6 +187,7 @@ tasks:
           --build-arg cmake="android-x86-cmake" \
           --build-arg android_abi="x86" \
           --build-arg android_target="{{.ANDROID_TARGET}}" \
+          --build-arg android_ndk_version="{{.ANDROID_NDK_VERSION}}" \
           -t abeimler/simple-cppbuilder:x86-android-{{.ANDROID_TARGET}} .
       - |
         docker build --force-rm=true -f ./Dockerfile.android-v \
@@ -192,6 +195,7 @@ tasks:
           --build-arg cmake="android-x86-64-cmake" \
           --build-arg android_abi="x86_64" \
           --build-arg android_target="{{.ANDROID_TARGET}}" \
+          --build-arg android_ndk_version="{{.ANDROID_NDK_VERSION}}" \
           -t abeimler/simple-cppbuilder:x64-android-{{.ANDROID_TARGET}} .
 
   android:21:
@@ -199,12 +203,21 @@ tasks:
       - task: android-template
         vars:
           ANDROID_TARGET: 21
+          ANDROID_NDK_VERSION: "-21"
 
   android:24:
     cmds:
       - task: android-template
         vars:
           ANDROID_TARGET: 24
+          ANDROID_NDK_VERSION: "-beta"
+
+  android:25:
+    cmds:
+      - task: android-template
+        vars:
+          ANDROID_TARGET: 25
+          ANDROID_NDK_VERSION: ""
 
   android:
     - task: base

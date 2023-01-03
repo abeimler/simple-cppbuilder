@@ -8,6 +8,7 @@ ARG processor="x86_64"
 ARG vcpkg_target_triplet="arm-android"
 ARG android_abi="armeabi-v7a"
 ARG android_target="30"
+ARG android_ndk_version=""
 
 ARG cmake="android-${android_abi}-cmake"
 ARG cmake_generator="Ninja"
@@ -34,7 +35,7 @@ RUN pacman-db-upgrade && \
 RUN runuser -l yay -c \
     "yay -Syu --noconfirm && yay -S --noconfirm \
         jdk-openjdk android-platform-${android_target} android-sdk-build-tools-${android_target} \
-        android-pkg-config android-cmake android-environment" && \
+        android-pkg-config android-cmake android-environment android-ndk${android_ndk_version}" && \
     runuser -l yay -c "yay -Scc --noconfirm" && \
     rm -rf /home/yay/.cache/*
 
@@ -42,6 +43,7 @@ RUN runuser -l yay -c \
 ENV ANDROID_HOME "/opt/android-sdk"
 ENV ANDROID_NDK "/opt/android-ndk"
 ENV ANDROID_NDK_HOME "/opt/android-ndk"
+ENV ANDROID_SDK_ROOT "/opt/android-sdk"
 ENV ANDROID_TOOLCHAIN "${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64"
 ENV ANDROID_TOOLCHAIN_FILE "${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake"
 ENV ANDROID_PLATFORM_TOOLS "${ANDROID_HOME}/platform-tools"
@@ -54,6 +56,7 @@ ENV SETUP_ENV_SCRIPT $setup_env_script
 ENV SETUP_ENV_SCRIPT_ARGS $setup_env_script_args
 RUN echo 'source "$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS"' >> /root/.bash_profile
 RUN . $setup_env_script $setup_env_script_args
+RUN . /etc/profile.d/android-ndk.sh
 
 # cross compiler settings
 ENV CC $cc
