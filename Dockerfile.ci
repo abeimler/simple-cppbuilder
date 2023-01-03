@@ -73,18 +73,10 @@ RUN apt-get update -y && \
         curl gnupg coreutils && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-
-# set default compiler
-ENV CC "gcc"
-ENV CXX "g++"
-ENV CMAKE "cmake"
-ENV MAKE "ninja"
-
-# build script settings
-ENV TARGET "all"
-ENV BUILD_TYPE "Release"
-ENV CMAKE_GENERATOR "Ninja"
-ENV CMAKE_ARGS ""
+# install task
+ADD https://taskfile.dev/install.sh /tmp/taskfile_install.sh
+RUN chmod +x /tmp/taskfile_install.sh
+RUN /tmp/taskfile_install.sh -d -b /usr/local/bin && rm /tmp/taskfile_install.sh
 
 # install CodeCov
 WORKDIR /home/codecov
@@ -97,18 +89,12 @@ RUN shasum -a 256 -c codecov.SHA256SUM
 RUN chmod +x codecov
 ENV CODECOV "/home/codecov/codecov"
 
-# install task
-ADD https://taskfile.dev/install.sh /tmp/taskfile_install.sh
-RUN chmod +x /tmp/taskfile_install.sh
-RUN /tmp/taskfile_install.sh -d -b /usr/local/bin && rm /tmp/taskfile_install.sh
 
-# setup project env
-WORKDIR /home/project
-COPY ./scripts/docker-build.sh ./docker-build.sh
-COPY ./scripts/docker-test.sh ./docker-test.sh
-COPY ./scripts/docker-test-coverage.sh ./docker-test-coverage.sh
-COPY ./taskfiles/*.yml /home/taskfiles/
-COPY ./taskfiles/TaskfileDefault.yml /home/taskfiles/Taskfile.yml
+# set default compiler
+ENV CC "gcc"
+ENV CXX "g++"
+ENV CMAKE "cmake"
+ENV MAKE "ninja"
 
 # install vcpkg
 ENV VCPKG_DISABLE_METRICS 1
@@ -118,6 +104,21 @@ ENV VCPKG_ROOT "/home/project/vcpkg"
 
 ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+
+# build script settings
+ENV TARGET "all"
+ENV BUILD_TYPE "Release"
+ENV CMAKE_GENERATOR "Ninja"
+ENV CMAKE_ARGS ""
+
+# setup project env
+WORKDIR /home/project
+COPY ./scripts/docker-build.sh ./docker-build.sh
+COPY ./scripts/docker-test.sh ./docker-test.sh
+COPY ./scripts/docker-test-coverage.sh ./docker-test-coverage.sh
+COPY ./taskfiles/*.yml /home/taskfiles/
+COPY ./taskfiles/TaskfileDefault.yml /home/taskfiles/Taskfile.yml
 
 ENV PROJECT_DIR /home/project
 WORKDIR /home/project

@@ -21,21 +21,6 @@ ENV CXX "g++"
 ENV CMAKE "cmake"
 ENV MAKE "make"
 
-# build script settings
-ENV TARGET "all"
-ENV BUILD_TYPE "Release"
-ENV CMAKE_GENERATOR "Ninja"
-ENV CMAKE_ARGS ""
-
-
-# setup project env
-WORKDIR /home/project
-COPY ./scripts/docker-build.sh ./docker-build.sh
-COPY ./scripts/docker-test.sh ./docker-test.sh
-COPY ./scripts/docker-test-coverage.sh ./docker-test-coverage.sh
-COPY ./taskfiles/*.yml /home/taskfiles/
-COPY ./taskfiles/TaskfileDefault.yml /home/taskfiles/Taskfile.yml
-
 # install vcpkg
 ENV VCPKG_DISABLE_METRICS 1
 RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/project/vcpkg
@@ -45,4 +30,21 @@ ENV VCPKG_ROOT "/home/project/vcpkg"
 ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 
+
+# build script settings
+ENV TARGET "all"
+ENV BUILD_TYPE "Release"
+ENV CMAKE_GENERATOR "Ninja"
+ENV CMAKE_ARGS ""
+
+# setup project env
+WORKDIR /home/project
+COPY ./scripts/docker-build.sh ./docker-build.sh
+COPY ./scripts/docker-test.sh ./docker-test.sh
+COPY ./scripts/docker-test-coverage.sh ./docker-test-coverage.sh
+COPY ./taskfiles/*.yml /home/taskfiles/
+COPY ./taskfiles/TaskfileDefault.yml /home/taskfiles/Taskfile.yml
+
+ENV PROJECT_DIR /home/project
+WORKDIR /home/project
 RUN mkdir build

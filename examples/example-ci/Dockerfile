@@ -5,13 +5,13 @@ COPY . .
 ## build stage
 FROM base as build
 COPY . .
-CMD ["./docker-build.sh"]
+CMD ["task", "-t", "/home/taskfiles/Taskfile.yml", "build"]
 ## test stage
 FROM build as test
-CMD ["./docker-test.sh"]
+CMD ["task", "-t", "/home/taskfiles/Taskfile.yml", "test"]
 
 
 ## build for windows
 FROM abeimler/simple-cppbuilder:ci-x64-mingw-w64 as build-windows
 COPY . .
-CMD ["./docker-build.sh"]
+CMD ["task", "-t", "/home/taskfiles/Taskfile.yml", "build"]

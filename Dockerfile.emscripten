@@ -34,12 +34,29 @@ RUN runuser -l yay -c \
     rm -rf /home/yay/.cache/*
 RUN /usr/lib/emsdk/emsdk install latest && /usr/lib/emsdk/emsdk activate latest
 
+# compiler env settings
+ENV EMSDK "/usr/lib/emsdk"
+ENV EM_CONFIG "/usr/lib/emsdk/.emscripten"
+ENV EM_CACHE "/usr/lib/emsdk/upstream/emscripten/cache"
+ENV EMSDK_PATH "/usr/lib/emsdk"
+ENV EMSCRIPTEN_PATH "/usr/lib/emscripten"
+ENV CLANG_PATH "/opt/emscripten-llvm/bin"
+ENV PYTHON_PATH "/usr/bin"
+ENV NODE_PATH "/usr/bin"
+ENV PATH="${EMSDK_PATH}:${EMSCRIPTEN_PATH}:${CLANG_PATH}:${NODE_PATH}:${PYTHON_PATH}:${PATH}"
+
 ARG setup_env_script="/usr/lib/emsdk/emsdk_env.sh"
 ARG setup_env_script_args=""
 ENV SETUP_ENV_SCRIPT $setup_env_script
 ENV SETUP_ENV_SCRIPT_ARGS $setup_env_script_args
-RUN echo 'source "$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS"' >> $HOME/.bash_profile
-RUN . $setup_env_script
+RUN echo 'source "$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS"' >> /root/.bash_profile
+RUN /usr/lib/emsdk/emsdk construct_env
+RUN . $setup_env_script $setup_env_script_args
+# FIXME: https://github.com/emscripten-core/emsdk/issues/430
+RUN mkdir -p /home/cross
+RUN touch /home/cross/.bashrc
+ENV SETUP_ENV_SCRIPT "/home/cross/.bashrc"
+ENV SETUP_ENV_SCRIPT_ARGS ""
 
 
 # cross compiler settings
@@ -53,17 +70,6 @@ ENV TARGET_TRIPLET $vcpkg_target_triplet
 ENV CROSS_CMAKE $cross_cmake
 ENV CROSS_MAKE $cross_make
 ENV CROSS_TOOLCHAIN $cmake_toolchain_file
-
-# compiler env settings
-ENV EMSDK "/usr/lib/emsdk"
-ENV EM_CONFIG "/usr/lib/emsdk/.emscripten"
-ENV EM_CACHE "/usr/lib/emsdk/upstream/emscripten/cache"
-ENV EMSDK_PATH "/usr/lib/emsdk"
-ENV EMSCRIPTEN_PATH "/usr/lib/emscripten"
-ENV CLANG_PATH "/opt/emscripten-llvm/bin"
-ENV PYTHON_PATH "/usr/bin"
-ENV NODE_PATH "/usr/bin"
-ENV PATH="${EMSDK_PATH}:${EMSCRIPTEN_PATH}:${CLANG_PATH}:${NODE_PATH}:${PYTHON_PATH}:${PATH}"
 
 
 # install vcpkg

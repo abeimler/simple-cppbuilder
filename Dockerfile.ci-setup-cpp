@@ -1,5 +1,5 @@
 ## base image
-FROM ubuntu:20.04 AS base
+FROM ubuntu:22.04 AS base
 
 ARG extra_libraries
 
@@ -28,7 +28,8 @@ RUN shasum -a 256 -c codecov.SHA256SUM
 RUN chmod +x codecov
 ENV CODECOV "/home/codecov/codecov"
 
-# download setup_cpp
+# download setup_cpp https://github.com/aminya/setup-cpp
+WORKDIR /
 ARG setup_cpp_linux_version="0.24.1"
 ARG setup_cpp_linux_download_url="https://github.com/aminya/setup-cpp/releases/download/v${setup_cpp_linux_version}/setup_cpp_linux"
 # add setup_cpp
@@ -36,7 +37,7 @@ ADD ${setup_cpp_linux_download_url} /setup_cpp_linux
 RUN chmod +x /setup_cpp_linux
 RUN /setup_cpp_linux --compiler llvm --gcc true --make true --cmake true --ninja true --ccache true --doxygen true --gcovr true --cppcheck true --clangtidy true --clangformat true --conan true --task true
 RUN rm -rf /tmp/*
-RUN echo 'source /root/.cpprc' >> $HOME/.bash_profile
+RUN echo 'source /root/.cpprc' >> /root/.bash_profile
 #RUN cp /root/.cpprc /root/.bashrc
 
 # Install more tools from standard repos
@@ -66,18 +67,24 @@ ENV CONAN_SYSREQUIRES_SUDO 0
 # leaving this flag undefined can cause some installation failures.
 ENV CONAN_SYSREQUIRES_MODE enabled
 
-
-ENV SETUP_ENV_SCRIPT ~/.cpprc
-
 # set default compiler
 ENV CC "/root/llvm/bin/clang"
 ENV CXX "/root/llvm/bin/clang++"
 ENV CMAKE "cmake"
 ENV MAKE "/root/ninja/ninja"
 
+# compiler env settings
+# e.g. mingw-env, emsdk_env.sh
+ARG setup_env_script="/root/.cpprc"
+ARG setup_env_script_args=""
+ENV SETUP_ENV_SCRIPT $setup_env_script
+ENV SETUP_ENV_SCRIPT_ARGS $setup_env_script_args
+RUN echo 'source "$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS"' >> /root/.bash_profile
+RUN bash -c 'source $setup_env_script $setup_env_script_args'
+
 # setup project env
 WORKDIR /home/project
-RUN bash -c 'source ~/.cpprc'
+RUN bash -c 'source /root/.cpprc'
 
 COPY ./scripts/docker-entrypoint.setup-cpp.sh /docker-entrypoint.sh
 ENTRYPOINT ["/bin/bash", "-c", "/docker-entrypoint.sh"]
@@ -104,6 +111,14 @@ ENV CXX "/root/llvm/bin/clang++"
 ENV CMAKE "cmake"
 ENV MAKE "/root/ninja/ninja"
 
+# install vcpkg
+ENV VCPKG_DISABLE_METRICS 1
+RUN /setup_cpp_linux --vcpkg true
+ENV VCPKG_ROOT "/root/vcpkg"
+RUN /root/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
@@ -111,13 +126,6 @@ ENV CMAKE_GENERATOR "Ninja"
 ENV VCPKG_TOOLCHAIN_FILE "/root/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV TOOLCHAIN_FILE "/root/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV CMAKE_ARGS ""
-
-# install vcpkg
-ENV VCPKG_DISABLE_METRICS 1
-RUN /setup_cpp_linux --vcpkg true
-ENV VCPKG_ROOT "/root/vcpkg"
-RUN /root/vcpkg/bootstrap-vcpkg.sh -disableMetrics
-ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 
 # setup project env
 ENV PROJECT_DIR /home/project
@@ -127,6 +135,7 @@ COPY ./scripts/docker-test.setup-cpp.sh ./docker-test.sh
 COPY ./scripts/docker-test-coverage.setup-cpp.sh ./docker-test-coverage.sh
 COPY ./taskfiles/*.yml /home/taskfiles/
 COPY ./taskfiles/TaskfileSetupCpp.yml /home/taskfiles/Taskfile.yml
-RUN mkdir build
 
-RUN bash -c 'source ~/.cpprc'
+ENV PROJECT_DIR /home/project
+WORKDIR /home/project
+RUN mkdir build

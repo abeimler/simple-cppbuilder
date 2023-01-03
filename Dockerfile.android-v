@@ -38,29 +38,7 @@ RUN runuser -l yay -c \
     runuser -l yay -c "yay -Scc --noconfirm" && \
     rm -rf /home/yay/.cache/*
 
-# setup project env
-WORKDIR /home/project
-COPY ./scripts/docker-build.android.sh ./docker-build.sh
-COPY ./taskfiles/*.yml /home/taskfiles/
-COPY ./taskfiles/TaskfileCross.yml /home/taskfiles/Taskfile.yml
 
-# install vcpkg
-## https://github.com/microsoft/vcpkg/blob/master/docs/users/android.md
-ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
-ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
-ENV VCPKG_DISABLE_METRICS 1
-RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
-RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
-ENV VCPKG_ROOT "/home/project/vcpkg"
-
-# cross compiler settings
-ENV CC $cc
-ENV CXX $cxx
-ENV PROCESSOR $processor
-ENV ANDROID_ABI $android_abi
-ENV TARGET_TRIPLET $vcpkg_target_triplet
-ENV CROSS_CMAKE $cmake
-ENV CROSS_MAKE $make
 ENV ANDROID_HOME "/opt/android-sdk"
 ENV ANDROID_NDK "/opt/android-ndk"
 ENV ANDROID_NDK_HOME "/opt/android-ndk"
@@ -74,11 +52,30 @@ ARG setup_env_script="android-env"
 ARG setup_env_script_args="$android_abi"
 ENV SETUP_ENV_SCRIPT $setup_env_script
 ENV SETUP_ENV_SCRIPT_ARGS $setup_env_script_args
-#RUN echo 'source "$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS"' >> $HOME/.bash_profile
+RUN echo 'source "$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS"' >> /root/.bash_profile
 RUN . $setup_env_script $setup_env_script_args
+
+# cross compiler settings
+ENV CC $cc
+ENV CXX $cxx
+ENV PROCESSOR $processor
+ENV ANDROID_ABI $android_abi
+ENV TARGET_TRIPLET $vcpkg_target_triplet
+ENV CROSS_CMAKE $cmake
+ENV CROSS_MAKE $make
 
 ENV CMAKE $CROSS_CMAKE
 ENV MAKE $CROSS_MAKE
+
+# install vcpkg
+## https://github.com/microsoft/vcpkg/blob/master/docs/users/android.md
+ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
+ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
+ENV VCPKG_DISABLE_METRICS 1
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
+RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
+ENV VCPKG_ROOT "/home/project/vcpkg"
+
 
 # build script settings
 ENV TARGET "all"
@@ -90,4 +87,12 @@ ENV CHAINLOAD_TOOLCHAIN_FILE $ANDROID_TOOLCHAIN_FILE
 ENV CROSS_CMAKE_ARGS -DANDROID_ABI="$ANDROID_ABI"
 ENV CMAKE_ARGS ""
 
+# setup project env
+WORKDIR /home/project
+COPY ./scripts/docker-build.android.sh ./docker-build.sh
+COPY ./taskfiles/*.yml /home/taskfiles/
+COPY ./taskfiles/TaskfileCross.yml /home/taskfiles/Taskfile.yml
+
+ENV PROJECT_DIR /home/project
+WORKDIR /home/project
 RUN mkdir build

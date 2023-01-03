@@ -48,21 +48,6 @@ ARG cxx="${cross_triple}-g++"
 ENV CC "gcc"
 ENV CXX "g++"
 
-# setup project env
-WORKDIR /home/project
-COPY ./cmake /home/cmake
-COPY ./scripts/docker-build.rpi.sh ./docker-build.sh
-COPY ./taskfiles/*.yml /home/taskfiles/
-COPY ./taskfiles/TaskfileCross.yml /home/taskfiles/Taskfile.yml
-
-# install vcpkg
-ENV VCPKG_DEFAULT_HOST_TRIPLET $triplet_host
-ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
-ENV VCPKG_DISABLE_METRICS 1
-RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
-RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
-ENV VCPKG_ROOT "/home/project/vcpkg"
-
 # cross compiler settings
 ENV CC $cc
 ENV CXX $cxx
@@ -77,14 +62,27 @@ ENV CROSS_TOOLCHAIN $cmake_toolchain_file
 # compiler env settings
 #COPY ${crosstool_dir}/bash-completion/ct-ng /etc/bash_completion.d/ct-ng
 
+# compiler env settings
+# e.g. mingw-env, emsdk_env.sh
 RUN mkdir -p /home/cross
 RUN touch /home/cross/.bashrc
 ARG setup_env_script="/home/cross/.bashrc"
+ARG setup_env_script_args=""
 ENV SETUP_ENV_SCRIPT $setup_env_script
-RUN . $setup_env_script
+ENV SETUP_ENV_SCRIPT_ARGS $setup_env_script_args
+RUN echo 'source "$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS"' >> /root/.bash_profile
+RUN . $setup_env_script $setup_env_script_args
 
 ENV CMAKE $CROSS_CMAKE
 ENV MAKE $CROSS_MAKE
+
+# install vcpkg
+ENV VCPKG_DEFAULT_HOST_TRIPLET $triplet_host
+ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
+ENV VCPKG_DISABLE_METRICS 1
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
+RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
+ENV VCPKG_ROOT "/home/project/vcpkg"
 
 # build script settings
 ENV TARGET "all"
@@ -95,4 +93,13 @@ ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
 
+# setup project env
+WORKDIR /home/project
+COPY ./cmake /home/cmake
+COPY ./scripts/docker-build.rpi.sh ./docker-build.sh
+COPY ./taskfiles/*.yml /home/taskfiles/
+COPY ./taskfiles/TaskfileCross.yml /home/taskfiles/Taskfile.yml
+
+ENV PROJECT_DIR /home/project
+WORKDIR /home/project
 RUN mkdir build

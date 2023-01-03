@@ -6,11 +6,11 @@ RUN git pull origin master
 ### copy project
 WORKDIR $PROJECT_DIR
 COPY . .
-CMD ["./docker-build.sh"]
+CMD ["task", "-t", "/home/taskfiles/Taskfile.yml", "build"]
 
 ## test stage
 FROM build as test
-CMD ["./docker-test.sh"]
+CMD ["task", "-t", "/home/taskfiles/Taskfile.yml", "build"]
 
 ## test (coverage) stage
 FROM test as test-coverage
@@ -26,10 +26,10 @@ RUN git pull origin master
 ### copy project
 WORKDIR $PROJECT_DIR
 COPY . .
-CMD ["./docker-build.sh"]
+CMD ["task", "-t", "/home/taskfiles/Taskfile.yml", "build"]
 ## test stage
 FROM build-clang as test-clang
-CMD ["./docker-test.sh"]
+CMD ["task", "-t", "/home/taskfiles/Taskfile.yml", "test"]
 
 
 ## build for windows
@@ -40,7 +40,7 @@ RUN git pull origin master
 ### copy project
 WORKDIR $PROJECT_DIR
 COPY . .
-CMD ["./docker-build.sh"]
+CMD ["task", "-t", "/home/taskfiles/Taskfile.yml", "build"]
 
 
 ## build for aarch64
@@ -51,7 +51,7 @@ RUN git pull origin master
 ### copy project
 WORKDIR $PROJECT_DIR
 COPY . .
-CMD ["./docker-build.sh"]
+CMD ["task", "-t", "/home/taskfiles/Taskfile.yml", "build"]
 
 
 ## build for aarch64
@@ -62,7 +62,7 @@ RUN git pull origin master
 ### copy project
 WORKDIR $PROJECT_DIR
 COPY . .
-CMD ["./docker-build.sh"]
+CMD ["task", "-t", "/home/taskfiles/Taskfile.yml", "build"]
 
 
 ## build for web
@@ -73,4 +73,4 @@ RUN git pull origin master
 ### copy project
 WORKDIR $PROJECT_DIR
 COPY . .
-CMD ["./docker-build.sh"]
+CMD ["task", "-t", "/home/taskfiles/Taskfile.yml", "build"]
