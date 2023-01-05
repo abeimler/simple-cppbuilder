@@ -5,10 +5,8 @@ tasks:
     - container-structure-test test --image abeimler/simple-cppbuilder:base --config tests/base-test.yaml
     - container-structure-test test --image abeimler/simple-cppbuilder --config tests/test.yaml
 
-  base:libs:clang:
-    aliases: [clang]
-    cmds:
-      - container-structure-test test --image abeimler/simple-cppbuilder:clang --config tests/clang-test.yaml
+  clang:
+    - container-structure-test test --image abeimler/simple-cppbuilder:clang --config tests/clang-test.yaml
 
   ci:
     - container-structure-test test --image abeimler/simple-cppbuilder:ci --config tests/ci-test.yaml
