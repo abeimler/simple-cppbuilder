@@ -5,6 +5,11 @@ on:
     branches:
       - "main"
       - "feature/ci"
+    tags:
+      - "v*.*.*"
+  pull_request:
+    branches:
+      - "main"
 
 jobs:
   docker:
@@ -13,48 +18,44 @@ jobs:
         include:
           - build_task: build:base
             test_task: test:base
-            push_tags: 
-              - abeimler/simple-cppbuilder:base
-              - abeimler/simple-cppbuilder:latest
           - build_task: build:clang
             test_task: test:clang
-            push_tags: 
-              - abeimler/simple-cppbuilder:clang
+            push_tags: ["abeimler/simple-cppbuilder:clang"]
           - build_task: build:base:libs
             test_task: test:base:libs:clang
             push_tags: 
-              - abeimler/simple-cppbuilder:clang
-              - abeimler/simple-cppbuilder:opengl-libs
-              - abeimler/simple-cppbuilder:boost
-              - abeimler/simple-cppbuilder:abseil-cpp
-              - abeimler/simple-cppbuilder:libcpp
+              - "abeimler/simple-cppbuilder:clang"
+              - "abeimler/simple-cppbuilder:opengl-libs"
+              - "abeimler/simple-cppbuilder:boost"
+              - "abeimler/simple-cppbuilder:abseil-cpp"
+              - "abeimler/simple-cppbuilder:libcpp"
           - build_task: build:ci
             test_task: test:ci
             push_tags: 
-              - abeimler/simple-cppbuilder:ci
-              - abeimler/simple-cppbuilder:ci-setup-cpp
-              - abeimler/simple-cppbuilder:ci-x64-mingw-w64
+              - "abeimler/simple-cppbuilder:ci"
+              - "abeimler/simple-cppbuilder:ci-setup-cpp"
+              - "abeimler/simple-cppbuilder:ci-x64-mingw-w64"
           - build_task: build:emscripten
             test_task: test:emscripten
             push_tags: 
-              - abeimler/simple-cppbuilder:emscripten
+              - "abeimler/simple-cppbuilder:emscripten"
           - build_task: build:mingw
             test_task: test:mingw
             push_tags: 
-              - abeimler/simple-cppbuilder:x64-mingw-w64
-              - abeimler/simple-cppbuilder:x86-mingw-w64
+              - "abeimler/simple-cppbuilder:x64-mingw-w64"
+              - "abeimler/simple-cppbuilder:x86-mingw-w64"
           - build_task: build:arm
             test_task: test:arm
             push_tags: 
-              - abeimler/simple-cppbuilder:aarch64-linux
-              - abeimler/simple-cppbuilder:arm-eabi
+              - "abeimler/simple-cppbuilder:aarch64-linux"
+              - "abeimler/simple-cppbuilder:arm-eabi"
           - build_task: build:android
             test_task: test:android
             push_tags: 
-              - abeimler/simple-cppbuilder:arm-android
-              - abeimler/simple-cppbuilder:arm64-android
-              - abeimler/simple-cppbuilder:x86-android
-              - abeimler/simple-cppbuilder:x64-android
+              - "abeimler/simple-cppbuilder:arm-android"
+              - "abeimler/simple-cppbuilder:arm64-android"
+              - "abeimler/simple-cppbuilder:x86-android"
+              - "abeimler/simple-cppbuilder:x64-android"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -80,6 +81,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Publish Docker Images
-        #if: startsWith(github.ref, 'refs/tags/v')
+        #if: ${{ matrix.test_task != '[]' && matrix.test_task != '' && startsWith(github.ref, 'refs/tags/v') }}
         run: for tag in "${{ join(matrix.push_tags, ' ') }}"; do echo "$tag"; done
         #run: for tag in "${{ join(matrix.push_tags, ' ') }}"; do docker push $tag; done

@@ -1,10 +1,10 @@
-name: ci
+name: ci (release)
 run-name: Release
 
 on:
   push:
     branches:
-      - "**"
+      - "main"
     tags:
       - "v*.*.*"
   pull_request:
