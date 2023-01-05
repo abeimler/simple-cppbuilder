@@ -12,13 +12,13 @@ jobs:
     strategy:
       matrix:
         build_task:
-          - arm:cross
-          - arm:rpi
-          - android:21
-          - android:24
-          - android:25
-          - mingw:mxe
-          - gcc
+          - build:arm:cross
+          - build:arm:rpi
+          - build:android:21
+          - build:android:24
+          - build:android:25
+          - build:mingw:mxe
+          - build:gcc
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
