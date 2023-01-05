@@ -2,7 +2,7 @@ version: '3'
 
 tasks:
   base:
-    - docker build --force-rm=true -f ./Dockerfile.base -t abeimler/simple-cppbuilder:base .
+    - docker build --force-rm=true -f ./Dockerfile --target base -t abeimler/simple-cppbuilder:base .
     - docker build --force-rm=true -t abeimler/simple-cppbuilder .
     #docker build --force-rm=true -t abeimler/simple-cppbuilder:1.7.0 .
 
