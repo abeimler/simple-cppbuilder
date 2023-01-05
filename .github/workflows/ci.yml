@@ -81,6 +81,5 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Publish Docker Images
-        #if: ${{ matrix.test_task != '[]' && matrix.test_task != '' && startsWith(github.ref, 'refs/tags/v') }}
-        run: for tag in "${{ join(matrix.push_tags, ' ') }}"; do echo "$tag"; done
-        #run: for tag in "${{ join(matrix.push_tags, ' ') }}"; do docker push $tag; done
+        if: ${{ matrix.test_task != '[]' && matrix.test_task != '' && startsWith(github.ref, 'refs/tags/v') }}
+        run: for tag in "${{ join(matrix.push_tags, ' ') }}"; do docker push $tag; done
