@@ -9,14 +9,14 @@ RUN apt-get update -y -qq && apt-get install --no-install-recommends -y gnupg wg
     apt-get update -y && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 # keys used by apt
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 40976EAF437D05B5
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1E9377A2BA9EF27F
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32 && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 40976EAF437D05B5 && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1E9377A2BA9EF27F
 # Install packages available from standard repos
 RUN apt-get update -y && \
-    apt-get install -yq \
+    apt-get install --no-install-recommends -yq \
         gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 wget curl pkg-config zip unzip tar git build-essential && \
-    apt-get install -y  \
+    apt-get install --no-install-recommends -y  \
         mingw-w64 mingw-w64-tools binutils bison \
         ${extra_libraries} \
         python3 python3-pip doxygen graphviz \
@@ -29,7 +29,7 @@ RUN apt-get update -y && \
 # install powershell
 ENV PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache
 ADD https://github.com/PowerShell/PowerShell/releases/download/v7.2.5/powershell-lts_7.2.5-1.deb_amd64.deb /tmp/powershell.deb
-RUN apt-get update -y && apt-get install -y /tmp/powershell.deb && \
+RUN apt-get update -y && apt-get install --no-install-recommends -y /tmp/powershell.deb && \
     apt-get clean && rm -rf /var/lib/apt/lists/* && \
     rm /tmp/powershell.deb
 ENV POWERSHELL_TELEMETRY_OPTOUT 1
@@ -49,12 +49,14 @@ ENV POWERSHELL_TELEMETRY_OPTOUT 1
 #ENV PATH="/usr/lib/mxe/usr/bin:${PATH}"
 
 # Install conan
-RUN python3 -m pip install --upgrade pip setuptools && \
-    python3 -m pip install conan && \
-    conan --version
+RUN python -m pip install --no-cache-dir conan==1.56.0 && \
+        conan --version
 # Install more pip tools
-RUN python3 -m pip install --upgrade pip setuptools && \
-    python3 -m pip install cogapp coverage cmake-format cmakelint
+RUN python -m pip install --no-cache-dir \
+        cogapp==3.3.0 \
+        coverage==7.0.3 \
+        cmake-format==0.6.13 \
+        cmakelint==1.4.2
 
 # install task
 ADD https://taskfile.dev/install.sh /tmp/taskfile_install.sh
@@ -104,14 +106,13 @@ ARG cross_root "/usr/x86_64-w64-mingw32"
 
 # compiler env settings
 # e.g. mingw-env, emsdk_env.sh
-RUN mkdir -p /home/cross
-RUN touch /home/cross/.bashrc
+RUN mkdir -p /home/cross && touch /home/cross/.bashrc
 ARG setup_env_script="/home/cross/.bashrc"
 ARG setup_env_script_args=""
 ENV SETUP_ENV_SCRIPT $setup_env_script
 ENV SETUP_ENV_SCRIPT_ARGS $setup_env_script_args
-RUN echo 'source "$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS"' >> /root/.bash_profile
-RUN . $setup_env_script $setup_env_script_args
+RUN echo 'source "$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS"' >> /root/.bash_profile && \
+    . $setup_env_script $setup_env_script_args
 
 # cross compiler settings
 ENV CC $cc
@@ -133,8 +134,8 @@ ENV CROSS_TOOLCHAIN $cmake_toolchain_file
 ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
 ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
 ENV VCPKG_DISABLE_METRICS 1
-RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/vcpkg
-RUN /home/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/vcpkg && \
+    /home/vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/vcpkg"
 
 ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"

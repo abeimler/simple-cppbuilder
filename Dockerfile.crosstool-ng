@@ -27,18 +27,17 @@ ARG crosstool_dir="/home/cross/crosstool-ng"
 ENV CT_ALLOW_BUILD_AS_ROOT_SURE 1
 #COPY ./config/crosstool/crosstool-ng.config.rpi $cross_root/.config
 RUN useradd -m -G root -s /bin/bash cross && passwd -d cross && echo "cross ALL=(ALL)  ALL" >> /etc/sudoers
+USER cross
 #RUN mkdir -p $crosstool_dir && chown cross:root $crosstool_dir
-RUN runuser -l cross -c \
-    "git clone --depth 1 https://github.com/crosstool-ng/crosstool-ng $crosstool_dir && \
-        cd $crosstool_dir && ./bootstrap && \
-        ./configure --enable-local && \
-        make"
-RUN runuser -l cross -c \
-    "cd $crosstool_dir && \
-        ./ct-ng ${cross_triple}"
-RUN runuser -l cross -c \
-    "cd $crosstool_dir && \
-        ./ct-ng build"
+RUN git clone --depth 1 https://github.com/crosstool-ng/crosstool-ng $crosstool_dir
+WORKDIR $crosstool_dir
+RUN ./bootstrap && \
+    ./configure --enable-local && \
+    make
+RUN ./ct-ng ${cross_triple} && \
+    ./ct-ng build
+USER root
+WORKDIR /
 ARG cross_root="/home/cross/x-tools/${cross_triple}"
 ENV PATH="${cross_root}/bin:${PATH}"
 ARG cc="${cross_triple}-gcc"
@@ -63,22 +62,21 @@ ENV CROSS "${cross_triple}-"
 ENV CROSS_ROOT $cross_root
 ENV CROSS_TOOLCHAIN $cmake_toolchain_file
 
-RUN mkdir -p /home/cross
-RUN touch /home/cross/.bashrc
+RUN mkdir -p /home/cross && touch /home/cross/.bashrc
 ARG setup_env_script="/home/cross/.bashrc"
 ARG setup_env_script_args=""
 ENV SETUP_ENV_SCRIPT $setup_env_script
 ENV SETUP_ENV_SCRIPT_ARGS $setup_env_script_args
-RUN echo 'source "$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS"' >> /root/.bash_profile
-RUN . $setup_env_script $setup_env_script_args
+RUN echo "source \"$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS\"" >> /root/.bash_profile && \
+    . $setup_env_script $setup_env_script_args
 
 
 # install vcpkg
 ENV VCPKG_DEFAULT_HOST_TRIPLET $triplet_host
 ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
 ENV VCPKG_DISABLE_METRICS 1
-RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/project/vcpkg
-RUN /home/project/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/project/vcpkg && \
+    /home/project/vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/project/vcpkg"
 
 ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file

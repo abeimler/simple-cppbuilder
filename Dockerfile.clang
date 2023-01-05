@@ -1,5 +1,5 @@
 ## base image
-FROM abeimler/simple-cppbuilder:latest AS base
+FROM abeimler/simple-cppbuilder:base AS base
 
 ARG extra_libraries
 

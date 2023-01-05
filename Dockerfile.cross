@@ -43,14 +43,13 @@ RUN runuser -l yay -c \
 
 # compiler env settings
 # e.g. mingw-env, emsdk_env.sh
-RUN mkdir -p /home/cross
-RUN touch /home/cross/.bashrc
+RUN mkdir -p /home/cross && touch /home/cross/.bashrc
 ARG setup_env_script="/home/cross/.bashrc"
 ARG setup_env_script_args=""
 ENV SETUP_ENV_SCRIPT $setup_env_script
 ENV SETUP_ENV_SCRIPT_ARGS $setup_env_script_args
-RUN echo 'source "$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS"' >> /root/.bash_profile
-RUN . $setup_env_script $setup_env_script_args
+RUN echo "source \"$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS\"" >> /root/.bash_profile && \
+    . $setup_env_script $setup_env_script_args
 
 # cross compiler settings
 ENV CC $cc
@@ -73,8 +72,8 @@ ENV CROSS_TOOLCHAIN $cmake_toolchain_file
 ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
 ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
 ENV VCPKG_DISABLE_METRICS 1
-RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/project/vcpkg
-RUN /home/project/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/project/vcpkg && \
+    /home/project/vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/project/vcpkg"
 
 ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file

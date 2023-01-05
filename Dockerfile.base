@@ -20,10 +20,11 @@ RUN pacman-db-upgrade && \
 
 # install yay
 RUN useradd -m -G nobody -s /bin/bash yay && passwd -d yay && echo "yay ALL=(ALL)  ALL" >> /etc/sudoers
-RUN git clone --depth 1 https://aur.archlinux.org/yay.git /opt/yay && cd /opt/yay && \
-    chown -R yay:root . && chmod -R 775 . && \
+RUN git clone --depth 1 https://aur.archlinux.org/yay.git /opt/yay 
+WORKDIR /opt/yay
+RUN chown -R yay:root . && chmod -R 775 . && \
     runuser -l yay -c "cd /opt/yay && makepkg -si --noprogressbar --noconfirm"
-RUN cd /
+WORKDIR /
 
 # install extra packages from AUR
 RUN runuser -l yay -c \
@@ -38,12 +39,14 @@ RUN chmod +x /tmp/taskfile_install.sh
 RUN /tmp/taskfile_install.sh -d -b /usr/local/bin && rm /tmp/taskfile_install.sh
 
 # Install conan
-RUN python -m pip install --upgrade pip setuptools && \
-    python -m pip install conan && \
-    conan --version
+RUN python -m pip install --no-cache-dir conan==1.56.0 && \
+        conan --version
 # Install more pip tools
-RUN python -m pip install --upgrade pip setuptools && \
-    python -m pip install cogapp coverage cmake-format cmakelint
+RUN python -m pip install --no-cache-dir \
+        cogapp==3.3.0 \
+        coverage==7.0.3 \
+        cmake-format==0.6.13 \
+        cmakelint==1.4.2
 
 # thx to https://github.com/lefticus/cpp_starter_project/pull/121
 

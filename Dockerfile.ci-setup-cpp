@@ -7,9 +7,9 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update -y -qq && apt-get install --no-install-recommends -y gnupg software-properties-common ca-certificates && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 # keys used by apt
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 40976EAF437D05B5
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1E9377A2BA9EF27F
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32 && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 40976EAF437D05B5 && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1E9377A2BA9EF27F
 # Install basic packages available from standard repos
 RUN apt-get update -y -qq && \
     apt-get install --no-install-recommends -yq \
@@ -19,13 +19,14 @@ RUN apt-get update -y -qq && \
 
 # install CodeCov
 WORKDIR /home/codecov
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN curl https://keybase.io/codecovsecurity/pgp_keys.asc | gpg --no-default-keyring --keyring trustedkeys.gpg --import
 ADD https://uploader.codecov.io/latest/alpine/codecov codecov
 ADD https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM codecov.SHA256SUM
 ADD https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM.sig codecov.SHA256SUM.sig
-RUN gpgv codecov.SHA256SUM.sig codecov.SHA256SUM
-RUN shasum -a 256 -c codecov.SHA256SUM
-RUN chmod +x codecov
+RUN gpgv codecov.SHA256SUM.sig codecov.SHA256SUM && \
+    shasum -a 256 -c codecov.SHA256SUM && \
+    chmod +x codecov
 ENV CODECOV "/home/codecov/codecov"
 
 # download setup_cpp https://github.com/aminya/setup-cpp
@@ -35,10 +36,14 @@ ARG setup_cpp_linux_download_url="https://github.com/aminya/setup-cpp/releases/d
 # add setup_cpp
 ADD ${setup_cpp_linux_download_url} /setup_cpp_linux
 RUN chmod +x /setup_cpp_linux
-RUN /setup_cpp_linux --compiler llvm --gcc true --make true --cmake true --ninja true --ccache true --doxygen true --gcovr true --cppcheck true --clangtidy true --clangformat true --conan true --task true
-RUN rm -rf /tmp/*
-RUN echo 'source /root/.cpprc' >> /root/.bash_profile
-RUN cp /root/.cpprc /root/.bashrc
+RUN /setup_cpp_linux --compiler llvm \
+        --gcc true --make true --cmake true --ninja true --ccache true \
+        --doxygen true --gcovr true --cppcheck true \
+        --clangtidy true --clangformat true \
+        --conan true --task true && \
+    rm -rf /tmp/*
+RUN echo 'source /root/.cpprc' >> /root/.bash_profile && \
+    cp /root/.cpprc /root/.bashrc
 
 # Install more tools from standard repos
 RUN apt-get update -y && \
@@ -50,8 +55,11 @@ RUN apt-get update -y && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install more pip tools
-RUN python3 -m pip install --upgrade pip setuptools && \
-    python3 -m pip install cogapp coverage cmake-format cmakelint
+RUN python3 -m pip install --no-cache-dir \
+        cogapp==3.3.0 \
+        coverage==7.0.3 \ 
+        cmake-format==0.6.13 \ 
+        cmakelint==1.4.2
 
 ## Cleanup cached apt data we don't need anymore
 RUN apt-get autoremove -y && apt-get clean && \
@@ -79,8 +87,8 @@ ARG setup_env_script="/root/.cpprc"
 ARG setup_env_script_args=""
 ENV SETUP_ENV_SCRIPT $setup_env_script
 ENV SETUP_ENV_SCRIPT_ARGS $setup_env_script_args
-RUN echo 'source "$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS"' >> /root/.bash_profile
-RUN . $setup_env_script $setup_env_script_args
+RUN echo "source \"$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS\"" >> /root/.bash_profile && \
+    . $setup_env_script $setup_env_script_args
 
 # setup project env
 WORKDIR /home/project
