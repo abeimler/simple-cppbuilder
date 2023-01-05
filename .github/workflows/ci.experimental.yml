@@ -11,7 +11,7 @@ jobs:
   docker:
     strategy:
       matrix:
-        - build_task:
+        build_task:
           - arm:cross
           - arm:rpi
           - android:21
