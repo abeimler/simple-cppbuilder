@@ -1,0 +1,35 @@
+name: ci (experimental)
+run-name: Experimental Builds
+
+on:
+  push:
+    branches:
+      #- "main"
+      - "feature/ci"
+
+jobs:
+  docker:
+    strategy:
+      matrix:
+        - build_task:
+          - arm:cross
+          - arm:rpi
+          - android:21
+          - android:24
+          - android:25
+          - mingw:mxe
+          - gcc
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup go-task/task
+        run: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+      - name: Setup Container Structure Tests
+        run: curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64 && chmod +x container-structure-test-linux-amd64 && mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build Docker Image  
+        run: task ${{ matrix.build_task }}
