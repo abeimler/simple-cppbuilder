@@ -284,8 +284,7 @@ tasks:
     #- docker build --force-rm=true -f ./Dockerfile.gcc --build-arg gcc_version=5 -t abeimler/simple-cppbuilder:gcc-5 .
     #- docker build --force-rm=true -f ./Dockerfile.gcc --build-arg gcc_version=49 -t abeimler/simple-cppbuilder:gcc-4.9 .
 
-
-  all:
+  default:
   - task: base
   - task: base:libs
   - task: ci

@@ -74,3 +74,17 @@ tasks:
   gcc:
     - container-structure-test test --image abeimler/simple-cppbuilder:gcc-10 --config tests/gcc10-test.yaml
     - container-structure-test test --image abeimler/simple-cppbuilder:gcc-9 --config tests/gcc9-test.yaml
+
+  default:
+  - task: base
+  - task: clang
+  - task: single
+  #- task: cpp_starter_project
+  - task: ci
+  - task: emscripten
+  - task: mingw
+  #- task: android
+  #- task: arm:rpi
+  #- task: rpi
+  #- task: mingw:mxe
+  #- task: gcc
