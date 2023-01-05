@@ -41,19 +41,16 @@ RUN runuser -l yay -c \
     runuser -l yay -c "yay -Scc --noconfirm" && \
     rm -rf /home/yay/.cache/*
 
-
-# install vcpkg
-## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
-ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
-ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
-ENV VCPKG_DISABLE_METRICS 1
-RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/project/vcpkg
-RUN /home/project/vcpkg/bootstrap-vcpkg.sh -disableMetrics
-ENV VCPKG_ROOT "/home/project/vcpkg"
-
-ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
-ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
-
+# compiler env settings
+# e.g. mingw-env, emsdk_env.sh
+RUN mkdir -p /home/cross
+RUN touch /home/cross/.bashrc
+ARG setup_env_script="/home/cross/.bashrc"
+ARG setup_env_script_args=""
+ENV SETUP_ENV_SCRIPT $setup_env_script
+ENV SETUP_ENV_SCRIPT_ARGS $setup_env_script_args
+RUN echo 'source "$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS"' >> /root/.bash_profile
+RUN . $setup_env_script $setup_env_script_args
 
 # cross compiler settings
 ENV CC $cc
@@ -71,29 +68,34 @@ ENV CROSS_ROOT $cross_root
 ENV CROSS_TOOLCHAIN $cmake_toolchain_file
 
 
+# install vcpkg
+## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
+ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
+ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
+ENV VCPKG_DISABLE_METRICS 1
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/project/vcpkg
+RUN /home/project/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+ENV VCPKG_ROOT "/home/project/vcpkg"
+
+ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
+ENV VCPKG_CHAINLOAD_TOOLCHAIN_FILE $CHAINLOAD_TOOLCHAIN_FILE
+ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
 ENV CMAKE_GENERATOR $cmake_generator
-ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
-
-ENV VCPKG_CHAINLOAD_TOOLCHAIN_FILE $CHAINLOAD_TOOLCHAIN_FILE
-
 
 # setup project env
 COPY ./cmake /home/cmake
 WORKDIR /home/project
 ARG docker_build_script "docker-build.cross.sh"
 COPY ./scripts/$docker_build_script ./docker-build.sh
-
-# compiler env settings
-# e.g. mingw-env, emsdk_env.sh
-RUN mkdir -p /home/cross
-RUN touch /home/cross/.bashrc
-ARG setup_env_script="/home/cross/.bashrc"
-ENV SETUP_ENV_SCRIPT $setup_env_script
-RUN . $setup_env_script
+COPY ./taskfiles/*.yml /home/taskfiles/
+COPY ./taskfiles/TaskfileCross.yml /home/taskfiles/Taskfile.yml
 
 ENV PROJECT_DIR /home/project
 WORKDIR /home/project

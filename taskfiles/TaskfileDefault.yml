@@ -1,0 +1,46 @@
+---
+version: "3"
+
+includes:
+  without-vcpkg-toolchain: ./TaskfileWithoutVcpkgToolchain.yml
+  cross: ./TaskfileCross.yml
+
+vars:
+  VCPKG_ROOT: '{{.VCPKG_ROOT | default "./vcpkg"}}'
+  PROJECT_DIR: '{{.PROJECT_DIR | default "."}}'
+  CMAKE: '{{.CMAKE | default "cmake"}}'
+  MAKE: '{{.MAKE | default "make"}}'
+  TARGET: '{{.TARGET | default "all"}}'
+  CMAKE_GENERATOR: '{{.CMAKE_GENERATOR | default "Ninja Multi-Config"}}'
+  BUILD_TYPE: '{{.BUILD_TYPE | default "Release"}}'
+  TOOLCHAIN_FILE: '{{.TOOLCHAIN_FILE | default "./vcpkg/scripts/buildsystems/vcpkg.cmake"}}'
+
+tasks:
+  configure:
+    dir: '{{.PROJECT_DIR}}'
+    cmds:
+      - >
+        {{.CMAKE}} -B build -S . -G "{{.CMAKE_GENERATOR}}" \
+            -DCMAKE_BUILD_TYPE="{{.BUILD_TYPE}}" \
+            {{.CMAKE_ARGS}}
+
+  configure:with-vcpkg:
+    dir: '{{.PROJECT_DIR}}'
+    cmds:
+      - >
+        {{.CMAKE}} -B build -S . -G "{{.CMAKE_GENERATOR}}" \
+            -DCMAKE_BUILD_TYPE="{{.BUILD_TYPE}}" \
+            -DCMAKE_TOOLCHAIN_FILE="{{.TOOLCHAIN_FILE}}" \
+            {{.CMAKE_ARGS}}
+
+  build:
+    dir: '{{.PROJECT_DIR}}'
+    cmds:
+      - task: configure
+      - '{{.CMAKE}} --build build --target "{{.TARGET}}"'
+
+  test:
+    dir: '{{.PROJECT_DIR}}'
+    cmds:
+      - task: build
+      - ctest --build-test --test-dir build

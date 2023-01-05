@@ -22,20 +22,17 @@ fileExistenceTests:
 - name: 'vcpkg'
   path: '/home/project/vcpkg/vcpkg'
   shouldExist: true
-- name: 'cmake toolchain'
-  path: $CROSS_TOOLCHAIN
-  shouldExist: true
-- name: 'android toolchain'
-  path: $ANDROID_TOOLCHAIN_FILE
-  shouldExist: true
 - name: 'android home'
-  path: $ANDROID_HOME
-  shouldExist: true
-- name: 'android ndk'
-  path: $ANDROID_NDK_HOME
+  path: '/opt/android-sdk'
   shouldExist: true
 - name: 'android platform tools'
-  path: $ANDROID_PLATFORM_TOOLS
+  path: '/opt/android-sdk/build-tools'
+  shouldExist: true
+- name: 'android ndk'
+  path: '/opt/android-ndk'
+  shouldExist: true
+- name: 'cmake toolchain'
+  path: '/opt/android-ndk/build/cmake/android.toolchain.cmake'
   shouldExist: true
 
 metadataTest:

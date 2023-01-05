@@ -32,6 +32,11 @@ RUN runuser -l yay -c \
     runuser -l yay -c "yay -Scc --noconfirm" && \
     rm -rf /home/yay/.cache/*
 
+# install task
+ADD https://taskfile.dev/install.sh /tmp/taskfile_install.sh
+RUN chmod +x /tmp/taskfile_install.sh
+RUN /tmp/taskfile_install.sh -d -b /usr/local/bin && rm /tmp/taskfile_install.sh
+
 # Install conan
 RUN python -m pip install --upgrade pip setuptools && \
     python -m pip install conan && \

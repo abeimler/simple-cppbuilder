@@ -34,9 +34,29 @@ RUN runuser -l yay -c \
     rm -rf /home/yay/.cache/*
 RUN /usr/lib/emsdk/emsdk install latest && /usr/lib/emsdk/emsdk activate latest
 
+# compiler env settings
+ENV EMSDK "/usr/lib/emsdk"
+ENV EM_CONFIG "/usr/lib/emsdk/.emscripten"
+ENV EM_CACHE "/usr/lib/emsdk/upstream/emscripten/cache"
+ENV EMSDK_PATH "/usr/lib/emsdk"
+ENV EMSCRIPTEN_PATH "/usr/lib/emscripten"
+ENV CLANG_PATH "/opt/emscripten-llvm/bin"
+ENV PYTHON_PATH "/usr/bin"
+ENV NODE_PATH "/usr/bin"
+ENV PATH="${EMSDK_PATH}:${EMSCRIPTEN_PATH}:${CLANG_PATH}:${NODE_PATH}:${PYTHON_PATH}:${PATH}"
+
 ARG setup_env_script="/usr/lib/emsdk/emsdk_env.sh"
+ARG setup_env_script_args=""
 ENV SETUP_ENV_SCRIPT $setup_env_script
-RUN . $setup_env_script
+ENV SETUP_ENV_SCRIPT_ARGS $setup_env_script_args
+RUN echo 'source "$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS"' >> /root/.bash_profile
+RUN /usr/lib/emsdk/emsdk construct_env
+RUN . $setup_env_script $setup_env_script_args
+# FIXME: https://github.com/emscripten-core/emsdk/issues/430
+RUN mkdir -p /home/cross
+RUN touch /home/cross/.bashrc
+ENV SETUP_ENV_SCRIPT "/home/cross/.bashrc"
+ENV SETUP_ENV_SCRIPT_ARGS ""
 
 
 # cross compiler settings
@@ -51,17 +71,6 @@ ENV CROSS_CMAKE $cross_cmake
 ENV CROSS_MAKE $cross_make
 ENV CROSS_TOOLCHAIN $cmake_toolchain_file
 
-# compiler env settings
-ENV EMSDK "/usr/lib/emsdk"
-ENV EM_CONFIG "/usr/lib/emsdk/.emscripten"
-ENV EM_CACHE "/usr/lib/emsdk/upstream/emscripten/cache"
-ENV EMSDK_PATH "/usr/lib/emsdk"
-ENV EMSCRIPTEN_PATH "/usr/lib/emscripten"
-ENV CLANG_PATH "/opt/emscripten-llvm/bin"
-ENV PYTHON_PATH "/usr/bin"
-ENV NODE_PATH "/usr/bin"
-ENV PATH="${EMSDK_PATH}:${EMSCRIPTEN_PATH}:${CLANG_PATH}:${NODE_PATH}:${PYTHON_PATH}:${PATH}"
-
 
 # install vcpkg
 ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
@@ -71,6 +80,8 @@ RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/project/vcp
 RUN /home/project/vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/project/vcpkg"
 
+ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
+ENV VCPKG_CHAINLOAD_TOOLCHAIN_FILE $CHAINLOAD_TOOLCHAIN_FILE
 ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 
@@ -79,10 +90,7 @@ ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
 ENV CMAKE_GENERATOR $cmake_generator
-ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
 ENV CMAKE_ARGS ""
-
-ENV VCPKG_CHAINLOAD_TOOLCHAIN_FILE $CHAINLOAD_TOOLCHAIN_FILE
 
 # setup project env
 ENV PROJECT_DIR /home/project
@@ -90,6 +98,8 @@ WORKDIR /home/project
 COPY ./cmake ./cmake
 COPY ./scripts/docker-build.setup-env.sh ./docker-build.sh
 COPY ./scripts/docker-test.setup-env.sh ./docker-test.sh
+COPY ./taskfiles/*.yml /home/taskfiles/
+COPY ./taskfiles/TaskfileCross.yml /home/taskfiles/Taskfile.yml
 
 ENV PROJECT_DIR /home/project
 WORKDIR /home/project

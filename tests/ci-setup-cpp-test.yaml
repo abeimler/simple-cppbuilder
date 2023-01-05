@@ -33,6 +33,9 @@ fileExistenceTests:
 - name: 'cmake toolchain'
   path: '/root/vcpkg/scripts/buildsystems/vcpkg.cmake'
   shouldExist: true
+- name: "cpprc"
+  path: "/root/.cpprc"
+  shouldExist: true
 
 metadataTest:
   env:

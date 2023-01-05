@@ -56,6 +56,12 @@ RUN python3 -m pip install --upgrade pip setuptools && \
 RUN python3 -m pip install --upgrade pip setuptools && \
     python3 -m pip install cogapp coverage cmake-format cmakelint
 
+# install task
+ADD https://taskfile.dev/install.sh /tmp/taskfile_install.sh
+RUN chmod +x /tmp/taskfile_install.sh
+RUN /tmp/taskfile_install.sh -d -b /usr/local/bin && rm /tmp/taskfile_install.sh
+
+
 # thx to https://github.com/lefticus/cpp_starter_project/pull/121
 
 # By default, anything you run in Docker is done as superuser.
@@ -95,18 +101,17 @@ ARG cmake_generator="Ninja"
 ARG cmake_toolchain_file="/home/cmake/x86_64-w64-mingw32.toolchain.cmake"
 ARG cross_root "/usr/x86_64-w64-mingw32"
 
-# install vcpkg
-## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
-ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
-ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
-ENV VCPKG_DISABLE_METRICS 1
-RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/vcpkg
-RUN /home/vcpkg/bootstrap-vcpkg.sh -disableMetrics
-ENV VCPKG_ROOT "/home/vcpkg"
 
-ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
-ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
-
+# compiler env settings
+# e.g. mingw-env, emsdk_env.sh
+RUN mkdir -p /home/cross
+RUN touch /home/cross/.bashrc
+ARG setup_env_script="/home/cross/.bashrc"
+ARG setup_env_script_args=""
+ENV SETUP_ENV_SCRIPT $setup_env_script
+ENV SETUP_ENV_SCRIPT_ARGS $setup_env_script_args
+RUN echo 'source "$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS"' >> /root/.bash_profile
+RUN . $setup_env_script $setup_env_script_args
 
 # cross compiler settings
 ENV CC $cc
@@ -122,6 +127,20 @@ ENV CROSS "${cross_triple}-"
 ENV CROSS_ROOT $cross_root
 ENV CROSS_TOOLCHAIN $cmake_toolchain_file
 
+
+# install vcpkg
+## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
+ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
+ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
+ENV VCPKG_DISABLE_METRICS 1
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/vcpkg
+RUN /home/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+ENV VCPKG_ROOT "/home/vcpkg"
+
+ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
@@ -133,11 +152,9 @@ ENV CMAKE_ARGS ""
 WORKDIR /home/project
 COPY ./cmake /home/cmake
 COPY ./scripts/docker-build.ci-mingw.sh ./docker-build.sh
+COPY ./taskfiles/*.yml /home/taskfiles/
+COPY ./taskfiles/TaskfileCross.yml /home/taskfiles/Taskfile.yml
 
 ENV PROJECT_DIR /home/project
 WORKDIR /home/project
 RUN mkdir build
-
-COPY ./scripts/docker-entrypoint.ci.sh /docker-entrypoint.sh
-ENTRYPOINT ["/bin/bash", "-c", "/docker-entrypoint.sh"]
-CMD ["/bin/bash"]

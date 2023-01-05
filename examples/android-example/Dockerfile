@@ -7,4 +7,4 @@ RUN ./vcpkg/vcpkg install jsoncpp:$TARGET_TRIPLET
 ## build stage
 FROM base as build
 COPY . .
-CMD ["./docker-build.sh"]
+CMD ["task", "-t", "/home/taskfiles/Taskfile.yml", "build"]

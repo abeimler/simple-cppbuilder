@@ -47,6 +47,9 @@ fileExistenceTests:
 - name: 'em env'
   path: '/usr/lib/emsdk/emsdk_env.sh'
   shouldExist: true
+- name: 'emsdk binary'
+  path: '/usr/lib/emsdk/emsdk'
+  shouldExist: true
 
 
 metadataTest:

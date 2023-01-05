@@ -8,6 +8,7 @@ ARG processor="x86_64"
 ARG vcpkg_target_triplet="arm-android"
 ARG android_abi="armeabi-v7a"
 ARG android_target="30"
+ARG android_ndk_version=""
 
 ARG cmake="android-${android_abi}-cmake"
 ARG cmake_generator="Ninja"
@@ -34,13 +35,40 @@ RUN pacman-db-upgrade && \
 RUN runuser -l yay -c \
     "yay -Syu --noconfirm && yay -S --noconfirm \
         jdk-openjdk android-platform-${android_target} android-sdk-build-tools-${android_target} \
-        android-pkg-config android-cmake android-environment" && \
+        android-pkg-config android-cmake android-environment android-ndk${android_ndk_version}" && \
     runuser -l yay -c "yay -Scc --noconfirm" && \
     rm -rf /home/yay/.cache/*
 
-# setup project env
-WORKDIR /home/project
-COPY ./scripts/docker-build.android.sh ./docker-build.sh
+
+ENV ANDROID_HOME "/opt/android-sdk"
+ENV ANDROID_NDK "/opt/android-ndk"
+ENV ANDROID_NDK_HOME "/opt/android-ndk"
+ENV ANDROID_SDK_ROOT "/opt/android-sdk"
+ENV ANDROID_TOOLCHAIN "${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64"
+ENV ANDROID_TOOLCHAIN_FILE "${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake"
+ENV ANDROID_PLATFORM_TOOLS "${ANDROID_HOME}/platform-tools"
+ARG cmake_toolchain_file="${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake"
+ENV CROSS_TOOLCHAIN "${ANDROID_TOOLCHAIN_FILE}"
+
+ARG setup_env_script="android-env"
+ARG setup_env_script_args="$android_abi"
+ENV SETUP_ENV_SCRIPT $setup_env_script
+ENV SETUP_ENV_SCRIPT_ARGS $setup_env_script_args
+RUN echo 'source "$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS"' >> /root/.bash_profile
+RUN . $setup_env_script $setup_env_script_args
+RUN . /etc/profile.d/android-ndk.sh
+
+# cross compiler settings
+ENV CC $cc
+ENV CXX $cxx
+ENV PROCESSOR $processor
+ENV ANDROID_ABI $android_abi
+ENV TARGET_TRIPLET $vcpkg_target_triplet
+ENV CROSS_CMAKE $cmake
+ENV CROSS_MAKE $make
+
+ENV CMAKE $CROSS_CMAKE
+ENV MAKE $CROSS_MAKE
 
 # install vcpkg
 ## https://github.com/microsoft/vcpkg/blob/master/docs/users/android.md
@@ -51,29 +79,6 @@ RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
 RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/project/vcpkg"
 
-# cross compiler settings
-ENV CC $cc
-ENV CXX $cxx
-ENV PROCESSOR $processor
-ENV ANDROID_ABI $android_abi
-ENV TARGET_TRIPLET $vcpkg_target_triplet
-ENV CROSS_CMAKE $cmake
-ENV CROSS_MAKE $make
-ENV ANDROID_HOME "/opt/android-sdk"
-ENV ANDROID_NDK "/opt/android-ndk"
-ENV ANDROID_NDK_HOME "/opt/android-ndk"
-ENV ANDROID_TOOLCHAIN "${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64"
-ENV ANDROID_TOOLCHAIN_FILE "${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake"
-ENV ANDROID_PLATFORM_TOOLS "${ANDROID_HOME}/platform-tools"
-ARG cmake_toolchain_file="${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake"
-ENV CROSS_TOOLCHAIN "${ANDROID_TOOLCHAIN_FILE}"
-
-ARG setup_env_script="android-env $android_abi"
-ENV SETUP_ENV_SCRIPT $setup_env_script
-RUN . $setup_env_script
-
-ENV CMAKE $CROSS_CMAKE
-ENV MAKE $CROSS_MAKE
 
 # build script settings
 ENV TARGET "all"
@@ -81,7 +86,16 @@ ENV BUILD_TYPE "Release"
 ENV CMAKE_GENERATOR $cmake_generator
 ENV VCPKG_TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ENV TOOLCHAIN_FILE "/home/project/vcpkg/scripts/buildsystems/vcpkg.cmake"
-ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
+ENV CHAINLOAD_TOOLCHAIN_FILE $ANDROID_TOOLCHAIN_FILE
+ENV CROSS_CMAKE_ARGS -DANDROID_ABI="$ANDROID_ABI"
 ENV CMAKE_ARGS ""
 
+# setup project env
+WORKDIR /home/project
+COPY ./scripts/docker-build.android.sh ./docker-build.sh
+COPY ./taskfiles/*.yml /home/taskfiles/
+COPY ./taskfiles/TaskfileCross.yml /home/taskfiles/Taskfile.yml
+
+ENV PROJECT_DIR /home/project
+WORKDIR /home/project
 RUN mkdir build
