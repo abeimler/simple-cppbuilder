@@ -22,12 +22,13 @@ RUN pacman-db-upgrade && \
         cmake make ninja && \
     pacman -Scc --noconfirm
 
-# install windows tools from AUR
-RUN runuser -l yay -c \
-    "yay -Syu --noconfirm && yay -S --noconfirm \
-        powershell-bin" && \
-    runuser -l yay -c "yay -Scc --noconfirm" && \
+# install extra packages from AUR (powershell)
+USER yay
+RUN yay -Syu --noconfirm && yay -S --noconfirm \
+        powershell-bin && \
+    yay -Scc --noconfirm && \
     rm -rf /home/yay/.cache/*
+USER root
 
 # install mxe
 RUN pacman-db-upgrade && \

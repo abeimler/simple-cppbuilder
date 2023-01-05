@@ -49,10 +49,10 @@ ENV POWERSHELL_TELEMETRY_OPTOUT 1
 #ENV PATH="/usr/lib/mxe/usr/bin:${PATH}"
 
 # Install conan
-RUN python -m pip install --no-cache-dir conan==1.56.0 && \
+RUN python3 -m pip install --no-cache-dir conan==1.56.0 && \
         conan --version
 # Install more pip tools
-RUN python -m pip install --no-cache-dir \
+RUN python3 -m pip install --no-cache-dir \
         cogapp==3.3.0 \
         coverage==7.0.3 \
         cmake-format==0.6.13 \

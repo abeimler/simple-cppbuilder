@@ -30,7 +30,8 @@ tasks:
     dir: '{{.PROJECT_DIR}}'
     cmds:
       - task: configure
-      - cd build && {{.CROSS_MAKE}} "{{.TARGET}}"
+      - cd build || exit
+      - {{.CROSS_MAKE}} "{{.TARGET}}"
 
   test:
     dir: '{{.PROJECT_DIR}}'

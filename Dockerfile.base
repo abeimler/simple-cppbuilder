@@ -22,16 +22,20 @@ RUN pacman-db-upgrade && \
 RUN useradd -m -G nobody -s /bin/bash yay && passwd -d yay && echo "yay ALL=(ALL)  ALL" >> /etc/sudoers
 RUN git clone --depth 1 https://aur.archlinux.org/yay.git /opt/yay 
 WORKDIR /opt/yay
-RUN chown -R yay:root . && chmod -R 775 . && \
-    runuser -l yay -c "cd /opt/yay && makepkg -si --noprogressbar --noconfirm"
+RUN chown -R yay:root . && chmod -R 775 .
+USER yay
+WORKDIR /opt/yay
+RUN makepkg -si --noprogressbar --noconfirm
+USER root
 WORKDIR /
 
 # install extra packages from AUR
-RUN runuser -l yay -c \
-    "yay -Syu --noconfirm && yay -S --noconfirm \
-        extra-cmake-modules-git lcov cccc" && \
-    runuser -l yay -c "yay -Scc --noconfirm" && \
+USER yay
+RUN yay -Syu --noconfirm && yay -S --noconfirm \
+        extra-cmake-modules-git lcov cccc && \
+    yay -Scc --noconfirm && \
     rm -rf /home/yay/.cache/*
+USER root
 
 # install task
 ADD https://taskfile.dev/install.sh /tmp/taskfile_install.sh
