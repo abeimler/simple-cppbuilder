@@ -58,7 +58,7 @@ ENV SETUP_ENV_SCRIPT $setup_env_script
 ENV SETUP_ENV_SCRIPT_ARGS $setup_env_script_args
 RUN echo "source \"$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS\"" >> /root/.bash_profile && \
     . $setup_env_script $setup_env_script_args
-RUN . /etc/profile.d/android-ndk.sh
+#RUN . /etc/profile.d/android-ndk.sh
 
 # cross compiler settings
 ENV CC $cc
