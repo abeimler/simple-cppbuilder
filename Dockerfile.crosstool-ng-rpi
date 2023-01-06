@@ -27,10 +27,11 @@ ARG crosstool_dir="/home/cross/crosstool-ng"
 ENV CT_ALLOW_BUILD_AS_ROOT_SURE 1
 #COPY ./config/crosstool/crosstool-ng.config.rpi $cross_root/.config
 RUN useradd -m -G root -s /bin/bash cross && passwd -d cross && echo "cross ALL=(ALL)  ALL" >> /etc/sudoers
-USER cross
 #RUN mkdir -p $crosstool_dir && chown cross:root $crosstool_dir
 RUN git clone --depth 1 https://github.com/crosstool-ng/crosstool-ng 
 WORKDIR $crosstool_dir
+RUN chown -R cross:root . && chmod -R 775 .
+USER cross
 RUN ./bootstrap && \
     ./configure --enable-local && \
     make
