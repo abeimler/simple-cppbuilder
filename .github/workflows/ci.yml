@@ -60,19 +60,6 @@ jobs:
             test_task: test:arm:rpi
             push_tags: 
               - "abeimler/simple-cppbuilder:aarch64-linux-gcc-rpi4"
-          - build_task: build:arm:cross
-            test_task: test:arm:cross
-            push_tags: 
-              - "abeimler/simple-cppbuilder:arm-none-eabi"
-          - build_task: build:arm:cross:rpi
-            test_task: test:arm:cross:rpi
-            push_tags: 
-              - "abeimler/simple-cppbuilder:rpi4"
-              - "abeimler/simple-cppbuilder:rpi3"
-              - "abeimler/simple-cppbuilder:rpi2"
-              - "abeimler/simple-cppbuilder:rpi1"
-              - "abeimler/simple-cppbuilder:rpi4-aarch64"
-              - "abeimler/simple-cppbuilder:rpi3-aarch64"
           - build_task: build:android:21
             test_task: test:android:21
             push_tags: 
