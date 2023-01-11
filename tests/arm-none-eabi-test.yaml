@@ -4,11 +4,11 @@ commandTests:
 - name: mingw c compiler
   command: $CC
   args: ["--version"]
-  expectedOutput: [".*aarch64-linux-gnu-gcc.*"]
+  expectedOutput: [".*arm-none-eabi-gcc.*"]
 - name: mingw c++ compiler
   command: $CXX
   args: ["--version"]
-  expectedOutput: [".*aarch64-linux-gnu-g\\+\\+.*"]
+  expectedOutput: [".*arm-none-eabi-g\\+\\+.*"]
 - name: cmake
   command: $CMAKE
   args: ["--version"]
@@ -23,18 +23,18 @@ fileExistenceTests:
   path: '/home/project/vcpkg/vcpkg'
   shouldExist: true
 - name: 'cmake toolchain'
-  path: '/home/cmake/aarch64.toolchain.cmake'
+  path: '/home/cmake/arm.toolchain.cmake'
   shouldExist: true
 
 metadataTest:
   env:
     - key: CC
-      value: aarch64-linux-gnu-gcc
+      value: arm-none-eabi-gcc
     - key: CXX
-      value: aarch64-linux-gnu-g++
+      value: arm-none-eabi-g++
     - key: CMAKE
       value: cmake
     - key: MAKE
       value: ninja
     - key: CROSS_TOOLCHAIN
-      value: /home/cmake/aarch64.toolchain.cmake
+      value: /home/cmake/arm.toolchain.cmake

@@ -20,10 +20,12 @@ tasks:
     - container-structure-test test --image abeimler/simple-cppbuilder:x64-mingw-w64 --config tests/mingw-test.yaml
 
   arm:
-    - container-structure-test test --image abeimler/simple-cppbuilder:aarch64-linux --config tests/aarch64-test.yaml
+    - container-structure-test test --image abeimler/simple-cppbuilder:aarch64-linux-gcc --config tests/aarch64-test.yaml
+    - container-structure-test test --image abeimler/simple-cppbuilder:arm-none-eabi-gcc --config tests/arm-test.yaml
+    - container-structure-test test --image abeimler/simple-cppbuilder:arm-none-eabi --config tests/arm-none-eabi-test.yaml
 
   arm:rpi:
-    - container-structure-test test --image abeimler/simple-cppbuilder:rpi4 --config tests/rpi4-test.yaml
+    - container-structure-test test --image abeimler/simple-cppbuilder:aarch64-linux-gcc-rpi4 --config tests/rpi4-test.yaml
 
   android:
     - container-structure-test test --image abeimler/simple-cppbuilder:arm-android --config tests/arm-android-test.yaml

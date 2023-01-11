@@ -4,11 +4,11 @@ commandTests:
 - name: cross c compiler
   command: $CC
   args: ["--version"]
-  expectedOutput: [".*armv8-rpi4-linux-gnueabihf-gcc.*"]
+  expectedOutput: [".*aarch64-linux-gnu-gcc.*"]
 - name: cross c++ compiler
   command: $CXX
   args: ["--version"]
-  expectedOutput: [".*armv8-rpi4-linux-gnueabihf-g\\+\\+.*"]
+  expectedOutput: [".*aarch64-linux-gnu-g\\+\\+.*"]
 - name: cmake
   command: $CMAKE
   args: ["--version"]
@@ -27,10 +27,6 @@ fileExistenceTests:
   shouldExist: true
 - name: 'raspberrypi firmware'
   path: $RASPBERRYPI_FIRMWARE_DIR
-  shouldExist: true
-- name: 'raspberrypi tools'
-  path: $RASPBERRYPI_TOOLS_DIR
-  shouldExist: true
 - name: 'opt vc'
   path: '/opt/vc'
   shouldExist: true
@@ -44,12 +40,12 @@ fileExistenceTests:
 metadataTest:
   env:
     - key: CC
-      value: armv8-rpi4-linux-gnueabihf-gcc
+      value: aarch64-linux-gnu-gcc
     - key: CXX
-      value: armv8-rpi4-linux-gnueabihf-g++
+      value: aarch64-linux-gnu-g++
     - key: CMAKE
       value: cmake
     - key: MAKE
       value: ninja
     - key: CROSS_TOOLCHAIN
-      value: /home/cmake/arm-rpi-toolchain.cmake
+      value: /home/cmake/aarch64-rpi.toolchain.cmake

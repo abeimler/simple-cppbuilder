@@ -46,8 +46,8 @@ jobs:
           - build_task: build:arm
             test_task: test:arm
             push_tags: 
-              - "abeimler/simple-cppbuilder:aarch64-linux"
-              - "abeimler/simple-cppbuilder:arm-eabi"
+              - "abeimler/simple-cppbuilder:aarch64-linux-gcc"
+              - "abeimler/simple-cppbuilder:arm-none-eabi-gcc"
           - build_task: build:android
             test_task: test:android
             push_tags: 
@@ -55,6 +55,44 @@ jobs:
               - "abeimler/simple-cppbuilder:arm64-android"
               - "abeimler/simple-cppbuilder:x86-android"
               - "abeimler/simple-cppbuilder:x64-android"
+          - build_task: build:arm:rpi
+            test_task: test:arm:rpi
+            push_tags: 
+              - "abeimler/simple-cppbuilder:aarch64-linux-gcc-rpi4"
+          - build_task: build:arm:cross
+            test_task: test:arm:cross
+            push_tags: 
+              - "abeimler/simple-cppbuilder:arm-none-eabi"
+          - build_task: build:arm:cross:rpi
+            test_task: test:arm:cross:rpi
+            push_tags: 
+              - "abeimler/simple-cppbuilder:rpi4"
+              - "abeimler/simple-cppbuilder:rpi3"
+              - "abeimler/simple-cppbuilder:rpi2"
+              - "abeimler/simple-cppbuilder:rpi1"
+              - "abeimler/simple-cppbuilder:rpi4-aarch64"
+              - "abeimler/simple-cppbuilder:rpi3-aarch64"
+          - build_task: build:android:21
+            test_task: test:android:21
+            push_tags: 
+              - "abeimler/simple-cppbuilder:arm-android-21"
+              - "abeimler/simple-cppbuilder:arm64-android-21"
+              - "abeimler/simple-cppbuilder:x86-android-21"
+              - "abeimler/simple-cppbuilder:x64-android-21"
+          - build_task: build:android:24
+            test_task: test:android:24
+            push_tags: 
+              - "abeimler/simple-cppbuilder:arm-android-24"
+              - "abeimler/simple-cppbuilder:arm64-android-24"
+              - "abeimler/simple-cppbuilder:x86-android-24"
+              - "abeimler/simple-cppbuilder:x64-android-24"
+          - build_task: build:android:25
+            test_task: test:android:25
+            push_tags: 
+              - "abeimler/simple-cppbuilder:arm-android-25"
+              - "abeimler/simple-cppbuilder:arm64-android-25"
+              - "abeimler/simple-cppbuilder:x86-android-25"
+              - "abeimler/simple-cppbuilder:x64-android-25"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

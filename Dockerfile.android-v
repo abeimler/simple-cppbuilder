@@ -27,15 +27,16 @@ RUN pacman-db-upgrade && \
 
 
 # install android stuff
-RUN echo '' >> /etc/pacman.conf && echo '[multilib]' >> /etc/pacman.conf && echo 'Include = /etc/pacman.d/mirrorlist' >> /etc/pacman.conf && pacman -Syyu
-RUN pacman-db-upgrade && \
-    pacman -S --noconfirm  \
-        lib32-zlib && \
-    pacman -Scc --noconfirm
+RUN echo '' >> /etc/pacman.conf && echo '[multilib]' >> /etc/pacman.conf && echo 'Include = /etc/pacman.d/mirrorlist' >> /etc/pacman.conf
+ARG android_extra_libraries=""
 USER yay
 RUN yay -Syu --noconfirm && yay -S --noconfirm \
+        jdk-openjdk ${android_extra_libraries} && \
+    yay -Scc --noconfirm && \
+    rm -rf /home/yay/.cache/*
+RUN yay -Syu --noconfirm && yay -S --noconfirm \
         jdk-openjdk android-platform-${android_target} android-sdk-build-tools-${android_target} \
-        android-pkg-config android-cmake android-environment android-ndk${android_ndk_version} && \
+        android-pkg-config android-cmake android-environment android-ndk${android_ndk_version} ${android_extra_libraries} && \
     yay -Scc --noconfirm && \
     rm -rf /home/yay/.cache/*
 USER root
@@ -58,7 +59,7 @@ ENV SETUP_ENV_SCRIPT $setup_env_script
 ENV SETUP_ENV_SCRIPT_ARGS $setup_env_script_args
 RUN echo "source \"$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS\"" >> /root/.bash_profile && \
     . $setup_env_script $setup_env_script_args
-#RUN . /etc/profile.d/android-ndk.sh
+#RUN . /etc/profile.d/android-ndk-${android_target}.sh
 
 # cross compiler settings
 ENV CC $cc
