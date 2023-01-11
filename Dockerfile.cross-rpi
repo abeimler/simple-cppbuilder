@@ -1,0 +1,110 @@
+## base image
+FROM abeimler/simple-cppbuilder:base AS base
+
+ARG extra_libraries
+ARG vcpkg_host_triplet="x64-linux"
+ARG processor="x86_64"
+
+# e.g. x64-mingw-dynamic
+ARG vcpkg_target_triplet
+
+# e.g. x86_64-w64-mingw32
+ARG cross_triple
+
+ARG cc="${cross_triple}-gcc"
+ARG cxx="${cross_triple}-g++"
+ARG cmake="cmake"
+ARG make="make"
+ARG cross_cmake="${cross_triple}-cmake"
+ARG cross_make="${cross_triple}-make"
+ARG cross_root="/usr/$cross_triple"
+ARG cmake_toolchain_file
+ARG cmake_generator="Unix Makefiles"
+
+# e.g. mingw-w64-toolchain
+ARG install_toolchain="${cross_triple}-gcc" 
+# e.g. mingw-w64-cmake mingw-w64-configure mingw-w64-make mingw-w64-environment powershell-bin ... mingw-w64-boost, mingw-w64-qt5-base, ... 
+ARG install_extras_toolchain
+
+
+# Install packages available from standard repos
+RUN pacman-db-upgrade && \
+    pacman -S --noconfirm  \
+        ${extra_libraries} \
+        cmake make ninja && \
+    pacman -Scc --noconfirm
+
+# install extra packages from AUR
+USER yay
+RUN yay -Syu --noconfirm && yay -S --noconfirm \
+        ${install_toolchain} ${install_extras_toolchain} && \
+    yay -Scc --noconfirm && \
+    rm -rf /home/yay/.cache/*
+USER root
+
+# get raspberrypi pi firmware
+ARG raspberrypi_firmware_repo="https://github.com/raspberrypi/firmware.git"
+ARG raspberrypi_firmware_branch="master"
+ARG raspberrypi_firmware_source_dir="/home/raspberrypi"
+RUN git clone --depth 1 -b $raspberrypi_firmware_branch $raspberrypi_firmware_repo $raspberrypi_firmware_source_dir
+RUN mkdir -p /opt/vc && cp -rf ${raspberrypi_firmware_source_dir}/opt/vc/* /opt/vc
+ENV RASPBERRYPI_FIRMWARE_DIR $raspberrypi_firmware_source_dir
+
+# compiler env settings
+# e.g. mingw-env, emsdk_env.sh
+RUN mkdir -p /home/cross && touch /home/cross/.bashrc
+ARG setup_env_script="/home/cross/.bashrc"
+ARG setup_env_script_args=""
+ENV SETUP_ENV_SCRIPT $setup_env_script
+ENV SETUP_ENV_SCRIPT_ARGS $setup_env_script_args
+RUN echo "source \"$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS\"" >> /root/.bash_profile && \
+    . $setup_env_script $setup_env_script_args
+
+# cross compiler settings
+ENV CC $cc
+ENV CXX $cxx
+ENV CMAKE $cmake
+ENV MAKE $make
+
+ENV PROCESSOR $processor
+ENV CROSS_TRIPLET $cross_triple
+ENV TARGET_TRIPLET $vcpkg_target_triplet
+ENV CROSS_CMAKE $cross_cmake
+ENV CROSS_MAKE $cross_make
+ENV CROSS "${cross_triple}-"
+ENV CROSS_ROOT $cross_root
+ENV CROSS_TOOLCHAIN $cmake_toolchain_file
+
+
+# install vcpkg
+## https://github.com/microsoft/vcpkg/blob/master/docs/users/mingw.md
+ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
+ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
+ENV VCPKG_DISABLE_METRICS 1
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/project/vcpkg && \
+    /home/project/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+ENV VCPKG_ROOT "/home/project/vcpkg"
+
+ENV CHAINLOAD_TOOLCHAIN_FILE $cmake_toolchain_file
+ENV VCPKG_CHAINLOAD_TOOLCHAIN_FILE $CHAINLOAD_TOOLCHAIN_FILE
+ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+
+# build script settings
+ENV TARGET "all"
+ENV BUILD_TYPE "Release"
+ENV CMAKE_GENERATOR $cmake_generator
+ENV CMAKE_ARGS ""
+
+# setup project env
+COPY ./cmake /home/cmake
+WORKDIR /home/project
+ARG docker_build_script "docker-build.cross.sh"
+COPY ./scripts/$docker_build_script ./docker-build.sh
+COPY ./taskfiles/*.yml /home/taskfiles/
+COPY ./taskfiles/TaskfileCross.yml /home/taskfiles/Taskfile.yml
+
+ENV PROJECT_DIR /home/project
+WORKDIR /home/project
+RUN mkdir build

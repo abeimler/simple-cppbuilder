@@ -65,10 +65,10 @@ ENV CONAN_SYSREQUIRES_MODE enabled
 
 
 # set default compiler
-ENV CC "gcc"
-ENV CXX "g++"
-ENV CMAKE "cmake"
-ENV MAKE "make"
+#ENV CC "gcc"
+#ENV CXX "g++"
+#ENV CMAKE "cmake"
+#ENV MAKE "make"
 
 # setup project env
 ENV PROJECT_DIR /home/project

@@ -18,9 +18,19 @@ RUN pacman-db-upgrade && \
     pacman -S --noconfirm --needed \
         wget curl pkg-config zip unzip tar go git help2man python unzip wget audit rsync && \
     pacman -S --noconfirm  \
-        ${extra_libraries} \
+        gcc automake autoconf ${extra_libraries} \
         cmake make ninja && \
     pacman -Scc --noconfirm
+
+# install multiarch stuff
+#RUN echo '' >> /etc/pacman.conf && echo '[multilib]' >> /etc/pacman.conf && echo 'Include = /etc/pacman.d/mirrorlist' >> /etc/pacman.conf
+#ARG lib32_extra_libraries=""
+#USER yay
+#RUN yay -Syu --noconfirm && yay -S --noconfirm \
+#        lib32-gcc-libs ${lib32_extra_libraries} && \
+#    yay -Scc --noconfirm && \
+#    rm -rf /home/yay/.cache/*
+#USER root
 
 # install crosstool-ng
 ARG crosstool_dir="/home/cross/crosstool-ng"
@@ -28,7 +38,7 @@ ENV CT_ALLOW_BUILD_AS_ROOT_SURE 1
 #COPY ./config/crosstool/crosstool-ng.config.rpi $cross_root/.config
 RUN useradd -m -G root -s /bin/bash cross && passwd -d cross && echo "cross ALL=(ALL)  ALL" >> /etc/sudoers
 #RUN mkdir -p $crosstool_dir && chown cross:root $crosstool_dir
-RUN git clone --depth 1 https://github.com/crosstool-ng/crosstool-ng 
+RUN git clone --depth 1 https://github.com/crosstool-ng/crosstool-ng $crosstool_dir
 WORKDIR $crosstool_dir
 RUN chown -R cross:root . && chmod -R 775 .
 USER cross
@@ -40,17 +50,18 @@ RUN ./ct-ng ${cross_triple} && \
 USER root
 WORKDIR /
 ARG cross_root="/home/cross/x-tools/${cross_triple}"
-ENV PATH="${cross_root}/bin:${PATH}"
+ENV TOOLCHAIN_PATH $cross_root
+ENV PATH="${TOOLCHAIN_PATH}/bin:${PATH}"
 ARG cc="${cross_triple}-gcc"
 ARG cxx="${cross_triple}-g++"
 
 # set default compiler
-ENV CC "gcc"
-ENV CXX "g++"
-
-# cross compiler settings
 ENV CC $cc
 ENV CXX $cxx
+ENV CMAKE $cmake
+ENV MAKE $make
+
+# cross compiler settings
 ENV PROCESSOR $processor
 ENV CROSS_TRIPLET $cross_triple
 ENV TARGET_TRIPLET $vcpkg_target_triplet
@@ -67,13 +78,12 @@ RUN git clone --depth 1 -b $raspberrypi_firmware_branch $raspberrypi_firmware_re
 RUN mkdir -p /opt/vc && cp -rf ${raspberrypi_firmware_source_dir}/opt/vc/* /opt/vc
 ENV RASPBERRYPI_FIRMWARE_DIR $raspberrypi_firmware_source_dir
 
-## @TODO: really needed ?
-# get raspberrypi pi tools
-ARG raspberrypi_tools_repo="https://github.com/raspberrypi/tools.git"
-ARG raspberrypi_tools_branch="master"
-ARG raspberrypi_tools_source_dir="/home/raspberrypi-tools"
-RUN git clone --depth 1 -b $raspberrypi_tools_branch $raspberrypi_tools_repo $raspberrypi_tools_source_dir
-ENV RASPBERRYPI_TOOLS_DIR $raspberrypi_tools_source_dir
+# get raspberrypi pi tools (deprecated)
+#ARG raspberrypi_tools_repo="https://github.com/raspberrypi/tools.git"
+#ARG raspberrypi_tools_branch="master"
+#ARG raspberrypi_tools_source_dir="/home/raspberrypi-tools"
+#RUN git clone --depth 1 -b $raspberrypi_tools_branch $raspberrypi_tools_repo $raspberrypi_tools_source_dir
+#ENV RASPBERRYPI_TOOLS_DIR $raspberrypi_tools_source_dir
 
 # compiler env settings
 #RUN cp ${crosstool_dir}/bash-completion/ct-ng /etc/bash_completion.d/ct-ng
