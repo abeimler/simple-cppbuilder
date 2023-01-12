@@ -1,10 +1,9 @@
-name: ci (experimental)
+name: ci-experimental
 run-name: Experimental Builds
 
 on:
   push:
     branches:
-      #- "main"
       - "feature/ci"
 
 jobs:

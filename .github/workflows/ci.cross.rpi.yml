@@ -1,4 +1,5 @@
-name: ci
+name: ci-cross-rpi
+run-name: crosstool-ng Builds (RaspberryPi ARM Compilers)
 
 on:
   push:
@@ -18,37 +19,15 @@ jobs:
         include:
           - build_task: build:base
             test_task: test:base
-          - build_task: build:clang
-            test_task: test:clang
-            push_tags: ["abeimler/simple-cppbuilder:clang"]
-          - build_task: build:base:libs
-            test_task: test:base:libs:clang
+          - build_task: build:arm:cross:rpi
+            test_task: test:arm:cross:rpi
             push_tags: 
-              - "abeimler/simple-cppbuilder:clang"
-              - "abeimler/simple-cppbuilder:opengl-libs"
-              - "abeimler/simple-cppbuilder:boost"
-              - "abeimler/simple-cppbuilder:abseil-cpp"
-              - "abeimler/simple-cppbuilder:libcpp"
-          - build_task: build:ci
-            test_task: test:ci
-            push_tags: 
-              - "abeimler/simple-cppbuilder:ci"
-              - "abeimler/simple-cppbuilder:ci-setup-cpp"
-              - "abeimler/simple-cppbuilder:ci-x64-mingw-w64"
-          - build_task: build:emscripten
-            test_task: test:emscripten
-            push_tags: 
-              - "abeimler/simple-cppbuilder:emscripten"
-          - build_task: build:mingw
-            test_task: test:mingw
-            push_tags: 
-              - "abeimler/simple-cppbuilder:x64-mingw-w64"
-              - "abeimler/simple-cppbuilder:x86-mingw-w64"
-          - build_task: build:arm
-            test_task: test:arm
-            push_tags: 
-              - "abeimler/simple-cppbuilder:aarch64-linux-gcc"
-              - "abeimler/simple-cppbuilder:arm-none-eabi-gcc"
+              - "abeimler/simple-cppbuilder:rpi4"
+              - "abeimler/simple-cppbuilder:rpi3"
+              - "abeimler/simple-cppbuilder:rpi2"
+              - "abeimler/simple-cppbuilder:rpi1"
+              - "abeimler/simple-cppbuilder:rpi4-aarch64"
+              - "abeimler/simple-cppbuilder:rpi3-aarch64"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
