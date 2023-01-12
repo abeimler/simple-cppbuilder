@@ -12,11 +12,6 @@ jobs:
     strategy:
       matrix:
         build_task:
-          #- build:arm:cross
-          #- build:arm:rpi
-          #- build:android:21
-          #- build:android:24
-          #- build:android:25
           - build:mingw:mxe
           - build:gcc
     runs-on: ubuntu-latest

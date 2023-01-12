@@ -1,4 +1,5 @@
-name: ci
+name: ci (cross)
+run-name: crosstool-ng Builds
 
 on:
   push:
