@@ -1,15 +1,18 @@
 # Simple C++ Docker Builder
 
 <a href="https://hub.docker.com/r/abeimler/simple-cppbuilder">![logo](https://raw.githubusercontent.com/abeimler/simple-cppbuilder/main/img/logo.png)</a>  
+![ci](https://github.com/abeimler/simple-cppbuilder/actions/workflows/ci.yml/badge.svg)
+![license](https://img.shields.io/github/license/abeimler/simple-cppbuilder) ![stars](https://img.shields.io/docker/stars/abeimler/simple-cppbuilder)
+![docker-image-size](https://img.shields.io/docker/image-size/abeimler/simple-cppbuilder) 
+![automated](https://img.shields.io/docker/automated/abeimler/simple-cppbuilder) ![pulls](https://img.shields.io/docker/pulls/abeimler/simple-cppbuilder) 
 
-![docker-image-size](https://img.shields.io/docker/image-size/abeimler/simple-cppbuilder) ![automated](https://img.shields.io/docker/automated/abeimler/simple-cppbuilder) ![pulls](https://img.shields.io/docker/pulls/abeimler/simple-cppbuilder) ![license](https://img.shields.io/github/license/abeimler/simple-cppbuilder) ![stars](https://img.shields.io/docker/stars/abeimler/simple-cppbuilder)
 
 Simple C++ Builder with compilers, buildtools and dependency manager.
 
 ## Features
 
 - Pre-installed Compilers and Tools
-- Ready to use ~~build scripts ([docker-build.sh](https://github.com/abeimler/simple-cppbuilder/blob/main/scripts/docker-build.sh) and [docker-test.sh](https://github.com/abeimler/simple-cppbuilder/blob/main/scripts/docker-test.sh))~~ [Taskfiles](https://github.com/abeimler/simple-cppbuilder/blob/main/taskfiles/TaskfileDefault.sh)
+- Ready to use ~~build scripts ([docker-build.sh](https://github.com/abeimler/simple-cppbuilder/blob/main/scripts/docker-build.sh) and [docker-test.sh](https://github.com/abeimler/simple-cppbuilder/blob/main/scripts/docker-test.sh))~~ [Taskfiles](https://github.com/abeimler/simple-cppbuilder/blob/main/taskfiles/TaskfileDefault.yml)
 
 ## What's included
 
