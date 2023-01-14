@@ -30,11 +30,10 @@ tasks:
     dir: '{{.PROJECT_DIR}}'
     cmds:
       - task: configure
-      - cd build || exit
-      - {{.CROSS_MAKE}} "{{.TARGET}}"
+      - '{{.CROSS_CMAKE}} --build build --config {{.BUILD_TYPE}} --target "{{.TARGET}}"'
 
   test:
     dir: '{{.PROJECT_DIR}}'
     cmds:
       - task: build
-      - ctest --build-test
+      - ctest --build-test --test-dir build -C {{.BUILD_TYPE}}

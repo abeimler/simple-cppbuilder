@@ -14,7 +14,7 @@ ARG cross_make="emmake make"
 ARG cmake="cmake"
 ARG make="make"
 ARG cmake_toolchain_file="/usr/lib/emscripten/cmake/Modules/Platform/Emscripten.cmake"
-ARG cmake_generator="Unix Makefiles"
+ARG cmake_generator="Ninja Multi-Config"
 
 
 # Install packages available from standard repos

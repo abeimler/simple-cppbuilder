@@ -37,7 +37,7 @@ tasks:
     - container-structure-test test --image abeimler/simple-cppbuilder:gcc-10 --config tests/gcc10-test.yaml
     - container-structure-test test --image abeimler/simple-cppbuilder:gcc-9 --config tests/gcc9-test.yaml
 
-  base:run:
+  base:example:
     - docker-compose -f examples/example/docker-compose.yml up --build example-gcc-debug-build
     - docker-compose -f examples/example/docker-compose.yml up --build example-gcc-debug-build-make
     - docker-compose -f examples/example/docker-compose.yml up --build example-gcc-debug-test
@@ -47,14 +47,14 @@ tasks:
     - docker-compose -f examples/example/docker-compose.yml up --build example-gcc-debug-test-lcov
     - docker-compose -f examples/example/docker-compose.yml down --volumes --rmi local
 
-  clang:run:
+  clang:example:
     - docker-compose -f examples/example/docker-compose.yml up --build example-clang-debug-build
     - docker-compose -f examples/example/docker-compose.yml up --build example-clang-debug-test
     - docker-compose -f examples/example/docker-compose.yml up --build example-clang-release-build
     - docker-compose -f examples/example/docker-compose.yml up --build example-clang-release-test
     - docker-compose -f examples/example/docker-compose.yml down --volumes --rmi local
 
-  cpp_starter_project:run:
+  cpp_starter_project:example:
     - docker-compose -f examples/cpp_starter_project/docker-compose.yml up --build cpp_starter_project-gcc-debug-build cpp_starter_project-gcc-debug-test
     - docker-compose -f examples/cpp_starter_project/docker-compose.yml up --build cpp_starter_project-clang-debug-build cpp_starter_project-clang-release-build
     - docker-compose -f examples/cpp_starter_project/docker-compose.yml up --build cpp_starter_project-gcc-debug-test-cov
@@ -62,7 +62,7 @@ tasks:
     - docker-compose -f examples/cpp_starter_project/docker-compose.yml up --build cpp_starter_project-gtkmm-clang-release-build
     - docker-compose -f examples/cpp_starter_project/docker-compose.yml down --volumes --rmi local
 
-  ci:run:
+  ci:example:
     - docker-compose -f examples/example-ci/docker-compose.yml up --build example-gcc-build
     - docker-compose -f examples/example-ci/docker-compose.yml up --build example-gcc-test
     - docker-compose -f examples/example-ci/docker-compose.yml up --build example-gcc-test-cov
@@ -75,23 +75,23 @@ tasks:
   single:old-build-script:
     - docker run -it --rm --name my-cpp-project -v "$PWD/examples/single":/home/project -w /home/project abeimler/simple-cppbuilder ./docker-build.sh
     
-  emscripten:run-example:
+  emscripten:example:
     - docker-compose -f examples/web-example/docker-compose.yml up --build
     - docker-compose -f examples/web-example/docker-compose.yml down --volumes --rmi local
 
-  mingw:run-example:
+  mingw:example:
     - docker-compose -f examples/example/docker-compose.cross.yml up --build example-mingw-release-build
     - docker-compose -f examples/example/docker-compose.cross.yml down --volumes --rmi local
 
-  android:run-example:
+  android:example:
     - docker-compose -f examples/android-example/docker-compose.yml up --build
     - docker-compose -f examples/android-example/docker-compose.yml down --volumes --rmi local
 
-  arm:rpi:run-example:
+  arm:rpi:example:
     - docker-compose -f examples/example/docker-compose.cross.yml up --build example-arm64-release-build
     - docker-compose -f examples/example/docker-compose.cross.yml down --volumes --rmi local
 
-  rpi:run-example:
+  rpi:example:
     - docker-compose -f examples/example/docker-compose.cross.yml up --build example-rpi4-release-build
     - docker-compose -f examples/example/docker-compose.cross.yml down --volumes --rmi local
 

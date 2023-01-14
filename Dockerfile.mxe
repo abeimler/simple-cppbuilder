@@ -13,7 +13,7 @@ ARG cc="${cross_triplet}-gcc"
 ARG cxx="${cross_triplet}-g++"
 ARG cmake="${cross_triplet}-cmake"
 ARG make="make"
-ARG cmake_generator="Unix Makefiles"
+ARG cmake_generator="Ninja Multi-Config"
 
 # Install packages available from standard repos
 RUN pacman-db-upgrade && \

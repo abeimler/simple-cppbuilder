@@ -11,7 +11,7 @@ ARG android_target="30"
 ARG android_ndk_version=""
 
 ARG cmake="android-${android_abi}-cmake"
-ARG cmake_generator="Ninja"
+ARG cmake_generator="Ninja Multi-Config"
 ARG make="ninja"
 ARG cc="clang"
 ARG cxx="clang++"

@@ -24,7 +24,7 @@ ENV MAKE "make"
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
-ENV CMAKE_GENERATOR "Ninja"
+ENV CMAKE_GENERATOR "Ninja Multi-Config"
 ENV CMAKE_ARGS ""
 
 # setup project env

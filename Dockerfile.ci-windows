@@ -99,7 +99,7 @@ ARG cc="x86_64-w64-mingw32-gcc"
 ARG cxx="x86_64-w64-mingw32-g++"
 ARG cmake="cmake"
 ARG make="ninja"
-ARG cmake_generator="Ninja"
+ARG cmake_generator="Ninja Multi-Config"
 ARG cmake_toolchain_file="/home/cmake/x86_64-w64-mingw32.toolchain.cmake"
 ARG cross_root "/usr/x86_64-w64-mingw32"
 
