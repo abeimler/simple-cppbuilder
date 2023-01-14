@@ -19,7 +19,7 @@ ARG cross_cmake="${cross_triple}-cmake"
 ARG cross_make="${cross_triple}-make"
 ARG cross_root="/usr/$cross_triple"
 ARG cmake_toolchain_file
-ARG cmake_generator="Unix Makefiles"
+ARG cmake_generator="Ninja Multi-Config"
 
 # e.g. mingw-w64-toolchain
 ARG install_toolchain="${cross_triple}-gcc" 

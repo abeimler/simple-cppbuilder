@@ -2,18 +2,18 @@ schemaVersion: 2.0.0
 
 commandTests:
 - name: gcc compiler
-  command: $CC
+  command: gcc
   args: ["--version"]
   expectedOutput: [".*gcc.*GCC.*"]
 - name: g++ compiler
-  command: $CXX
+  command: g++
   args: ["--version"]
   expectedOutput: [".*g\\+\\+.*GCC.*"]
 - name: cmake
-  command: $CMAKE
+  command: cmake
   args: ["--version"]
   expectedOutput: [".*cmake version.*"]
 - name: make
-  command: $MAKE
+  command: make
   args: ["--version"]
   expectedOutput: [".*GNU Make.*"]

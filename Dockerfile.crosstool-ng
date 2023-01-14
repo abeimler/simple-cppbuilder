@@ -10,7 +10,7 @@ ARG vcpkg_target_triplet
 ARG cross_triple
 ARG cmake="cmake"
 ARG make="ninja"
-ARG cmake_generator="Ninja"
+ARG cmake_generator="Ninja Multi-Config"
 ARG cmake_toolchain_file
 
 # Install packages available from standard repos

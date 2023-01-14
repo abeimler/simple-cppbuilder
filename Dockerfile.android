@@ -9,7 +9,7 @@ ARG vcpkg_target_triplet="arm-android"
 ARG android_abi="armeabi-v7a"
 
 ARG cmake="android-${android_abi}-cmake"
-ARG cmake_generator="Ninja"
+ARG cmake_generator="Ninja Multi-Config"
 ARG make="ninja"
 ARG cc="clang"
 ARG cxx="clang++"

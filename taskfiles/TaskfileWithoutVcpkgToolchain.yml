@@ -21,10 +21,10 @@ tasks:
     dir: '{{.PROJECT_DIR}}'
     cmds:
       - task: configure
-      - '{{.CMAKE}} --build build --target "{{.TARGET}}"'
+      - '{{.CMAKE}} --build build --config {{.BUILD_TYPE}} --target "{{.TARGET}}"'
 
   test:
     dir: '{{.PROJECT_DIR}}'
     cmds:
       - task: build
-      - ctest --build-test --test-dir build
+      - ctest --build-test --test-dir build -C {{.BUILD_TYPE}}

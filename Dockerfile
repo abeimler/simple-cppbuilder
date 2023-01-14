@@ -110,7 +110,7 @@ ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
-ENV CMAKE_GENERATOR "Ninja"
+ENV CMAKE_GENERATOR "Ninja Multi-Config"
 ENV CMAKE_ARGS ""
 
 # setup project env
