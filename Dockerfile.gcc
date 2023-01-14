@@ -17,11 +17,14 @@ RUN pacman-db-upgrade && \
         cmake make ninja && \
     pacman -Scc --noconfirm
 
-RUN runuser -l yay -c \
-    "yay -Syu --noconfirm && yay -S --noconfirm \
-        gcc${gcc_version}" && \
-    runuser -l yay -c "yay -Scc --noconfirm" && \
+# install extra packages from AUR (gcc)
+USER yay
+RUN yay -Syu --noconfirm && yay -S --noconfirm \
+        gcc${gcc_version} && \
+    yay -Scc --noconfirm && \
     rm -rf /home/yay/.cache/*
+USER root
+
 
 # set default compiler
 ENV CC $cc
@@ -32,8 +35,8 @@ ENV MAKE "make"
 
 # install vcpkg
 ENV VCPKG_DISABLE_METRICS 1
-RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/project/vcpkg
-RUN /home/project/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/project/vcpkg && \
+    /home/project/vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/project/vcpkg"
 
 ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
@@ -43,7 +46,7 @@ ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
-ENV CMAKE_GENERATOR "Unix Makefiles"
+ENV CMAKE_GENERATOR "Ninja Multi-Config"
 ENV CMAKE_ARGS ""
 
 # setup project env

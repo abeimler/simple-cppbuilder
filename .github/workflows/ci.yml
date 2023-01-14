@@ -1,0 +1,78 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - "main"
+      - "feature/ci"
+    tags:
+      - "v*.*.*"
+  pull_request:
+    branches:
+      - "main"
+
+jobs:
+  docker:
+    strategy:
+      matrix:
+        include:
+          - build_task: build:base
+            test_task: test:base
+          - build_task: build:clang
+            test_task: test:clang
+            push_tags: ["abeimler/simple-cppbuilder:clang"]
+          - build_task: build:base:libs
+            test_task: test:base:libs:clang
+            push_tags: 
+              - "abeimler/simple-cppbuilder:clang"
+              - "abeimler/simple-cppbuilder:opengl-libs"
+              - "abeimler/simple-cppbuilder:boost"
+              - "abeimler/simple-cppbuilder:abseil-cpp"
+              - "abeimler/simple-cppbuilder:libcpp"
+          - build_task: build:ci
+            test_task: test:ci
+            push_tags: 
+              - "abeimler/simple-cppbuilder:ci"
+              - "abeimler/simple-cppbuilder:ci-setup-cpp"
+              - "abeimler/simple-cppbuilder:ci-x64-mingw-w64"
+          - build_task: build:emscripten
+            test_task: test:emscripten
+            push_tags: 
+              - "abeimler/simple-cppbuilder:emscripten"
+          - build_task: build:mingw
+            test_task: test:mingw
+            push_tags: 
+              - "abeimler/simple-cppbuilder:x64-mingw-w64"
+              - "abeimler/simple-cppbuilder:x86-mingw-w64"
+          - build_task: build:arm
+            test_task: test:arm
+            push_tags: 
+              - "abeimler/simple-cppbuilder:aarch64-linux-gcc"
+              - "abeimler/simple-cppbuilder:arm-none-eabi-gcc"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup go-task/task
+        run: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+      - name: Setup Container Structure Tests
+        run: curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64 && chmod +x container-structure-test-linux-amd64 && mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build Docker Image  
+        run: task ${{ matrix.build_task }}
+      #- name: Test
+      #  if: ${{ matrix.test_task != '[]' && matrix.test_task != '' }}
+      # FIXME: Error: error parsing config file: error unmarshalling config: yaml: unmarshal errors: field unboundEnv not found in type v2.MetadataTest
+      #  run: task ${{ matrix.test_task }}
+      - name: Login to Docker Hub
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Publish Docker Images
+        if: ${{ matrix.test_task != '[]' && matrix.test_task != '' && startsWith(github.ref, 'refs/tags/v') }}
+        run: for tag in "${{ join(matrix.push_tags, ' ') }}"; do docker push $tag; done

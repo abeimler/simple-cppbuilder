@@ -9,7 +9,7 @@ ARG vcpkg_target_triplet="arm-android"
 ARG android_abi="armeabi-v7a"
 
 ARG cmake="android-${android_abi}-cmake"
-ARG cmake_generator="Ninja"
+ARG cmake_generator="Ninja Multi-Config"
 ARG make="ninja"
 ARG cc="clang"
 ARG cxx="clang++"
@@ -24,14 +24,15 @@ RUN pacman-db-upgrade && \
     pacman -Scc --noconfirm
 
 
-# install android stuff
-RUN runuser -l yay -c \
-    "yay -Syu --noconfirm && yay -S --noconfirm \
+# install extra packages from AUR (android)
+USER yay
+RUN yay -Syu --noconfirm && yay -S --noconfirm \
         jdk-openjdk android-platform android-sdk-build-tools android-sdk-cmdline-tools-latest \
-        android-pkg-config android-cmake android-environment android-ndk" && \
-    runuser -l yay -c "yay -Scc --noconfirm" && \
-    rm -rf /home/yay/.cache/* && \
-    ln -s /opt/android-ndk /opt/android-sdk/ndk-bundle
+        android-pkg-config android-cmake android-environment android-ndk && \
+    yay -Scc --noconfirm && \
+    rm -rf /home/yay/.cache/*
+USER root
+RUN ln -s /opt/android-ndk /opt/android-sdk/ndk-bundle
 
 
 ENV ANDROID_HOME "/opt/android-sdk"
@@ -47,8 +48,8 @@ ARG setup_env_script="android-env"
 ARG setup_env_script_args="$android_abi"
 ENV SETUP_ENV_SCRIPT $setup_env_script
 ENV SETUP_ENV_SCRIPT_ARGS $setup_env_script_args
-RUN echo 'source "$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS"' >> /root/.bash_profile
-RUN . $setup_env_script $setup_env_script_args
+RUN echo 'source "$SETUP_ENV_SCRIPT $SETUP_ENV_SCRIPT_ARGS"' >> /root/.bash_profile && \
+    . $setup_env_script $setup_env_script_args
 RUN . /etc/profile.d/android-ndk.sh
 
 
@@ -69,8 +70,8 @@ ENV MAKE $CROSS_MAKE
 ENV VCPKG_DEFAULT_HOST_TRIPLET $vcpkg_host_triplet
 ENV VCPKG_DEFAULT_TRIPLET $vcpkg_target_triplet
 ENV VCPKG_DISABLE_METRICS 1
-RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git
-RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git && \
+    ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/project/vcpkg"
 
 ENV ANDROID_TOOLCHAIN_FILE "${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake"

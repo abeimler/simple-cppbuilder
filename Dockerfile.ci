@@ -25,12 +25,14 @@ RUN apt-get update -yqq && \
 #ADD https://apt.llvm.org/llvm.sh /tmp/llvm.sh
 
 # Install conan
-RUN python3 -m pip install --upgrade pip setuptools && \
-    python3 -m pip install conan && \
+RUN python3 -m pip install --no-cache-dir conan==1.56.0 && \
     conan --version
 # Install more pip tools
-RUN python3 -m pip install --upgrade pip setuptools && \
-    python3 -m pip install cogapp coverage cmake-format cmakelint
+RUN python3 -m pip install --no-cache-dir \
+        cogapp==3.3.0 \
+        coverage==7.0.3 \
+        cmake-format==0.6.13 \
+        cmakelint==1.4.2
 
 # install task
 ADD https://taskfile.dev/install.sh /tmp/taskfile_install.sh
@@ -80,13 +82,14 @@ RUN /tmp/taskfile_install.sh -d -b /usr/local/bin && rm /tmp/taskfile_install.sh
 
 # install CodeCov
 WORKDIR /home/codecov
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN curl https://keybase.io/codecovsecurity/pgp_keys.asc | gpg --no-default-keyring --keyring trustedkeys.gpg --import
 ADD https://uploader.codecov.io/latest/alpine/codecov codecov
 ADD https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM codecov.SHA256SUM
 ADD https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM.sig codecov.SHA256SUM.sig
-RUN gpgv codecov.SHA256SUM.sig codecov.SHA256SUM
-RUN shasum -a 256 -c codecov.SHA256SUM
-RUN chmod +x codecov
+RUN gpgv codecov.SHA256SUM.sig codecov.SHA256SUM && \
+    shasum -a 256 -c codecov.SHA256SUM && \
+    chmod +x codecov
 ENV CODECOV "/home/codecov/codecov"
 
 
@@ -98,8 +101,8 @@ ENV MAKE "ninja"
 
 # install vcpkg
 ENV VCPKG_DISABLE_METRICS 1
-RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/project/vcpkg
-RUN /home/project/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+RUN git clone --depth 1 https://github.com/Microsoft/vcpkg.git /home/project/vcpkg && \
+    /home/project/vcpkg/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT "/home/project/vcpkg"
 
 ENV VCPKG_TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
@@ -109,7 +112,7 @@ ENV TOOLCHAIN_FILE "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 # build script settings
 ENV TARGET "all"
 ENV BUILD_TYPE "Release"
-ENV CMAKE_GENERATOR "Ninja"
+ENV CMAKE_GENERATOR "Ninja Multi-Config"
 ENV CMAKE_ARGS ""
 
 # setup project env

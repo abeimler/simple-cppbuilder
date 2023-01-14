@@ -2,14 +2,17 @@ version: '3'
 
 tasks:
   base:
-    - docker build --force-rm=true -f ./Dockerfile.base -t abeimler/simple-cppbuilder:base .
+    - docker build --force-rm=true -f ./Dockerfile --target base -t abeimler/simple-cppbuilder:base .
     - docker build --force-rm=true -t abeimler/simple-cppbuilder .
     #docker build --force-rm=true -t abeimler/simple-cppbuilder:1.7.0 .
+
+  clang:
+    - task: base
+    - docker build --force-rm=true -f ./Dockerfile.clang -t abeimler/simple-cppbuilder:clang .
 
   base:libs:
     - task: base
     - docker build --force-rm=true -f ./Dockerfile.without-vcpkg -t abeimler/simple-cppbuilder:without-vcpkg .
-    - docker build --force-rm=true -f ./Dockerfile.clang -t abeimler/simple-cppbuilder:clang .
     - docker build --force-rm=true --build-arg extra_libraries="mesa glu glfw-x11 libx11 libxrender libxext libxcursor libxrandr libxinerama xorg-server-devel" -t abeimler/simple-cppbuilder:opengl-libs .
     - docker build --force-rm=true --build-arg extra_libraries="boost" -t abeimler/simple-cppbuilder:boost .
     - docker build --force-rm=true --build-arg extra_libraries="abseil-cpp" -t abeimler/simple-cppbuilder:abseil-cpp .
@@ -32,7 +35,7 @@ tasks:
         --build-arg cross_triple="x86_64-w64-mingw32" \
         --build-arg install_toolchain="mingw-w64-toolchain" \
         --build-arg install_extras_toolchain="mingw-w64-pkg-config mingw-w64-cmake mingw-w64-configure mingw-w64-make mingw-w64-environment powershell-bin" \
-        --build-arg cmake_generator="Ninja" \
+        --build-arg cmake_generator="Ninja Multi-Config" \
         --build-arg make="make" \
         --build-arg cmake="cmake" \
         --build-arg cross_make="x86_64-w64-mingw32-make" \
@@ -50,7 +53,7 @@ tasks:
         --build-arg cross_triple="i686-w64-mingw32" \
         --build-arg install_toolchain="mingw-w64-toolchain" \
         --build-arg install_extras_toolchain="mingw-w64-pkg-config mingw-w64-cmake mingw-w64-configure mingw-w64-make mingw-w64-environment powershell-bin" \
-        --build-arg cmake_generator="Ninja" \
+        --build-arg cmake_generator="Ninja Multi-Config" \
         --build-arg make="make" \
         --build-arg cmake="cmake" \
         --build-arg cross_make="i686-w64-mingw32-make" \
@@ -70,32 +73,32 @@ tasks:
         --build-arg vcpkg_target_triplet="arm64-linux" \
         --build-arg cross_triple="aarch64-linux-gnu" \
         --build-arg install_toolchain="aarch64-linux-gnu-gcc" \
-        --build-arg cmake_generator="Ninja" \
+        --build-arg cmake_generator="Ninja Multi-Config" \
         --build-arg make="ninja" \
         --build-arg cmake="cmake" \
         --build-arg cross_make="ninja" \
         --build-arg cross_cmake="cmake" \
         --build-arg cmake_toolchain_file="/home/cmake/aarch64.toolchain.cmake" \
-        -t abeimler/simple-cppbuilder:aarch64-linux .
+        -t abeimler/simple-cppbuilder:aarch64-linux-gcc .
     - |
       docker build --force-rm=true -f ./Dockerfile.cross \
         --build-arg vcpkg_target_triplet="arm-linux" \
         --build-arg cross_triple="arm-none-eabi" \
         --build-arg install_toolchain="arm-none-eabi-gcc" \
-        --build-arg cmake_generator="Ninja" \
+        --build-arg cmake_generator="Ninja Multi-Config" \
         --build-arg make="ninja" \
         --build-arg cmake="cmake" \
         --build-arg cross_make="ninja" \
         --build-arg cross_cmake="cmake" \
-        --build-arg cmake_toolchain_file="/home/cmake/gnueabihf.toolchain.cmake" \
-        -t abeimler/simple-cppbuilder:arm-eabi .
+        --build-arg cmake_toolchain_file="/home/cmake/arm.toolchain.cmake" \
+        -t abeimler/simple-cppbuilder:arm-none-eabi-gcc .
     ## @FIXME: https://aur.archlinux.org/packages/arm-linux-gnueabihf-gcc-stage1/#pinned-806072
     #- |
     #  docker build --force-rm=true -f ./Dockerfile.cross \
     #    --build-arg vcpkg_target_triplet="arm-linux" \
     #    --build-arg cross_triple="arm-linux-gnueabihf" \
     #    --build-arg install_toolchain="arm-linux-gnueabihf-gcc-stage1 arm-linux-gnueabihf-gcc-stage2 arm-linux-gnueabihf-gcc" \
-    #    --build-arg cmake_generator="Ninja" \
+    #    --build-arg cmake_generator="Ninja Multi-Config" \
     #    --build-arg make="ninja" \
     #    --build-arg cmake="cmake" \
     #    --build-arg cmake_toolchain_file="/home/cmake/arm.toolchain.cmake" \
@@ -106,59 +109,79 @@ tasks:
     - |
       docker build --force-rm=true -f ./Dockerfile.crosstool-ng \
         --build-arg vcpkg_target_triplet="arm-linux" \
-        --build-arg cross_triple="arm-unknown-linux-gnueabi" \
-        --build-arg cmake_toolchain_file="/home/cmake/arm-toolchain.cmake" \
-        -t abeimler/simple-cppbuilder:arm-unknown-linux-gnueabi .  
+        --build-arg cross_triple="arm-none-eabi" \
+        --build-arg cmake_toolchain_file="/home/cmake/arm.toolchain.cmake" \
+        -t abeimler/simple-cppbuilder:arm-none-eabi .  
+    #- |
+    #  docker build --force-rm=true -f ./Dockerfile.crosstool-ng \
+    #    --build-arg vcpkg_target_triplet="arm-linux" \
+    #    --build-arg cross_triple="arm-unknown-linux-gnueabi" \
+    #    --build-arg cmake_toolchain_file="/home/cmake/arm.toolchain.cmake" \
+    #    -t abeimler/simple-cppbuilder:arm-unknown-linux-gnueabi .  
     #- |
     #  docker build --force-rm=true -f ./Dockerfile.crosstool-ng \
     #    --build-arg vcpkg_target_triplet="avr" \
     #    --build-arg cross_triple="avr" \
-    #    --build-arg cmake_toolchain_file="/home/cmake/avr-toolchain.cmake" \
+    #    --build-arg cmake_toolchain_file="/home/cmake/avr.toolchain.cmake" \
     #    -t abeimler/simple-cppbuilder:avr .
     #- |
     #  docker build --force-rm=true -f ./Dockerfile.crosstool-ng \
     #    --build-arg vcpkg_target_triplet="ppc64le-linux" \
     #    --build-arg cross_triple="powerpc64le-unknown-linux-gnu" \
-    #    --build-arg cmake_toolchain_file="/home/cmake/ppc64le-toolchain.cmake" \
+    #    --build-arg cmake_toolchain_file="/home/cmake/ppc64le.toolchain.cmake" \
     #    -t abeimler/simple-cppbuilder:powerpc64le-unknown-linux-gnu .
 
   arm:rpi:
+    - |
+      docker build --force-rm=true -f ./Dockerfile.cross-rpi \
+        --build-arg vcpkg_target_triplet="arm64-linux" \
+        --build-arg cross_triple="aarch64-linux-gnu" \
+        --build-arg install_toolchain="aarch64-linux-gnu-gcc" \
+        --build-arg cmake_generator="Ninja Multi-Config" \
+        --build-arg make="ninja" \
+        --build-arg cmake="cmake" \
+        --build-arg cross_make="ninja" \
+        --build-arg cross_cmake="cmake" \
+        --build-arg cmake_toolchain_file="/home/cmake/aarch64-rpi.toolchain.cmake" \
+        -t abeimler/simple-cppbuilder:aarch64-linux-gcc-rpi4 .
+
+  arm:cross:rpi:
     - task: base
     - | 
       docker build --force-rm=true -f ./Dockerfile.crosstool-ng-rpi \
         --build-arg vcpkg_target_triplet="arm-linux" \
         --build-arg cross_triple="armv8-rpi4-linux-gnueabihf" \
-        --build-arg cmake_toolchain_file="/home/cmake/arm-rpi-toolchain.cmake" \
+        --build-arg cmake_toolchain_file="/home/cmake/arm-rpi.toolchain.cmake" \
         -t abeimler/simple-cppbuilder:rpi4 .
     - |
       docker build --force-rm=true -f ./Dockerfile.crosstool-ng-rpi \
         --build-arg vcpkg_target_triplet="arm-linux" \
         --build-arg cross_triple="armv8-rpi3-linux-gnueabihf" \
-        --build-arg cmake_toolchain_file="/home/cmake/arm-rpi-toolchain.cmake" \
+        --build-arg cmake_toolchain_file="/home/cmake/arm-rpi.toolchain.cmake" \
         -t abeimler/simple-cppbuilder:rpi3 .
     - |
       docker build --force-rm=true -f ./Dockerfile.crosstool-ng-rpi \
         --build-arg vcpkg_target_triplet="arm-linux" \
         --build-arg cross_triple="armv7-rpi2-linux-gnueabihf" \
-        --build-arg cmake_toolchain_file="/home/cmake/arm-rpi-toolchain.cmake" \
+        --build-arg cmake_toolchain_file="/home/cmake/arm-rpi.toolchain.cmake" \
         -t abeimler/simple-cppbuilder:rpi2 .
     - |
       docker build --force-rm=true -f ./Dockerfile.crosstool-ng-rpi \
         --build-arg vcpkg_target_triplet="arm-linux" \
         --build-arg cross_triple="armv6-unknown-linux-gnueabihf" \
-        --build-arg cmake_toolchain_file="/home/cmake/arm-rpi-toolchain.cmake" \
+        --build-arg cmake_toolchain_file="/home/cmake/arm-rpi.toolchain.cmake" \
         -t abeimler/simple-cppbuilder:rpi1 .
     - |
       docker build --force-rm=true -f ./Dockerfile.crosstool-ng-rpi \
         --build-arg vcpkg_target_triplet="arm64-linux" \
         --build-arg cross_triple="aarch64-rpi4-linux-gnu" \
-        --build-arg cmake_toolchain_file="/home/cmake/aarch64-rpi-toolchain.cmake" \
+        --build-arg cmake_toolchain_file="/home/cmake/aarch64-rpi.toolchain.cmake" \
         -t abeimler/simple-cppbuilder:rpi4-aarch64 .
     - |
       docker build --force-rm=true -f ./Dockerfile.crosstool-ng-rpi \
         --build-arg vcpkg_target_triplet="arm64-linux" \
         --build-arg cross_triple="aarch64-rpi3-linux-gnu" \
-        --build-arg cmake_toolchain_file="/home/cmake/aarch64-rpi-toolchain.cmake" \
+        --build-arg cmake_toolchain_file="/home/cmake/aarch64-rpi.toolchain.cmake" \
         -t abeimler/simple-cppbuilder:rpi3-aarch64 .
 
   android-template:
@@ -172,6 +195,7 @@ tasks:
           --build-arg android_abi="armeabi-v7a" \
           --build-arg android_target="{{.ANDROID_TARGET}}" \
           --build-arg android_ndk_version="{{.ANDROID_NDK_VERSION}}" \
+          --build-arg android_extra_libraries="{{.ANDROID_EXTRA_LIBRARIES | default ""}}" \
           -t abeimler/simple-cppbuilder:arm-android-{{.ANDROID_TARGET}} .
       - |
         docker build --force-rm=true -f ./Dockerfile.android-v \
@@ -180,6 +204,7 @@ tasks:
           --build-arg android_abi="arm64-v8a" \
           --build-arg android_target="{{.ANDROID_TARGET}}" \
           --build-arg android_ndk_version="{{.ANDROID_NDK_VERSION}}" \
+          --build-arg android_extra_libraries="{{.ANDROID_EXTRA_LIBRARIES | default ""}}" \
           -t abeimler/simple-cppbuilder:arm64-android{{.ANDROID_TARGET}} .
       - |
         docker build --force-rm=true -f ./Dockerfile.android-v \
@@ -188,6 +213,7 @@ tasks:
           --build-arg android_abi="x86" \
           --build-arg android_target="{{.ANDROID_TARGET}}" \
           --build-arg android_ndk_version="{{.ANDROID_NDK_VERSION}}" \
+          --build-arg android_extra_libraries="{{.ANDROID_EXTRA_LIBRARIES | default ""}}" \
           -t abeimler/simple-cppbuilder:x86-android-{{.ANDROID_TARGET}} .
       - |
         docker build --force-rm=true -f ./Dockerfile.android-v \
@@ -196,6 +222,7 @@ tasks:
           --build-arg android_abi="x86_64" \
           --build-arg android_target="{{.ANDROID_TARGET}}" \
           --build-arg android_ndk_version="{{.ANDROID_NDK_VERSION}}" \
+          --build-arg android_extra_libraries="{{.ANDROID_EXTRA_LIBRARIES | default ""}}" \
           -t abeimler/simple-cppbuilder:x64-android-{{.ANDROID_TARGET}} .
 
   android:21:
@@ -204,6 +231,7 @@ tasks:
         vars:
           ANDROID_TARGET: 21
           ANDROID_NDK_VERSION: "-21"
+          ANDROID_EXTRA_LIBRARIES: "lib32-zlib"
 
   android:24:
     cmds:
@@ -291,10 +319,12 @@ tasks:
   - task: emscripten
   - task: mingw
   - task: arm
+  - task: arm:rpi
   - task: android
-  #- task: android:21
-  #- task: android:24
-  #- task: arm:cross
-  #- task: arm:rpi
+  - task: android:21
+  - task: android:24
+  - task: android:25
+  - task: arm:cross
+  - task: arm:cross:rpi
   #- task: gcc
   #- task: mingw:mxe

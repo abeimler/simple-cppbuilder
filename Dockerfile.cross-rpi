@@ -19,7 +19,7 @@ ARG cross_cmake="${cross_triple}-cmake"
 ARG cross_make="${cross_triple}-make"
 ARG cross_root="/usr/$cross_triple"
 ARG cmake_toolchain_file
-ARG cmake_generator="Unix Makefiles"
+ARG cmake_generator="Ninja Multi-Config"
 
 # e.g. mingw-w64-toolchain
 ARG install_toolchain="${cross_triple}-gcc" 
@@ -41,6 +41,14 @@ RUN yay -Syu --noconfirm && yay -S --noconfirm \
     yay -Scc --noconfirm && \
     rm -rf /home/yay/.cache/*
 USER root
+
+# get raspberrypi pi firmware
+ARG raspberrypi_firmware_repo="https://github.com/raspberrypi/firmware.git"
+ARG raspberrypi_firmware_branch="master"
+ARG raspberrypi_firmware_source_dir="/home/raspberrypi"
+RUN git clone --depth 1 -b $raspberrypi_firmware_branch $raspberrypi_firmware_repo $raspberrypi_firmware_source_dir
+RUN mkdir -p /opt/vc && cp -rf ${raspberrypi_firmware_source_dir}/opt/vc/* /opt/vc
+ENV RASPBERRYPI_FIRMWARE_DIR $raspberrypi_firmware_source_dir
 
 # compiler env settings
 # e.g. mingw-env, emsdk_env.sh
